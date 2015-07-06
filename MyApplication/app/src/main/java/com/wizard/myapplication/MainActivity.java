@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
         //普通地图
         baiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
 
-        //设置中心点
+        /*//设置中心点
         LatLng center = new LatLng(121.442522, 31.031231);
         //定义地图状态
         MapStatus mMapStatus = new MapStatus.Builder()
@@ -39,7 +39,7 @@ public class MainActivity extends Activity {
         //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
         MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
         //改变地图状态
-        baiduMap.setMapStatus(mMapStatusUpdate);
+        baiduMap.setMapStatus(mMapStatusUpdate);*/
 
     }
 
