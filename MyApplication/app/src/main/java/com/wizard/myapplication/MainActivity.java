@@ -4,18 +4,18 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.*;
-
-import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.*;
 import com.baidu.mapapi.model.LatLng;
+import com.wizard.myapplication.entity.College;
+import com.wizard.myapplication.entity.DataManager;
 
 
 public class MainActivity extends Activity {
 
-    MapView mapView;
-    BaiduMap baiduMap;
+    private MapView mapView;
+    private BaiduMap baiduMap;
+
+    private College college = DataManager.getCollege("sjtu-mh");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,16 +30,8 @@ public class MainActivity extends Activity {
         //普通地图
         baiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
 
-        /*//设置中心点
-        LatLng center = new LatLng(121.442522, 31.031231);
-        //定义地图状态
-        MapStatus mMapStatus = new MapStatus.Builder()
-                .target(center)
-                .build();
-        //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
-        MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
-        //改变地图状态
-        baiduMap.setMapStatus(mMapStatusUpdate);*/
+        //设置中心点
+        baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLngZoom(college.getCenter(), 17));
 
     }
 
