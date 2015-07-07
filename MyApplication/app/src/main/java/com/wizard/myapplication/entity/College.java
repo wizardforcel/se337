@@ -2,6 +2,7 @@ package com.wizard.myapplication.entity;
 
 import com.baidu.mapapi.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,6 +62,8 @@ public class College
     private String name;
     private String content;
     private LatLng center;
-    private List<Building> buildings;
-    private List<LatLng> covered;
+    private List<Building> buildings
+            = new ArrayList<Building>();
+    private List<LatLng> covered
+            = new ArrayList<LatLng>();
 }

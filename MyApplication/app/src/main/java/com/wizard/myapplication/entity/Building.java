@@ -2,6 +2,7 @@ package com.wizard.myapplication.entity;
 
 import com.baidu.mapapi.model.LatLng;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +45,16 @@ public class Building
 
     private String id;
     private String name;
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    private String content;
     private LatLng center;
     private List<Comment> comments
             = new ArrayList<Comment>();
