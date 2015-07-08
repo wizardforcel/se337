@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity" >
+    <item android:id="@+id/login_settings"
+        android:title="@string/login_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
+    <item android:id="@+id/reg_settings"
+        android:title="@string/reg_settings"
+        android:orderInCategory="101"
+        android:showAsAction="never" />
+    <item android:id="@+id/user_settings"
+        android:title="@string/user_settings"
+        android:orderInCategory="102"
+        android:showAsAction="never" />
+    <item android:id="@+id/select_settings"
+        android:title="@string/select_settings"
+        android:orderInCategory="103"
+        android:showAsAction="never" />
+    <item android:id="@+id/loc_settings"
+        android:title="@string/loc_settings"
+        android:orderInCategory="104"
+        android:showAsAction="never" />
+</menu>
