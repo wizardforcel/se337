@@ -6,7 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.baidu.location.*;
 import com.baidu.mapapi.map.*;
+import com.baidu.mapapi.model.LatLng;
 import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.College;
 import com.wizard.myapplication.entity.DataManager;
@@ -23,6 +26,7 @@ public class MainActivity extends Activity {
     private MapView mapView;
     private BaiduMap baiduMap;
     private List<Marker> markers = new ArrayList<Marker>();
+    private LocationClient mLocationClient;
 
     private MenuItem loginMenuItem;
     private MenuItem regMenuItem;
@@ -36,6 +40,7 @@ public class MainActivity extends Activity {
 
     private String un;
     private boolean onLocation = false;
+    private boolean isFirstLoc = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +76,44 @@ public class MainActivity extends Activity {
             //在地图上添加Marker，并显示
             Marker marker = (Marker) baiduMap.addOverlay(option);
             markers.add(marker);
+        }
+
+        //定位
+        // 开启定位图层
+        baiduMap.setMyLocationEnabled(true);
+        //声明LocationClient类
+        mLocationClient = new LocationClient(getApplicationContext());
+        mLocationClient.registerLocationListener(new BDLocationListener(){
+            @Override
+            public void onReceiveLocation(BDLocation bdLocation) {
+                baiduMapOnReceiveLocation(bdLocation);
+            }
+        });
+        LocationClientOption option = new LocationClientOption();
+        option.setOpenGps(true);// 打开gps
+        option.setCoorType("bd09ll"); // 设置坐标类型
+        option.setScanSpan(200);
+        mLocationClient.setLocOption(option);
+        mLocationClient.start();
+    }
+
+    private void baiduMapOnReceiveLocation(BDLocation location)
+    {
+        //Log.v("Location", "Location");
+        System.out.println("Location");
+
+        MyLocationData locData = new MyLocationData.Builder()
+                .accuracy(location.getRadius())
+                // 此处设置开发者获取到的方向信息，顺时针0-360
+                .direction(100).latitude(location.getLatitude())
+                .longitude(location.getLongitude()).build();
+        baiduMap.setMyLocationData(locData);
+
+        if(isFirstLoc) {
+            LatLng ll = new LatLng(location.getLatitude(),
+                    location.getLongitude());
+            baiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(ll));
+            isFirstLoc = false;
         }
     }
 

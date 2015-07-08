@@ -61,7 +61,9 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="baidumapapi_v3_5_0" level="project" />
+    <orderEntry type="library" exported="" name="android_api_1.1_forsdk" level="project" />
+    <orderEntry type="library" exported="" name="galaxy_mini" level="project" />
+    <orderEntry type="library" exported="" name="BaiduLBS_Android" level="project" />
   </component>
 </module>
 
