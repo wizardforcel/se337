@@ -1,0 +1,84 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context=".application"
+    android:background="#fffff59c">
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/userName"
+        android:layout_above="@+id/passWord"
+        android:layout_centerHorizontal="true"
+        android:background="#ffffffff"
+        android:minHeight="40dp"
+        android:layout_marginBottom="5dp"
+        android:hint="用户名:" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/passWord"
+        android:layout_above="@+id/login"
+        android:layout_alignLeft="@+id/userName"
+        android:layout_alignStart="@+id/userName"
+        android:background="#ffffffff"
+        android:minHeight="40dp"
+        android:layout_marginBottom="5dp"
+        android:hint="密码:" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="登录"
+        android:id="@+id/login"
+        android:layout_centerVertical="true"
+        android:layout_alignRight="@+id/passWord"
+        android:layout_alignEnd="@+id/passWord"
+        android:layout_alignLeft="@+id/passWord"
+        android:layout_alignStart="@+id/passWord"
+        android:background="#ff9bff8f"
+        android:layout_marginBottom="5dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="注册"
+        android:id="@+id/signup"
+        android:layout_below="@+id/login"
+        android:layout_alignLeft="@+id/login"
+        android:layout_alignStart="@+id/login"
+        android:layout_alignRight="@+id/login"
+        android:layout_alignEnd="@+id/login"
+        android:background="#ff60f1ff" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="校园导航系统"
+        android:id="@+id/title"
+        android:editable="false"
+        android:textColor="#ff000000"
+        android:singleLine="false"
+        android:gravity="center"
+        android:textSize="30dip"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="77dp"
+        android:typeface="serif"
+        android:autoText="false"
+        android:background="#fffff59c"
+        android:layout_above="@+id/userName"
+        android:layout_marginBottom="5dp" />
+
+</RelativeLayout>

@@ -11,14 +11,23 @@
         android:showAsAction="never" />
     <item android:id="@+id/user_settings"
         android:title="@string/user_settings"
-        android:orderInCategory="102"
+        android:orderInCategory="103"
         android:showAsAction="never" />
+
     <item android:id="@+id/select_settings"
         android:title="@string/select_settings"
-        android:orderInCategory="103"
+        android:orderInCategory="105"
         android:showAsAction="never" />
     <item android:id="@+id/loc_settings"
         android:title="@string/loc_settings"
+        android:orderInCategory="106"
+        android:showAsAction="never" />
+    <item android:id="@+id/navi_settings"
+        android:title="@string/navi_settings"
         android:orderInCategory="104"
+        android:showAsAction="never" />
+    <item android:id="@+id/logout_settings"
+        android:title="@string/logout_settings"
+        android:orderInCategory="200"
         android:showAsAction="never" />
 </menu>

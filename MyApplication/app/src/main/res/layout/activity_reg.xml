@@ -1,0 +1,60 @@
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#ffb8fff6"
+    android:longClickable="false"
+    android:weightSum="1">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="注册"
+        android:id="@+id/textView2"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.10"
+        android:gravity="center"
+        android:textSize="30dp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/userName"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.10"
+        android:hint="请输入用户名:" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/passWord"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.10"
+        android:hint="请输入密码:" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/passWord2"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.10"
+        android:hint="请再次输入密码:" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="提交"
+        android:id="@+id/signup"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.10"
+        android:textStyle="bold"
+        android:textSize="25dp" />
+</LinearLayout>

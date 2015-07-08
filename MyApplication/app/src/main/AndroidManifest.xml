@@ -26,6 +26,14 @@
             android:name=".BuildingActivity"
             android:label="@string/title_activity_building" >
         </activity>
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_building" >
+        </activity>
+        <activity
+            android:name=".RegActivity"
+            android:label="@string/title_activity_building" >
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

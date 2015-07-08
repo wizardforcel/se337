@@ -17,18 +17,25 @@ import java.util.List;
 
 public class MainActivity extends Activity {
 
+    private static final int ACTIVITY_REG = 0;
+    private static final int ACTIVITY_LOGIN = 1;
+
     private MapView mapView;
     private BaiduMap baiduMap;
+    private List<Marker> markers = new ArrayList<Marker>();
 
     private MenuItem loginMenuItem;
     private MenuItem regMenuItem;
     private MenuItem selectMenuItem;
     private MenuItem locMenuItem;
     private MenuItem userMenuItem;
+    private MenuItem naviMenuItem;
+    private MenuItem logoutMenuItem;
 
     private College college = DataManager.getCollege("sjtu-mh");
 
-    private List<Marker> markers = new ArrayList<Marker>();
+    private String un;
+    private boolean onLocation = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,9 +125,34 @@ public class MainActivity extends Activity {
         selectMenuItem = menu.findItem(R.id.select_settings);
         locMenuItem = menu.findItem(R.id.loc_settings);
         userMenuItem = menu.findItem(R.id.user_settings);
-        userMenuItem.setVisible(false);
+        naviMenuItem = menu.findItem(R.id.navi_settings);
+        logoutMenuItem = menu.findItem(R.id.logout_settings);
+        setMenuStatus(false);
 
         return true;
+    }
+
+    private void loginMenuItemOnClick()
+    {
+        Intent i = new Intent(this, LoginActivity.class);
+        startActivityForResult(i, ACTIVITY_LOGIN);
+    }
+
+    private void regMenuItemOnClick()
+    {
+        Intent i = new Intent(this, RegActivity.class);
+        startActivityForResult(i, ACTIVITY_REG);
+    }
+
+    private void logoutMenuItemOnClick()
+    {
+        un = "";
+        setMenuStatus(false);
+    }
+
+    private void locMenuItemOnClick()
+    {
+        onLocation = !onLocation;
     }
 
     @Override
@@ -130,6 +162,48 @@ public class MainActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         Log.v("Menu", item.getTitle().toString());
 
+        if(item.getItemId() == loginMenuItem.getItemId())
+        {
+            loginMenuItemOnClick();
+            return true;
+        }
+        if(item.getItemId() == regMenuItem.getItemId())
+        {
+            regMenuItemOnClick();
+            return true;
+        }
+        if(item.getItemId() == logoutMenuItem.getItemId())
+        {
+            logoutMenuItemOnClick();
+            return true;
+        }
+        if(item.getItemId() == locMenuItem.getItemId())
+        {
+            locMenuItemOnClick();
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent i)
+    {
+        Log.v("Result", requestCode + " " + resultCode);
+
+        if((requestCode == ACTIVITY_REG || requestCode == ACTIVITY_LOGIN) &&
+            resultCode == Activity.RESULT_OK)
+        {
+            un = i.getStringExtra("un");
+            setMenuStatus(true);
+        }
+    }
+
+    private void setMenuStatus(boolean isLogin)
+    {
+        userMenuItem.setVisible(isLogin);
+        logoutMenuItem.setVisible(isLogin);
+        loginMenuItem.setVisible(!isLogin);
+        regMenuItem.setVisible(!isLogin);
     }
 }
