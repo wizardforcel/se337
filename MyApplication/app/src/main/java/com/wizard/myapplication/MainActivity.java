@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
 
     private String un;
     private boolean onLocation = false;
-    private boolean isFirstLoc = true;
+    private LatLng lastLoc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +82,7 @@ public class MainActivity extends Activity {
         // 开启定位图层
         baiduMap.setMyLocationEnabled(true);
         //声明LocationClient类
-        mLocationClient = new LocationClient(getApplicationContext());
+        mLocationClient = new LocationClient(this);
         mLocationClient.registerLocationListener(new BDLocationListener(){
             @Override
             public void onReceiveLocation(BDLocation bdLocation) {
@@ -92,7 +92,7 @@ public class MainActivity extends Activity {
         LocationClientOption option = new LocationClientOption();
         option.setOpenGps(true);// 打开gps
         option.setCoorType("bd09ll"); // 设置坐标类型
-        option.setScanSpan(200);
+        option.setScanSpan(1000);
         mLocationClient.setLocOption(option);
         mLocationClient.start();
     }
@@ -102,18 +102,18 @@ public class MainActivity extends Activity {
         //Log.v("Location", "Location");
         System.out.println("Location");
 
-        MyLocationData locData = new MyLocationData.Builder()
-                .accuracy(location.getRadius())
-                // 此处设置开发者获取到的方向信息，顺时针0-360
-                .direction(100).latitude(location.getLatitude())
-                .longitude(location.getLongitude()).build();
-        baiduMap.setMyLocationData(locData);
+        LatLng ll = new LatLng(location.getLatitude(),
+                location.getLongitude());
+        lastLoc = ll;
 
-        if(isFirstLoc) {
-            LatLng ll = new LatLng(location.getLatitude(),
-                    location.getLongitude());
+        if(onLocation) {
+            MyLocationData locData = new MyLocationData.Builder()
+                    .accuracy(location.getRadius())
+                            // 此处设置开发者获取到的方向信息，顺时针0-360
+                    .direction(100).latitude(location.getLatitude())
+                    .longitude(location.getLongitude()).build();
+            baiduMap.setMyLocationData(locData);
             baiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(ll));
-            isFirstLoc = false;
         }
     }
 
