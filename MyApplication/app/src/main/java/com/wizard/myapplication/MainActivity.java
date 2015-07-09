@@ -35,11 +35,12 @@ public class MainActivity extends Activity {
     private MenuItem userMenuItem;
     private MenuItem naviMenuItem;
     private MenuItem logoutMenuItem;
+    private MenuItem followMenuItem;
 
     private College college = DataManager.getCollege("sjtu-mh");
 
     private String un;
-    private boolean onLocation = false;
+    private boolean onFollow = false;
     private LatLng lastLoc;
 
     @Override
@@ -106,15 +107,15 @@ public class MainActivity extends Activity {
                 location.getLongitude());
         lastLoc = ll;
 
-        if(onLocation) {
-            MyLocationData locData = new MyLocationData.Builder()
-                    .accuracy(location.getRadius())
-                            // 此处设置开发者获取到的方向信息，顺时针0-360
-                    .direction(100).latitude(location.getLatitude())
-                    .longitude(location.getLongitude()).build();
-            baiduMap.setMyLocationData(locData);
+        MyLocationData locData = new MyLocationData.Builder()
+                .accuracy(location.getRadius())
+                        // 此处设置开发者获取到的方向信息，顺时针0-360
+                .direction(100).latitude(location.getLatitude())
+                .longitude(location.getLongitude()).build();
+        baiduMap.setMyLocationData(locData);
+
+        if(onFollow)
             baiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(ll));
-        }
     }
 
     private boolean baiduMapOnMarkerClick(Marker m)
@@ -170,6 +171,7 @@ public class MainActivity extends Activity {
         userMenuItem = menu.findItem(R.id.user_settings);
         naviMenuItem = menu.findItem(R.id.navi_settings);
         logoutMenuItem = menu.findItem(R.id.logout_settings);
+        followMenuItem = menu.findItem(R.id.follow_settings);
         setMenuStatus(false);
 
         return true;
@@ -195,7 +197,14 @@ public class MainActivity extends Activity {
 
     private void locMenuItemOnClick()
     {
-        onLocation = !onLocation;
+        if(lastLoc != null)
+            baiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(lastLoc));
+    }
+
+    private void followMenuItemOnClick()
+    {
+        onFollow = !onFollow;
+        followMenuItem.setTitle(onFollow? "关闭跟随": "跟随模式");
     }
 
     @Override
@@ -223,6 +232,11 @@ public class MainActivity extends Activity {
         if(item.getItemId() == locMenuItem.getItemId())
         {
             locMenuItemOnClick();
+            return true;
+        }
+        if(item.getItemId() == followMenuItem.getItemId())
+        {
+            followMenuItemOnClick();
             return true;
         }
 

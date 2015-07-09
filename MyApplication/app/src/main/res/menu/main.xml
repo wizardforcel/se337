@@ -22,9 +22,13 @@
         android:title="@string/loc_settings"
         android:orderInCategory="106"
         android:showAsAction="never" />
+    <item android:id="@+id/follow_settings"
+        android:title="@string/follow_settings"
+        android:orderInCategory="107"
+        android:showAsAction="never" />
     <item android:id="@+id/navi_settings"
         android:title="@string/navi_settings"
-        android:orderInCategory="104"
+        android:orderInCategory="108"
         android:showAsAction="never" />
     <item android:id="@+id/logout_settings"
         android:title="@string/logout_settings"

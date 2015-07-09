@@ -6,8 +6,9 @@
     <string name="login_settings">登录</string>
     <string name="reg_settings">注册</string>
     <string name="select_settings">选择校区</string>
-    <string name="loc_settings">定位</string>
+    <string name="loc_settings">我的位置</string>
     <string name="navi_settings">导航</string>
+    <string name="follow_settings">跟随模式</string>
     <string name="logout_settings">退出</string>
     <string name="user_settings">用户信息</string>
     <string name="title_activity_building">BuildingActivity</string>
