@@ -1,0 +1,42 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="45dp"
+    android:background="@drawable/bg_title_bar"
+    android:gravity="center_vertical"
+    android:clickable="false">
+
+    <ImageView
+        android:id="@+id/titlebar_menu_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="3.0dip"
+        android:layout_marginRight="3.0dip"
+        android:layout_marginTop="3.0dip"
+        android:gravity="center"
+        android:src="@drawable/ic_top_bar_category" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_toRightOf="@id/titlebar_menu_btn"
+        android:background="@drawable/ic_top_divider"
+        android:adjustViewBounds="false"
+        android:id="@+id/imageView" />
+
+    <TextView
+        android:id="@+id/titlebar_name"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:paddingLeft="75.0dip"
+        android:paddingRight="75.0dip"
+        android:singleLine="true"
+        android:text="微校"
+        android:textColor="#ffffff"
+        android:textSize="22sp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

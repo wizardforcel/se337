@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -20,7 +22,17 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
+
+        Button returnButton = (Button) findViewById(R.id.titlebar_return);
+        returnButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { finish(); }
+        });
+        TextView titlebarText = (TextView) findViewById(R.id.titlebar_name);
+        titlebarText.setText("登录");
+
         userName = (EditText) findViewById(R.id.userName);
         passWord = (EditText) findViewById(R.id.passWord);
         login = (Button) findViewById(R.id.login);
@@ -60,7 +72,7 @@ public class LoginActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.login, menu);
+        //getMenuInflater().inflate(R.menu.login, menu);
         return true;
     }
 

@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,7 +23,16 @@ public class BuildingActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_building);
+
+        Button returnButton = (Button) findViewById(R.id.titlebar_return);
+        returnButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { finish(); }
+        });
+        TextView titlebarText = (TextView) findViewById(R.id.titlebar_name);
+        titlebarText.setText("景点");
 
         titleText = (TextView) findViewById(R.id.titleText);
         contentText = (TextView) findViewById(R.id.contentText);
@@ -36,7 +48,7 @@ public class BuildingActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.building, menu);
+        //getMenuInflater().inflate(R.menu.building, menu);
         return true;
     }
 

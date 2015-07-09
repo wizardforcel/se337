@@ -6,6 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.baidu.location.*;
 import com.baidu.mapapi.map.*;
@@ -13,6 +17,7 @@ import com.baidu.mapapi.model.LatLng;
 import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.College;
 import com.wizard.myapplication.entity.DataManager;
+import com.wizard.myapplication.view.SlideMenu;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,14 +33,17 @@ public class MainActivity extends Activity {
     private List<Marker> markers = new ArrayList<Marker>();
     private LocationClient mLocationClient;
 
-    private MenuItem loginMenuItem;
-    private MenuItem regMenuItem;
-    private MenuItem selectMenuItem;
-    private MenuItem locMenuItem;
-    private MenuItem userMenuItem;
-    private MenuItem naviMenuItem;
-    private MenuItem logoutMenuItem;
-    private MenuItem followMenuItem;
+    private SlideMenu slideMenu;
+    private ImageView menuButton;
+
+    private TextView loginMenuItem;
+    private TextView regMenuItem;
+    private TextView collegeMenuItem;
+    private TextView locMenuItem;
+    private TextView userMenuItem;
+    private TextView naviMenuItem;
+    private TextView logoutMenuItem;
+    private TextView followMenuItem;
 
     private College college = DataManager.getCollege("sjtu-mh");
 
@@ -46,8 +54,70 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
+        initSideBar();
+        initBaiduMap();
+        initLocator();
+    }
+
+    //初始化侧栏
+    private void initSideBar()
+    {
+        slideMenu = (SlideMenu) findViewById(R.id.slide_menu);
+        menuButton = (ImageView) findViewById(R.id.titlebar_menu_btn);
+        menuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("Menu");
+                if(slideMenu.isMainScreenShowing())
+                    slideMenu.openMenu();
+                else
+                    slideMenu.closeMenu();
+            }
+        });
+
+        loginMenuItem = (TextView) slideMenu.findViewById(R.id.loginMenu);
+        regMenuItem = (TextView) slideMenu.findViewById(R.id.regMenu);
+        collegeMenuItem = (TextView) slideMenu.findViewById(R.id.collegeMenu);
+        locMenuItem = (TextView) slideMenu.findViewById(R.id.locMenu);
+        followMenuItem = (TextView) slideMenu.findViewById(R.id.followMenu);
+        userMenuItem = (TextView) slideMenu.findViewById(R.id.userMenu);
+        naviMenuItem = (TextView) slideMenu.findViewById(R.id.naviMenu);
+        logoutMenuItem = (TextView) slideMenu.findViewById(R.id.logoutMenu);
+
+        setMenuStatus(false);
+
+        loginMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { loginMenuItemOnClick(); }
+        });
+        regMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { regMenuItemOnClick(); }
+        });
+        locMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { locMenuItemOnClick(); }
+        });
+        followMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { followMenuItemOnClick(); }
+        });
+        /*naviMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { naviMenuItemOnClick(); }
+        });*/
+        logoutMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { logoutMenuItemOnClick(); }
+        });
+    }
+
+    //初始化地图
+    private void initBaiduMap()
+    {
         mapView = (MapView) findViewById(R.id.bmapView);
         mapView.showScaleControl(false);
         mapView.showZoomControls(false);
@@ -78,8 +148,11 @@ public class MainActivity extends Activity {
             Marker marker = (Marker) baiduMap.addOverlay(option);
             markers.add(marker);
         }
+    }
 
-        //定位
+    // 初始化定位
+    private void initLocator()
+    {
         // 开启定位图层
         baiduMap.setMyLocationEnabled(true);
         //声明LocationClient类
@@ -151,18 +224,20 @@ public class MainActivity extends Activity {
         super.onResume();
         //在activity执行onResume时执行mMapView. onResume ()，实现地图生命周期管理
         mapView.onResume();
+        mLocationClient.start();
     }
     @Override
     protected void onPause() {
         super.onPause();
         //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
         mapView.onPause();
+        mLocationClient.stop();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        /*getMenuInflater().inflate(R.menu.main, menu);
 
         loginMenuItem = menu.findItem(R.id.login_settings);
         regMenuItem = menu.findItem(R.id.reg_settings);
@@ -172,7 +247,7 @@ public class MainActivity extends Activity {
         naviMenuItem = menu.findItem(R.id.navi_settings);
         logoutMenuItem = menu.findItem(R.id.logout_settings);
         followMenuItem = menu.findItem(R.id.follow_settings);
-        setMenuStatus(false);
+        setMenuStatus(false);*/
 
         return true;
     }
@@ -199,12 +274,14 @@ public class MainActivity extends Activity {
     {
         if(lastLoc != null)
             baiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(lastLoc));
+        slideMenu.closeMenu();
     }
 
     private void followMenuItemOnClick()
     {
         onFollow = !onFollow;
-        followMenuItem.setTitle(onFollow? "关闭跟随": "跟随模式");
+        followMenuItem.setText(onFollow ? "关闭跟随" : "跟随模式");
+        slideMenu.closeMenu();
     }
 
     @Override
@@ -212,7 +289,7 @@ public class MainActivity extends Activity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        Log.v("Menu", item.getTitle().toString());
+        /*Log.v("Menu", item.getTitle().toString());
 
         if(item.getItemId() == loginMenuItem.getItemId())
         {
@@ -238,7 +315,7 @@ public class MainActivity extends Activity {
         {
             followMenuItemOnClick();
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
@@ -258,9 +335,9 @@ public class MainActivity extends Activity {
 
     private void setMenuStatus(boolean isLogin)
     {
-        userMenuItem.setVisible(isLogin);
-        logoutMenuItem.setVisible(isLogin);
-        loginMenuItem.setVisible(!isLogin);
-        regMenuItem.setVisible(!isLogin);
+        userMenuItem.setVisibility(isLogin? TextView.VISIBLE: TextView.GONE);
+        logoutMenuItem.setVisibility(isLogin? TextView.VISIBLE: TextView.GONE);
+        loginMenuItem.setVisibility(!isLogin? TextView.VISIBLE: TextView.GONE);
+        regMenuItem.setVisibility(!isLogin? TextView.VISIBLE: TextView.GONE);
     }
 }

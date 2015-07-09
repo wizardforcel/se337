@@ -1,0 +1,148 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="240dip"
+    android:layout_height="fill_parent"
+    android:background="@drawable/ic_top_divider"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="240dip"
+        android:layout_height="28.0dip"
+        android:background="#ff313131"
+        android:gravity="center_vertical"
+        android:paddingLeft="15.0dip"
+        android:text="选项"
+        android:textColor="#ff959595"
+        android:textSize="14.0sp" />
+
+    <!--             begin              -->
+    <TextView
+        android:layout_width="240dip"
+        android:layout_height="50.0dip"
+        android:background="@drawable/selector_category_item"
+        android:clickable="true"
+        android:drawableLeft="@drawable/ic_category_mark"
+        android:drawablePadding="1.0dip"
+        android:gravity="center_vertical"
+        android:paddingLeft="15.0dip"
+        android:paddingRight="10.0dip"
+        android:text="登录"
+        android:textColor="#ff959595"
+        android:textSize="16.0sp"
+        android:id="@+id/loginMenu"
+        android:layout_marginBottom="2dp" />
+
+    <TextView
+        android:layout_width="240dip"
+        android:layout_height="50.0dip"
+        android:background="@drawable/selector_category_item"
+        android:clickable="true"
+        android:drawableLeft="@drawable/ic_category_mark"
+        android:drawablePadding="1.0dip"
+        android:gravity="center_vertical"
+        android:paddingLeft="15.0dip"
+        android:paddingRight="10.0dip"
+        android:text="注册"
+        android:textColor="#ff959595"
+        android:textSize="16.0sp"
+        android:id="@+id/regMenu"
+        android:layout_marginBottom="2dp" />
+
+    <TextView
+        android:layout_width="240dip"
+        android:layout_height="50.0dip"
+        android:background="@drawable/selector_category_item"
+        android:clickable="true"
+        android:drawableLeft="@drawable/ic_category_mark"
+        android:drawablePadding="1.0dip"
+        android:gravity="center_vertical"
+        android:paddingLeft="15.0dip"
+        android:paddingRight="10.0dip"
+        android:text="用户信息"
+        android:textColor="#ff959595"
+        android:textSize="16.0sp"
+        android:id="@+id/userMenu"
+        android:layout_marginBottom="2dp" />
+
+    <TextView
+        android:layout_width="240dip"
+        android:layout_height="50.0dip"
+        android:background="@drawable/selector_category_item"
+        android:clickable="true"
+        android:drawableLeft="@drawable/ic_category_mark"
+        android:drawablePadding="1.0dip"
+        android:gravity="center_vertical"
+        android:paddingLeft="15.0dip"
+        android:paddingRight="10.0dip"
+        android:text="选择校区"
+        android:textColor="#ff959595"
+        android:textSize="16.0sp"
+        android:id="@+id/collegeMenu"
+        android:layout_marginBottom="2dp" />
+
+    <TextView
+        android:layout_width="240dip"
+        android:layout_height="50.0dip"
+        android:background="@drawable/selector_category_item"
+        android:clickable="true"
+        android:drawableLeft="@drawable/ic_category_mark"
+        android:drawablePadding="1.0dip"
+        android:gravity="center_vertical"
+        android:paddingLeft="15.0dip"
+        android:paddingRight="10.0dip"
+        android:text="我的位置"
+        android:textColor="#ff959595"
+        android:textSize="16.0sp"
+        android:id="@+id/locMenu"
+        android:layout_marginBottom="2dp" />
+
+    <TextView
+        android:layout_width="240dip"
+        android:layout_height="50.0dip"
+        android:background="@drawable/selector_category_item"
+        android:clickable="true"
+        android:drawableLeft="@drawable/ic_category_mark"
+        android:drawablePadding="1.0dip"
+        android:gravity="center_vertical"
+        android:paddingLeft="15.0dip"
+        android:paddingRight="10.0dip"
+        android:text="跟随模式"
+        android:textColor="#ff959595"
+        android:textSize="16.0sp"
+        android:id="@+id/followMenu"
+        android:layout_marginBottom="2dp" />
+
+    <TextView
+        android:layout_width="240dip"
+        android:layout_height="50.0dip"
+        android:background="@drawable/selector_category_item"
+        android:clickable="true"
+        android:drawableLeft="@drawable/ic_category_mark"
+        android:drawablePadding="1.0dip"
+        android:gravity="center_vertical"
+        android:paddingLeft="15.0dip"
+        android:paddingRight="10.0dip"
+        android:text="导航"
+        android:textColor="#ff959595"
+        android:textSize="16.0sp"
+        android:id="@+id/naviMenu"
+        android:layout_marginBottom="2dp" />
+
+    <TextView
+        android:layout_width="240dip"
+        android:layout_height="50.0dip"
+        android:background="@drawable/selector_category_item"
+        android:clickable="true"
+        android:drawableLeft="@drawable/ic_category_mark"
+        android:drawablePadding="1.0dip"
+        android:gravity="center_vertical"
+        android:paddingLeft="15.0dip"
+        android:paddingRight="10.0dip"
+        android:text="退出"
+        android:textColor="#ff959595"
+        android:textSize="16.0sp"
+        android:id="@+id/logoutMenu"
+        android:layout_marginBottom="2dp" />
+
+    <!--             end              -->
+
+</LinearLayout>

@@ -4,13 +4,30 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.baidu.mapapi.map.MapView
-        android:id="@+id/bmapView"
+    <com.wizard.myapplication.view.SlideMenu
+        android:id="@+id/slide_menu"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:clickable="true"
-        android:layout_alignParentTop="false"
-        android:layout_alignParentRight="false"
-        android:layout_alignParentEnd="true" />
+        android:layout_height="fill_parent">
+
+        <include layout="@layout/sidebar_main"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
+
+            <include layout="@layout/titlebar_main" />
+
+            <com.baidu.mapapi.map.MapView
+                android:id="@+id/bmapView"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:clickable="true"
+                android:layout_alignParentTop="false"
+                android:layout_alignParentRight="false"
+                android:layout_alignParentEnd="true" />
+        </LinearLayout>
+
+    </com.wizard.myapplication.view.SlideMenu>
 
 </RelativeLayout>
