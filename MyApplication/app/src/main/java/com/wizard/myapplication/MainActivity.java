@@ -17,6 +17,7 @@ import com.baidu.mapapi.model.LatLng;
 import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.College;
 import com.wizard.myapplication.entity.DataManager;
+import com.wizard.myapplication.entity.NaviNode;
 import com.wizard.myapplication.view.SlideMenu;
 
 import java.util.ArrayList;
@@ -105,10 +106,10 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) { followMenuItemOnClick(); }
         });
-        /*naviMenuItem.setOnClickListener(new View.OnClickListener() {
+        naviMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { naviMenuItemOnClick(); }
-        });*/
+        });
         logoutMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { logoutMenuItemOnClick(); }
@@ -282,6 +283,27 @@ public class MainActivity extends Activity {
         onFollow = !onFollow;
         followMenuItem.setText(onFollow ? "关闭跟随" : "跟随模式");
         slideMenu.closeMenu();
+    }
+
+    private void naviMenuItemOnClick()
+    {
+        Intent i = new Intent(this, NaviSettingActivity.class);
+        ArrayList<NaviNode> nodes = new ArrayList<NaviNode>();
+        for(Building b : college.getBuildings())
+        {
+            NaviNode n = new NaviNode();
+            n.setName(b.getName());
+            n.setLat(b.getCenter().latitude);
+            n.setLng(b.getCenter().longitude);
+            nodes.add(n);
+        }
+        i.putExtra("nodes", nodes);
+        NaviNode myLoc = new NaviNode();
+        myLoc.setName("我的位置");
+        myLoc.setLat(lastLoc.latitude);
+        myLoc.setLng(lastLoc.longitude);
+        i.putExtra("myLoc", myLoc);
+        startActivity(i);
     }
 
     @Override

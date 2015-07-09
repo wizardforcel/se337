@@ -12,5 +12,7 @@
     <string name="logout_settings">退出</string>
     <string name="user_settings">用户信息</string>
     <string name="title_activity_building">BuildingActivity</string>
+    <string name="title_activity_navi_setting">NaviSettingActivity</string>
+    <string name="action_settings">Settings</string>
 
 </resources>
