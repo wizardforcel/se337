@@ -79,6 +79,8 @@ public class NaviSettingActivity extends Activity {
             destList.add(n.getName());
         }
         srcList.add(myLoc.getName());
+        srcButton.setText(srcList.get(currentSrc));
+        destButton.setText(destList.get(currentDest));
 
         srcDialog = new AlertDialog.Builder(this).setTitle("请输入提醒方式")
                 .setSingleChoiceItems(srcList.toArray(new String[0]), currentSrc,

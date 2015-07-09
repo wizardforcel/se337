@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baidu.location.*;
 import com.baidu.mapapi.map.*;
@@ -287,6 +288,11 @@ public class MainActivity extends Activity {
 
     private void naviMenuItemOnClick()
     {
+        if(college.getBuildings().size() == 0) {
+            Toast.makeText(this, "无任何景点", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Intent i = new Intent(this, NaviSettingActivity.class);
         ArrayList<NaviNode> nodes = new ArrayList<NaviNode>();
         for(Building b : college.getBuildings())
