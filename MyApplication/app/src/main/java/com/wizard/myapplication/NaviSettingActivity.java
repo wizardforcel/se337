@@ -12,7 +12,9 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.wizard.myapplication.R;
+import com.baidu.navisdk.BNaviPoint;
+import com.baidu.navisdk.BaiduNaviManager;
+import com.baidu.navisdk.comapi.routeplan.RoutePlanParams;
 import com.wizard.myapplication.entity.NaviNode;
 
 import java.util.ArrayList;
@@ -129,7 +131,38 @@ public class NaviSettingActivity extends Activity {
 
     private void okButtonOnClick()
     {
+        NaviNode src = currentSrc == nodes.size()? myLoc: nodes.get(currentSrc);
+        NaviNode dest = nodes.get(currentDest);
 
+        /*Intent intent = new Intent();
+        intent.putExtra("src", src);
+        intent.putExtra("dest", dest);
+        setResult(Activity.RESULT_OK, intent);
+        finish();*/
+
+        BNaviPoint startPoint = new BNaviPoint(src.getLng(), src.getLat(), src.getName());
+        BNaviPoint endPoint = new BNaviPoint(dest.getLng(), dest.getLat(), dest.getName());
+
+        BaiduNaviManager.getInstance().launchNavigator(this, startPoint, endPoint,
+                RoutePlanParams.NE_RoutePlan_Mode.ROUTE_PLAN_MOD_MIN_DIST, 		 //算路方式
+                true, 									   		 //真实导航
+                BaiduNaviManager.STRATEGY_FORCE_ONLINE_PRIORITY, //在离线策略
+                new BaiduNaviManager.OnStartNavigationListener() {				 //跳转监听
+                    @Override
+                    public void onJumpToNavigator(Bundle configParams) {
+                        baiduNaviOnJumpToNavigator(configParams);
+                    }
+                    @Override
+                    public void onJumpToDownloader() {
+                    }
+                });
+    }
+
+    private void baiduNaviOnJumpToNavigator(Bundle bundle)
+    {
+        Intent intent = new Intent(NaviSettingActivity.this, NaviActivity.class);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
 

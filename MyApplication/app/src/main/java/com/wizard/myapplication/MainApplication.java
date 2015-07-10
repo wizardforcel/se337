@@ -3,6 +3,7 @@ package com.wizard.myapplication;
 import android.app.Application;
 
 import com.baidu.mapapi.SDKInitializer;
+import com.baidu.navisdk.BaiduNaviManager;
 
 /**
  * Created by Wizard on 2015/7/6.
