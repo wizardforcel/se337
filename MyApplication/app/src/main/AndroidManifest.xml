@@ -49,6 +49,10 @@
             android:name=".NaviActivity"
             android:label="@string/title_activity_navi" >
         </activity>
+        <activity
+            android:name=".CampusActivity"
+            android:label="@string/title_activity_campus" >
+        </activity>
     </application>
 
     <!-- 这个权限用于进行网络定位 -->

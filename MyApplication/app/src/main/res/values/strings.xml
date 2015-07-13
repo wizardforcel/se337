@@ -15,5 +15,6 @@
     <string name="title_activity_navi_setting">NaviSettingActivity</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_navi">NaviActivity</string>
+    <string name="title_activity_campus">CampusActivity</string>
 
 </resources>

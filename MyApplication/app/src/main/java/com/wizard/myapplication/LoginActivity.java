@@ -22,6 +22,8 @@ import com.wizard.myapplication.util.WizardHTTP;
 
 public class LoginActivity extends Activity {
 
+    private static final int ACTIVITY_REG = 0;
+
     private EditText usernameText, passwordText;
     private Button loginButton, regButton;
     private Handler handler;
@@ -56,6 +58,10 @@ public class LoginActivity extends Activity {
                 loginButtonOnClick();
             }
         });
+        regButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { regButtonOnClick(); }
+        });
 
         handler = new Handler()
         {
@@ -64,6 +70,21 @@ public class LoginActivity extends Activity {
                 LoginActivity.this.handleMessage(msg);
             }
         };
+    }
+
+    private void regButtonOnClick()
+    {
+        Intent i = new Intent(this, RegActivity.class);
+        startActivityForResult(i, ACTIVITY_REG);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent i) {
+        if(requestCode == ACTIVITY_REG && resultCode == Activity.RESULT_OK)
+        {
+            setResult(Activity.RESULT_OK, i);
+            finish();
+        }
     }
 
     private void handleMessage(Message msg)

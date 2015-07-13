@@ -14,7 +14,10 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:orientation="vertical" >
+            android:animateLayoutChanges="true"
+            android:orientation="vertical"
+            android:weightSum="1"
+            android:id="@+id/map_info">
 
             <include layout="@layout/titlebar_main" />
 
@@ -23,9 +26,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:clickable="true"
-                android:layout_alignParentTop="false"
-                android:layout_alignParentRight="false"
-                android:layout_alignParentEnd="true" />
+                android:layout_weight="1.11" />
         </LinearLayout>
 
     </com.wizard.myapplication.view.SlideMenu>

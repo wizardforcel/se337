@@ -6,35 +6,65 @@
     android:layout_alignParentLeft="true"
     android:layout_alignParentStart="true"
     android:layout_alignParentTop="true"
-    tools:context="com.wizard.myapplication.BuildingActivity">
+    tools:context="com.wizard.myapplication.BuildingActivity"
+    android:focusableInTouchMode="false"
+    android:focusable="false">
 
     <include layout="@layout/titlebar_other" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical" >
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/titleText" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/contentText" />
+        android:layout_height="fill_parent">
 
         <ImageView
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/image"
+            android:layout_height="50dp"
+            android:id="@+id/buildingImage"
             android:minHeight="40dp"
-            android:contentDescription="building" />
+            android:contentDescription="building"
+            android:layout_weight="0.20"
+            android:layout_alignParentTop="true"
+            android:layout_above="@+id/contentText" />
 
-    </LinearLayout>
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/contentText"
+            android:layout_above="@+id/commentTable"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="314dp"
+            android:id="@+id/commentTable"
+            android:layout_above="@+id/addComment"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"></TableLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="66dp"
+            android:text="发送"
+            android:id="@+id/addComment"
+            android:layout_gravity="right"
+            android:layout_weight="0.20"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <EditText
+            android:layout_width="280dp"
+            android:layout_height="66dp"
+            android:id="@+id/commentInput"
+            android:layout_gravity="center_horizontal|left"
+            android:layout_alignTop="@+id/addComment"
+            android:layout_toLeftOf="@+id/addComment"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:hint="添加评论" />
+    </RelativeLayout>
 
 </LinearLayout>
 
