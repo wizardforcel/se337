@@ -3,6 +3,8 @@ package com.wizard.myapplication;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,13 +13,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import org.json.JSONObject;
 
+import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.UrlConfig;
+import com.wizard.myapplication.util.WizardHTTP;
 
 
 public class LoginActivity extends Activity {
-    private EditText userName, passWord;
-    private Button login, signup;
 
+    private EditText usernameText, passwordText;
+    private Button loginButton, regButton;
+    private Handler handler;
+
+    private String un;
+    private String pw;
+
+    private static final int LOGIN_SUCCESS = 0;
+    private static final int LOGIN_FAIL = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,39 +46,101 @@ public class LoginActivity extends Activity {
         TextView titlebarText = (TextView) findViewById(R.id.titlebar_name);
         titlebarText.setText("登录");
 
-        userName = (EditText) findViewById(R.id.userName);
-        passWord = (EditText) findViewById(R.id.passWord);
-        login = (Button) findViewById(R.id.login);
-        signup = (Button) findViewById(R.id.signup);
-        login.setOnClickListener(new View.OnClickListener() {
+        usernameText = (EditText) findViewById(R.id.userName);
+        passwordText = (EditText) findViewById(R.id.passWord);
+        loginButton = (Button) findViewById(R.id.login);
+        regButton = (Button) findViewById(R.id.signup);
+        loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 loginButtonOnClick();
             }
         });
+
+        handler = new Handler()
+        {
+            @Override
+            public void handleMessage(Message msg) {
+                LoginActivity.this.handleMessage(msg);
+            }
+        };
     }
 
-    private boolean login(String un, String pw)
+    private void handleMessage(Message msg)
     {
-        return true;
+        Bundle b = msg.getData();
+        int type = b.getInt("type");
+        switch(type)
+        {
+            case LOGIN_SUCCESS:
+                Toast.makeText(this, "登录成功！", Toast.LENGTH_SHORT).show();
+                User u = (User) b.getSerializable("user");
+                Intent i = new Intent();
+                i.putExtra("user", u);
+                setResult(Activity.RESULT_OK, i);
+                finish();
+                break;
+            case LOGIN_FAIL:
+                Toast.makeText(this, "登录失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
+                break;
+        }
     }
 
     private void loginButtonOnClick(){
-        String un = userName.getText().toString();
-        String pw = passWord.getText().toString();
+        un = usernameText.getText().toString();
+        pw = passwordText.getText().toString();
 
-        if(un.equals(""))
+        if(un.equals("")) {
             Toast.makeText(this, "用户名不能为空", Toast.LENGTH_SHORT).show();
-        else if(pw.equals(""))
+            return;
+        }
+        if(pw.equals("")) {
             Toast.makeText(this, "密码不能为空", Toast.LENGTH_SHORT).show();
-        else if(login(un, pw)){
-                Intent intent = new Intent();
-                intent.putExtra("un", un);
-                setResult(Activity.RESULT_OK, intent);
-                finish();
-            }
-        else{
-            Toast.makeText(this, "用户名或密码错误", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() { threadLogin(); }
+        }).start();
+        //new Thread(this::threadLogin).start();
+    }
+
+    private void threadLogin()
+    {
+        try
+        {
+            WizardHTTP http = new WizardHTTP();
+            http.setDefHeader(false);
+            http.setHeader("Content-Type", "application/json");
+            JSONObject json = new JSONObject();
+            json.put("username", un);
+            json.put("password", pw);
+            String postStr = json.toString();
+            String retStr = http.httpPost("http://" + UrlConfig.HOST + "/user/login/", postStr);
+            JSONObject retJson = new JSONObject(retStr);
+
+            User user = new User();
+            user.setId(retJson.getString("id"));
+            user.setUn(retJson.getString("username"));
+            user.setPw(retJson.getString("password"));
+            user.setName(retJson.getString("name"));
+
+            Bundle b = new Bundle();
+            b.putInt("type", LOGIN_SUCCESS);
+            b.putSerializable("user", user);
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+        catch(Exception ex)
+        {
+            Bundle b = new Bundle();
+            b.putInt("type", LOGIN_FAIL);
+            b.putSerializable("errmsg", ex.getMessage());
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
         }
     }
 

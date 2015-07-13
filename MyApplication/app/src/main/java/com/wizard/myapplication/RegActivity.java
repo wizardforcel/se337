@@ -3,6 +3,8 @@ package com.wizard.myapplication;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,11 +14,23 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.UrlConfig;
+import com.wizard.myapplication.util.WizardHTTP;
+
+import org.json.JSONObject;
+
 
 public class RegActivity extends Activity {
-    private EditText userName, passWord, passWord2;
-    private Button signup;
+    private EditText usernameText, passwordText, password2Text;
+    private Button regButton;
+    private Handler handler;
 
+    private String un;
+    private String pw;
+
+    private static final int REG_SUCCESS = 0;
+    private static final int REG_FAIL = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,46 +46,105 @@ public class RegActivity extends Activity {
         TextView titlebarText = (TextView) findViewById(R.id.titlebar_name);
         titlebarText.setText("注册");
 
-        userName = (EditText) findViewById(R.id.userName);
-        passWord = (EditText) findViewById(R.id.passWord);
-        passWord2 = (EditText) findViewById(R.id.passWord2);
-        signup = (Button) findViewById(R.id.signup);
-        signup.setOnClickListener(new View.OnClickListener() {
+        usernameText = (EditText) findViewById(R.id.userName);
+        passwordText = (EditText) findViewById(R.id.passWord);
+        password2Text = (EditText) findViewById(R.id.passWord2);
+        regButton = (Button) findViewById(R.id.signup);
+        regButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkSignup();
+                regButtonOnClick();
             }
         });
-    }
 
-    private boolean reg(String un, String pw)
-    {
-        return true;
-    }
-
-    private void checkSignup(){
-
-        String un = userName.getText().toString();
-        String pw = passWord.getText().toString();
-        String pw2 = passWord2.getText().toString();
-
-        if(un.equals(""))
-            Toast.makeText(this, "用户名不能为空", Toast.LENGTH_SHORT).show();
-        else if(pw.equals(""))
-            Toast.makeText(this, "密码不能为空", Toast.LENGTH_SHORT).show();
-        else if(pw2.equals(""))
-            Toast.makeText(this, "请重复输入密码", Toast.LENGTH_SHORT).show();
-        else if(!pw.equals(pw2))
-            Toast.makeText(this, "两次密码输入不同", Toast.LENGTH_SHORT).show();
-        else if(reg(un, pw))
+        handler = new Handler()
         {
-            Intent i = new Intent();
-            i.putExtra("un", un);
-            setResult(Activity.RESULT_OK, i);
-            finish();
+            @Override
+            public void handleMessage(Message msg) {
+                RegActivity.this.handleMessage(msg);
+            }
+        };
+    }
+
+    private void handleMessage(Message msg) {
+        Bundle b = msg.getData();
+        int type = b.getInt("type");
+        switch(type)
+        {
+            case REG_SUCCESS:
+                Toast.makeText(this, "注册成功！", Toast.LENGTH_SHORT).show();
+                User u = (User) b.getSerializable("user");
+                Intent i = new Intent();
+                i.putExtra("user", u);
+                setResult(Activity.RESULT_OK, i);
+                finish();
+                break;
+            case REG_FAIL:
+                Toast.makeText(this, "注册失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
+                break;
         }
-        else {
-            Toast.makeText(RegActivity.this, "用户名已被占用", Toast.LENGTH_SHORT).show();
+    }
+
+
+    private void regButtonOnClick(){
+
+        un = usernameText.getText().toString();
+        pw = passwordText.getText().toString();
+        String pw2 = password2Text.getText().toString();
+
+        if(un.equals("")) {
+            Toast.makeText(this, "用户名不能为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(pw.equals("")) {
+            Toast.makeText(this, "密码不能为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(!pw.equals(pw2)) {
+            Toast.makeText(this, "两次密码输入不同", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() { threadReg(); }
+        }).start();
+    }
+
+    private void threadReg()
+    {
+        try {
+            WizardHTTP http = new WizardHTTP();
+            http.setDefHeader(false);
+            http.setHeader("Content-Type", "application/json");
+            JSONObject json = new JSONObject();
+            json.put("username", un);
+            json.put("password", pw);
+            String postStr = json.toString();
+            String retStr = http.httpPost("http://" + UrlConfig.HOST + "/user/register/", postStr);
+            JSONObject retJson = new JSONObject(retStr);
+
+            User user = new User();
+            user.setId(retJson.getString("id"));
+            user.setUn(retJson.getString("username"));
+            user.setPw(retJson.getString("password"));
+            user.setName(retJson.getString("name"));
+
+            Bundle b = new Bundle();
+            b.putInt("type", REG_SUCCESS);
+            b.putSerializable("user", user);
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+        catch(Exception ex)
+        {
+            Bundle b = new Bundle();
+            b.putInt("type", REG_FAIL);
+            b.putSerializable("errmsg", ex.getMessage());
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
         }
     }
 

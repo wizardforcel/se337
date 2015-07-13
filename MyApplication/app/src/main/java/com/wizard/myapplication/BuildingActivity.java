@@ -12,13 +12,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.wizard.myapplication.R;
+import com.wizard.myapplication.entity.Building;
+
+import java.io.Serializable;
 
 public class BuildingActivity extends Activity {
 
     private TextView titleText;
     private TextView contentText;
     private ImageView image;
-    private String id;
+    private Building building;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +42,9 @@ public class BuildingActivity extends Activity {
         image = (ImageView) findViewById(R.id.image);
 
         Intent intent = getIntent();
-        id = intent.getStringExtra("id");
-        titleText.setText(intent.getStringExtra("name"));
-        contentText.setText(intent.getStringExtra("content"));
+        building = (Building) intent.getSerializableExtra("building");
+        titleText.setText(building.getName());
+        contentText.setText(building.getContent());
     }
 
 

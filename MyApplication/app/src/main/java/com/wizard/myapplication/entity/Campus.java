@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by Wizard on 2015/7/7.
  */
-public class Building implements Serializable
+public class Campus implements Serializable
 {
 
     public String getName() {
@@ -20,20 +20,20 @@ public class Building implements Serializable
         this.name = name;
     }
 
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
     public String getContent() {
         return content;
     }
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public List<Building> getBuildings() {
+        return buildings;
+    }
+
+    public void setBuildings(List<Building> buildings) {
+        this.buildings = buildings;
     }
 
     public int getId() {
@@ -50,6 +50,14 @@ public class Building implements Serializable
 
     public void setRadius(double radius) {
         this.radius = radius;
+    }
+
+    public List<String> getPictures() {
+        return pictures;
+    }
+
+    public void setPictures(List<String> pictures) {
+        this.pictures = pictures;
     }
 
 
@@ -74,8 +82,10 @@ public class Building implements Serializable
     private String content;
     private double latitude;
     private double longitude;
-    private List<Comment> comments
-            = new ArrayList<Comment>();
     private double radius;
+    private List<Building> buildings
+            = new ArrayList<Building>();
+    private List<String> pictures
+            = new ArrayList<String>();
 
 }

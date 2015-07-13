@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,10 +22,15 @@ import com.baidu.mapapi.model.LatLng;
 import com.baidu.navisdk.BNaviEngineManager;
 import com.baidu.navisdk.BaiduNaviManager;
 import com.wizard.myapplication.entity.Building;
-import com.wizard.myapplication.entity.College;
-import com.wizard.myapplication.entity.DataManager;
+import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.NaviNode;
+import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.UrlConfig;
+import com.wizard.myapplication.util.WizardHTTP;
 import com.wizard.myapplication.view.SlideMenu;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +40,16 @@ public class MainActivity extends Activity {
 
     private static final int ACTIVITY_REG = 0;
     private static final int ACTIVITY_LOGIN = 1;
-    private static final int ACTIVITY_NAVI = 2;
+
+    private static final int GET_CAMPUS_SUCCESS = 0;
+    private static final int GET_CAMPUS_FAIL = 1;
 
     private MapView mapView;
     private BaiduMap baiduMap;
     private List<Marker> markers = new ArrayList<Marker>();
     private LocationClient mLocationClient;
+
+    private Handler handler;
 
     private SlideMenu slideMenu;
     private ImageView menuButton;
@@ -52,10 +63,10 @@ public class MainActivity extends Activity {
     private TextView logoutMenuItem;
     private TextView followMenuItem;
 
-    private College college = DataManager.getCollege("sjtu-mh");
-
-    private String un;
+    private Campus campus;
+    private User user;
     private boolean onFollow = false;
+    private boolean firstLoc = true;
     private LatLng lastLoc;
 
     @Override
@@ -68,6 +79,31 @@ public class MainActivity extends Activity {
         initBaiduMap();
         initLocator();
         initNavi();
+
+        handler = new Handler()
+        {
+            @Override
+            public void handleMessage(Message msg) {
+                MainActivity.this.handleMessage(msg);
+            }
+        };
+    }
+
+    private void handleMessage(Message msg)
+    {
+        Bundle b = msg.getData();
+        int type = b.getInt("type");
+        switch(type)
+        {
+            case GET_CAMPUS_SUCCESS:
+                Toast.makeText(this, "获取校园信息成功！", Toast.LENGTH_SHORT).show();
+                campus = (Campus) b.getSerializable("campus");
+                setCampusOnMap();
+                break;
+            case GET_CAMPUS_FAIL:
+                Toast.makeText(this, "获取校园信息失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
+                break;
+        }
     }
 
     //初始化侧栏
@@ -149,18 +185,22 @@ public class MainActivity extends Activity {
                 return baiduMapOnMarkerClick(marker);
             }
         });
+    }
 
+    private void setCampusOnMap()
+    {
         //设置中心点
-        baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLngZoom(college.getCenter(), 17));
-        List<Building> buildings = college.getBuildings();
+        baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLngZoom(
+                new LatLng(campus.getLatitude(), campus.getLongitude()), 17));
+        List<Building> buildings = campus.getBuildings();
         for (Building b : buildings) {
             BitmapDescriptor bitmap = BitmapDescriptorFactory
                     .fromResource(R.drawable.icon_mark);
             //构建MarkerOption，用于在地图上添加Marker
             OverlayOptions option = new MarkerOptions()
-                    .position(b.getCenter())
+                    .position(new LatLng(b.getLatitude(), b.getLongitude()))
                     .icon(bitmap)
-                    .title(b.getId());
+                    .title(String.valueOf(b.getId()));
             //在地图上添加Marker，并显示
             Marker marker = (Marker) baiduMap.addOverlay(option);
             markers.add(marker);
@@ -188,8 +228,7 @@ public class MainActivity extends Activity {
     }
 
     private void baiduMapOnReceiveLocation(BDLocation location) {
-        //Log.v("Location", "Location");
-        System.out.println("Location");
+        Log.v("Location", "Location");
 
         LatLng ll = new LatLng(location.getLatitude(),
                 location.getLongitude());
@@ -204,22 +243,88 @@ public class MainActivity extends Activity {
 
         if (onFollow)
             baiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(ll));
+
+        if(firstLoc)
+        {
+            firstLoc = false;
+            new Thread(new Runnable() {
+                @Override
+                public void run() { threadGetCampus(); }
+            }).start();
+        }
+    }
+
+    private void threadGetCampus()
+    {
+        try
+        {
+            WizardHTTP http = new WizardHTTP();
+            http.setDefHeader(false);
+            http.setHeader("Content-Type", "application/json");
+            http.setCharset("utf-8");
+            String url = String.format("http://%s/university/findByGPS/longitude/%6f/latitude/%6f",
+                                       UrlConfig.HOST, lastLoc.longitude, lastLoc.latitude);
+            String retStr = http.httpGet(url);
+            JSONArray retArr = new JSONArray(retStr);
+            JSONObject retJson = retArr.getJSONObject(0);
+
+            Campus c = new Campus();
+            c.setId(retJson.getInt("id"));
+            c.setName(retJson.getString("name"));
+            c.setContent(retJson.getString("description"));
+            c.setRadius(retJson.getDouble("radius"));
+            c.setLatitude(retJson.getDouble("latitude"));
+            c.setLongitude(retJson.getDouble("longitude"));
+
+            retStr = http.httpGet("http://" + UrlConfig.HOST + "/view/university/" + c.getId());
+            retArr = new JSONArray(retStr);
+
+            List<Building> buildings = new ArrayList<Building>();
+            for(int i = 0; i < retArr.length(); i++)
+            {
+                JSONObject o = retArr.getJSONObject(i);
+                Building b = new Building();
+                b.setId(o.getInt("id"));
+                b.setName(o.getString("name"));
+                b.setContent(o.getString("description"));
+                b.setLatitude(o.getDouble("latitude"));
+                b.setLongitude(o.getDouble("longitude"));
+                b.setRadius(o.getDouble("radius"));
+                buildings.add(b);
+            }
+            c.setBuildings(buildings);
+
+            Bundle b = new Bundle();
+            b.putInt("type", GET_CAMPUS_SUCCESS);
+            b.putSerializable("campus", c);
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+        catch(Exception ex)
+        {
+            Bundle b = new Bundle();
+            b.putInt("type", GET_CAMPUS_FAIL);
+            b.putSerializable("errmsg", ex.getMessage());
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
     }
 
     private boolean baiduMapOnMarkerClick(Marker m) {
         Log.v("MarkerOnClick", m.getTitle());
         Building b = null;
-        for (Building b2 : college.getBuildings()) {
-            if (b2.getId().equals(m.getTitle())) {
+        for (Building b2 : campus.getBuildings()) {
+            if (b2.getId() == Integer.parseInt(m.getTitle())) {
                 b = b2;
                 break;
             }
         }
+        Log.v("location", String.format("(%6f, %6f)", b.getLatitude(), b.getLongitude()));
 
         Intent intent = new Intent(this, BuildingActivity.class);
-        intent.putExtra("name", b.getName());
-        intent.putExtra("id", b.getId());
-        intent.putExtra("content", b.getContent());
+        intent.putExtra("building", b);
         startActivity(intent);
 
         return false;
@@ -277,7 +382,7 @@ public class MainActivity extends Activity {
     }
 
     private void logoutMenuItemOnClick() {
-        un = "";
+        user = null;
         setMenuStatus(false);
     }
 
@@ -294,18 +399,18 @@ public class MainActivity extends Activity {
     }
 
     private void naviMenuItemOnClick() {
-        if (college.getBuildings().size() == 0) {
+        if (campus.getBuildings().size() == 0) {
             Toast.makeText(this, "无任何景点", Toast.LENGTH_SHORT).show();
             return;
         }
 
         Intent i = new Intent(this, NaviSettingActivity.class);
         ArrayList<NaviNode> nodes = new ArrayList<NaviNode>();
-        for (Building b : college.getBuildings()) {
+        for (Building b : campus.getBuildings()) {
             NaviNode n = new NaviNode();
             n.setName(b.getName());
-            n.setLat(b.getCenter().latitude);
-            n.setLng(b.getCenter().longitude);
+            n.setLat(b.getLatitude());
+            n.setLng(b.getLongitude());
             nodes.add(n);
         }
         i.putExtra("nodes", nodes);
@@ -359,10 +464,9 @@ public class MainActivity extends Activity {
 
         if ((requestCode == ACTIVITY_REG || requestCode == ACTIVITY_LOGIN) &&
                 resultCode == Activity.RESULT_OK) {
-            un = i.getStringExtra("un");
+            user = (User) i.getSerializableExtra("user");
             setMenuStatus(true);
-        } else if (requestCode == ACTIVITY_NAVI && resultCode == Activity.RESULT_OK)
-            naviActivityOnOk(i);
+        }
     }
 
     private void setMenuStatus(boolean isLogin) {
@@ -370,11 +474,6 @@ public class MainActivity extends Activity {
         logoutMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
         loginMenuItem.setVisibility(!isLogin ? TextView.VISIBLE : TextView.GONE);
         regMenuItem.setVisibility(!isLogin ? TextView.VISIBLE : TextView.GONE);
-    }
-
-    private void naviActivityOnOk(Intent i) {
-        //NaviNode src = (NaviNode) i.getSerializableExtra("src");
-        //NaviNode dest = (NaviNode) i.getSerializableExtra("dest");
     }
 
     private void initNavi() {

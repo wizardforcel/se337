@@ -1,9 +1,11 @@
 package com.wizard.myapplication.entity;
 
+import java.io.Serializable;
+
 /**
  * Created by Wizard on 2015/7/7.
  */
-public class Comment
+public class Comment implements Serializable
 {
     public String getUn() {
         return un;

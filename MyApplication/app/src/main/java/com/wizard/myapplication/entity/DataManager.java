@@ -14,14 +14,14 @@ public class DataManager
         return new String[]{"sjtu-mh"};
     }
 
-    public static College getCollege(String id)
+    public static Campus getCollege(String id)
     {
-        College college = new College();
-        college.setId("sjtu-mh");
-        college.setName("上海交通大学 闵行校区");
-        college.setContent("上海交通大学 闵行校区");
-        college.setCenter(new LatLng(31.031231, 121.442522));
-        List<Building> buildings = college.getBuildings();
+        /*Campus campus = new Campus();
+        campus.setId("sjtu-mh");
+        campus.setName("上海交通大学 闵行校区");
+        campus.setContent("上海交通大学 闵行校区");
+        campus.setCenter(new LatLng(31.031231, 121.442522));
+        List<Building> buildings = campus.getBuildings();
 
         Building se = new Building();
         se.setId("se");
@@ -49,9 +49,9 @@ public class DataManager
         newLib.setCenter(new LatLng(31.032334, 121.444013));
         newLib.setName("新图书馆");
         newLib.setContent("新图书馆");
-        buildings.add(newLib);
+        buildings.add(newLib);*/
 
-        return college;
+        return null;
     }
 
 }
