@@ -79,7 +79,7 @@ public class WizardHTTP
         this.proxy = proxy;
     }
     
-    private String httpSubmit(String method, String tar, String postdata)
+    private InputStream getResponseStream(String method, String tar, String postdata)
             throws IOException
     {
         URL url = new URL(tar);
@@ -114,13 +114,35 @@ public class WizardHTTP
                 sb.setLength(sb.length() - 1);
             retHeader.put(k, sb.toString());
         }
+        return conn.getInputStream();
+    }
+
+    private String httpSubmit(String method, String tar, String postdata)
+            throws IOException
+    {
         StreamReader sr
-          = new StreamReader(conn.getInputStream(), charset);
+          = new StreamReader(getResponseStream(method, tar, postdata), charset);
         String retstr = sr.readToEnd();
         sr.close();
         return retstr;
     }
-    
+
+    private byte[] httpSubmitData(String method, String tar, String postdata)
+            throws IOException
+    {
+        InputStream inStream = getResponseStream(method, tar, postdata);
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[4000];
+        while(true)
+        {
+            int size = inStream.read(buffer);
+            if(size == -1) break;
+            outStream.write(buffer, 0, size);
+        }
+        inStream.close();
+        return outStream.toByteArray();
+    }
+
     public String httpGet(String tar)
            throws IOException
     {
@@ -132,4 +154,8 @@ public class WizardHTTP
     {
         return httpSubmit("POST", tar, data);
     }
+
+    public byte[] httpGetData(String tar) throws IOException { return httpSubmitData("GET", tar, ""); }
+
+    public byte[] httpPostData(String tar, String data) throws IOException { return httpSubmitData("POST", tar, data); }
 }

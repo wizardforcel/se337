@@ -478,6 +478,7 @@ public class MainActivity extends Activity {
     {
         Intent i = new Intent(this, CampusActivity.class);
         i.putExtra("campus", campus);
+        i.putExtra("user", user);
         startActivityForResult(i, ACTIVITY_CAMPUS);
     }
 
