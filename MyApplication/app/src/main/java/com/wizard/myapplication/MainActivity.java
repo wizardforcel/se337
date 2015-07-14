@@ -69,6 +69,9 @@ public class MainActivity extends Activity {
     private TextView naviMenuItem;
     private TextView logoutMenuItem;
     private TextView followMenuItem;
+    private TextView accomMenuItem;
+    private TextView rankMenuItem;
+    private TextView exchangeMenuItem;
 
     private Campus campus;
     private User user;
@@ -136,6 +139,9 @@ public class MainActivity extends Activity {
         userMenuItem = (TextView) slideMenu.findViewById(R.id.userMenu);
         naviMenuItem = (TextView) slideMenu.findViewById(R.id.naviMenu);
         logoutMenuItem = (TextView) slideMenu.findViewById(R.id.logoutMenu);
+        accomMenuItem = (TextView) slideMenu.findViewById(R.id.acconMenu);
+        rankMenuItem = (TextView) slideMenu.findViewById(R.id.rankMenu);
+        exchangeMenuItem = (TextView) slideMenu.findViewById(R.id.exchangeMenu);
 
         setMenuStatus(false);
 
@@ -178,6 +184,18 @@ public class MainActivity extends Activity {
         campusMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { campusMenuItemOnClick(); }
+        });
+        rankMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { rankMenuItemOnClick(); }
+        });
+        accomMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { accomMenuItemOnClick(); }
+        });
+        exchangeMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { exchangeMenuItemOnClick(); }
         });
     }
 
@@ -438,6 +456,24 @@ public class MainActivity extends Activity {
         return true;
     }
 
+    private void accomMenuItemOnClick()
+    {
+        Intent i = new Intent(this, AccomActivity.class);
+        startActivity(i);
+    }
+
+    private void rankMenuItemOnClick()
+    {
+        Intent i = new Intent(this, RankActivity.class);
+        startActivity(i);
+    }
+
+    private void exchangeMenuItemOnClick()
+    {
+        Intent i = new Intent(this, ExchangeActivity.class);
+        startActivity(i);
+    }
+
     private void loginMenuItemOnClick() {
         Intent i = new Intent(this, LoginActivity.class);
         startActivityForResult(i, ACTIVITY_LOGIN);
@@ -548,6 +584,10 @@ public class MainActivity extends Activity {
     private void setMenuStatus(boolean isLogin) {
         userMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
         logoutMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
+        accomMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
+        exchangeMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
+        rankMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
+
         loginMenuItem.setVisibility(!isLogin ? TextView.VISIBLE : TextView.GONE);
         regMenuItem.setVisibility(!isLogin ? TextView.VISIBLE : TextView.GONE);
     }

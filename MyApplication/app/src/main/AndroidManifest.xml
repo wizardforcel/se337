@@ -53,6 +53,18 @@
             android:name=".CampusActivity"
             android:label="@string/title_activity_campus" >
         </activity>
+        <activity
+            android:name=".AccomActivity"
+            android:label="@string/title_activity_campus" >
+        </activity>
+        <activity
+            android:name=".RankActivity"
+            android:label="@string/title_activity_campus" >
+        </activity>
+        <activity
+            android:name=".ExchangeActivity"
+            android:label="@string/title_activity_campus" >
+        </activity>
     </application>
 
     <!-- 这个权限用于进行网络定位 -->
