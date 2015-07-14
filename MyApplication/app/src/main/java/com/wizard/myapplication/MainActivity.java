@@ -56,9 +56,10 @@ public class MainActivity extends Activity {
     private LocationClient mLocationClient;
 
     private Handler handler;
-
     private SlideMenu slideMenu;
     private ImageView menuButton;
+    private LinearLayout mapLinear;
+    private TextView buildingText;
 
     private TextView loginMenuItem;
     private TextView regMenuItem;
@@ -73,8 +74,8 @@ public class MainActivity extends Activity {
     private User user;
     private boolean onFollow = false;
     private boolean firstLoc = true;
-    private boolean isAdd = false;
     private LatLng lastLoc;
+    private Building currentBuilding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +105,6 @@ public class MainActivity extends Activity {
         {
             case GET_CAMPUS_SUCCESS:
                 Toast.makeText(this, "获取校园信息成功！", Toast.LENGTH_SHORT).show();
-                campus = (Campus) b.getSerializable("campus");
                 setCampusOnMap();
                 break;
             case GET_CAMPUS_FAIL:
@@ -183,6 +183,15 @@ public class MainActivity extends Activity {
 
     //初始化地图
     private void initBaiduMap() {
+
+        mapLinear = (LinearLayout) findViewById(R.id.mapLinear);
+        buildingText = (TextView) findViewById(R.id.buildingText);
+        buildingText.setVisibility(TextView.GONE);
+        buildingText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { buildingTextOnClick(); }
+        });
+
         mapView = (MapView) findViewById(R.id.bmapView);
         mapView.showScaleControl(false);
         mapView.showZoomControls(false);
@@ -196,9 +205,23 @@ public class MainActivity extends Activity {
                 return baiduMapOnMarkerClick(marker);
             }
         });
+        baiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) { baiduMapOnMapClick(); }
+            @Override
+            public boolean onMapPoiClick(MapPoi mapPoi) { return false; }
+        });
         baiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(17));
         baiduMap.setMaxAndMinZoomLevel(20, 17);
 
+    }
+
+    private void buildingTextOnClick()
+    {
+        Intent i = new Intent(this, BuildingActivity.class);
+        i.putExtra("building", currentBuilding);
+        i.putExtra("user", user);
+        startActivityForResult(i, ACTIVITY_BUILDING);
     }
 
     private void setCampusOnMap()
@@ -315,10 +338,10 @@ public class MainActivity extends Activity {
                 buildings.add(b);
             }
             c.setBuildings(buildings);
+            campus = c;
 
             Bundle b = new Bundle();
             b.putInt("type", GET_CAMPUS_SUCCESS);
-            b.putSerializable("campus", c);
             Message msg = handler.obtainMessage();
             msg.setData(b);
             handler.sendMessage(msg);
@@ -343,18 +366,16 @@ public class MainActivity extends Activity {
                 break;
             }
         }
+        currentBuilding = b;
+        buildingText.setText(b.getName());
+        buildingText.setVisibility(TextView.VISIBLE);
         Log.v("location", String.format("(%6f, %6f)", b.getLatitude(), b.getLongitude()));
-
-        final Intent intent = new Intent(this, BuildingActivity.class);
-        intent.putExtra("building", b);
-        intent.putExtra("user", user);
 
         InfoWindow infoWindow;
         TextView location = new TextView(getApplicationContext());
         location.setBackgroundResource(R.drawable.location_tips);
         location.setPadding(30, 20, 30, 50);
         location.setText(b.getName());
-        final LinearLayout view_map = (LinearLayout) findViewById(R.id.map_info);
         LayoutInflater flater = LayoutInflater.from(this);
         LatLng ll = m.getPosition();
         Button btn1=new Button(this);
@@ -367,43 +388,13 @@ public class MainActivity extends Activity {
                 });
         baiduMap.showInfoWindow(infoWindow);
 
-        if(!isAdd){
-            Log.v("addView", "addView");
-            final View view = flater.inflate(R.layout.marker_info, null);
-            TextView buildingname = (TextView) view.findViewById(R.id.buildingname);
-            buildingname.setText(b.getName());
-            view_map.addView(view);
-            isAdd = true;
-        }
-        else{
-            ((TextView)(view_map.getChildAt(2).findViewById(R.id.buildingname))).setText(b.getName());
-        }
-
-
-        view_map.getChildAt(2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(intent, ACTIVITY_BUILDING);
-            }
-        });
-        baiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                view_map.removeView(view_map.getChildAt(2));
-                baiduMap.hideInfoWindow();
-                isAdd = false;
-            }
-
-            @Override
-            public boolean onMapPoiClick(MapPoi mapPoi) {
-                return false;
-            }
-        });
-
-        //view_map.addView(btn1);
-        System.out.println(view_map.getChildCount());
-        System.out.println(((TextView)view_map.getChildAt(2).findViewById(R.id.buildingname)).getText());
         return false;
+    }
+
+    private void baiduMapOnMapClick()
+    {
+        baiduMap.hideInfoWindow();
+        buildingText.setVisibility(TextView.GONE);
     }
 
     @Override

@@ -15,6 +15,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,9 +37,10 @@ public class CampusActivity extends Activity {
     private static final int GET_IMAGE_FAIL = 1;
 
     private ImageView collegeImage;
-    private TextView collegeText;
-    private LinearLayout buildingList;
+    private TextView contentText;
+    private LinearLayout buildingPage;
     private Handler handler;
+    private TabHost tHost;
 
     private Campus campus;
     private List<Building> buildings;
@@ -52,15 +54,22 @@ public class CampusActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_campus);
 
-        collegeText = (TextView) findViewById(R.id.collegeText);
-        buildingList = (LinearLayout) findViewById(R.id.buildingList);
+        contentText = (TextView) findViewById(R.id.contentText);
+        buildingPage = (LinearLayout) findViewById(R.id.buildingsPage);
         collegeImage = (ImageView) findViewById(R.id.collegeImage);
+
+        tHost = (TabHost) findViewById(R.id.tabHost);
+        tHost.setup();
+        tHost.addTab(tHost.newTabSpec("简介").setIndicator("简介").setContent(R.id.contentPage));
+        tHost.addTab(tHost.newTabSpec("景点").setIndicator("景点").setContent(R.id.buildingsPage));
+        tHost.addTab(tHost.newTabSpec("活动").setIndicator("活动").setContent(R.id.activityPage));
+        tHost.setCurrentTab(0);
 
         Intent i = getIntent();
         campus = (Campus) i.getSerializableExtra("campus");
         buildings = campus.getBuildings();
         user = (User) i.getSerializableExtra("user");
-        collegeText.setText(campus.getContent());
+        contentText.setText(campus.getContent());
         setBuildingTable();
 
         TextView tv = (TextView) findViewById(R.id.titlebar_name);
@@ -159,12 +168,13 @@ public class CampusActivity extends Activity {
                     buildingTextOnClick(building);
                 }
             });
-            buildingList.addView(buildingText);
+            buildingPage.addView(buildingText);
         }
     }
 
     private void buildingTextOnClick(Building b)
     {
+        Log.d("building", b.getName());
         Intent intent = new Intent(CampusActivity.this, BuildingActivity.class);
         intent.putExtra("building", b);
         intent.putExtra("user", user);

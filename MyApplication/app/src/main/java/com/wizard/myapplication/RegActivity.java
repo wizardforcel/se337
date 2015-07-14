@@ -125,7 +125,7 @@ public class RegActivity extends Activity {
             JSONObject retJson = new JSONObject(retStr);
 
             User user = new User();
-            user.setId(retJson.getString("id"));
+            user.setId(retJson.getInt("id"));
             user.setUn(retJson.getString("username"));
             user.setPw(retJson.getString("password"));
             user.setName(retJson.getString("name"));

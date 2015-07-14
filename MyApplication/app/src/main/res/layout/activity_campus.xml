@@ -9,33 +9,42 @@
         android:id="@+id/include2">
     </include>
 
-    <ScrollView
+    <ImageView
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/scrollView"
-        android:layout_weight="1">
+        android:layout_height="120dp"
+        android:id="@+id/collegeImage"
+        android:scaleType="centerCrop" />
+
+    <TabHost
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/tabHost">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/buildingList">
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
 
-            <ImageView
+            <TabWidget
+                android:id="@android:id/tabs"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/collegeImage"
-                android:padding="10dp" />
+                android:layout_height="wrap_content"/>
 
-            <TextView
+            <FrameLayout
+                android:id="@android:id/tabcontent"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/collegeText"
-                android:textAppearance="@android:style/TextAppearance.Medium"
-                android:padding="10dp" />
+                android:layout_height="fill_parent">
+
+                <include layout="@layout/campus_content_page" />
+
+                <include layout="@layout/campus_buildings_page" />
+
+                <include layout="@layout/campus_activity_page" />
+
+            </FrameLayout>
 
         </LinearLayout>
 
-    </ScrollView>
+    </TabHost>
 
 </LinearLayout>

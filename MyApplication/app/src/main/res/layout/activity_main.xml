@@ -17,16 +17,25 @@
             android:animateLayoutChanges="true"
             android:orientation="vertical"
             android:weightSum="1"
-            android:id="@+id/map_info">
+            android:id="@+id/mapLinear">
 
             <include layout="@layout/titlebar_main" />
 
             <com.baidu.mapapi.map.MapView
                 android:id="@+id/bmapView"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="0dp"
                 android:clickable="true"
-                android:layout_weight="1.11" />
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/buildingText"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center" />
         </LinearLayout>
 
     </com.wizard.myapplication.view.SlideMenu>

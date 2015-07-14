@@ -7,6 +7,13 @@ import java.io.Serializable;
  */
 public class Comment implements Serializable
 {
+
+    private int id;
+    private int uid;
+    private String un;
+    private String content;
+    private int like;
+
     public String getUn() {
         return un;
     }
@@ -23,6 +30,37 @@ public class Comment implements Serializable
         this.content = content;
     }
 
-    private String un;
-    private String content;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getUid() {
+        return uid;
+    }
+
+    public void setUid(int uid) {
+        this.uid = uid;
+    }
+
+    public int getLike() {
+        return like;
+    }
+
+    public void setLike(int like) {
+        this.like = like;
+    }
+
+    public int getDislike() {
+        return dislike;
+    }
+
+    public void setDislike(int dislike) {
+        this.dislike = dislike;
+    }
+
+    private int dislike;
 }

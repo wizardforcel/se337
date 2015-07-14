@@ -25,7 +25,8 @@
 
             <TableRow
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -40,13 +41,16 @@
                     android:layout_height="wrap_content"
                     android:text="选择"
                     android:id="@+id/naviSrcButton"
-                    android:layout_weight="5" />
+                    android:layout_weight="5"
+                    android:background="#2672b2"
+                    android:textColor="#fff" />
 
             </TableRow>
 
             <TableRow
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -61,7 +65,9 @@
                     android:layout_height="wrap_content"
                     android:text="选择"
                     android:id="@+id/naviDestButton"
-                    android:layout_weight="5" />
+                    android:layout_weight="5"
+                    android:background="#2672b2"
+                    android:textColor="#fff" />
             </TableRow>
 
         </TableLayout>
@@ -70,7 +76,9 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="确定"
-            android:id="@+id/naviOkButton" />
+            android:id="@+id/naviOkButton"
+            android:background="#2672b2"
+            android:textColor="#fff" />
 
     </LinearLayout>
 

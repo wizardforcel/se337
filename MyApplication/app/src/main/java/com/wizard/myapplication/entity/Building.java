@@ -20,14 +20,6 @@ public class Building implements Serializable
         this.name = name;
     }
 
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
     public String getContent() {
         return content;
     }
@@ -74,8 +66,6 @@ public class Building implements Serializable
     private String content;
     private double latitude;
     private double longitude;
-    private List<Comment> comments
-            = new ArrayList<Comment>();
     private double radius;
 
 }
