@@ -2,7 +2,6 @@ package com.wizard.myapplication;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,7 +27,6 @@ import com.wizard.myapplication.util.WizardHTTP;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.net.URL;
 import java.util.List;
 
 public class CampusActivity extends Activity {
@@ -156,11 +154,8 @@ public class CampusActivity extends Activity {
             final Building building = buildings.get(row);
             Log.v("building", building.getName());
 
-            TextView buildingText = new TextView(this);
-            buildingText.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT));
-            buildingText.setPadding(10, 10, 10, 10);
+            TextView buildingText
+                    = (TextView) getLayoutInflater().inflate(R.layout.campus_building_text, null);
             buildingText.setText(building.getName());
             buildingText.setOnClickListener(new View.OnClickListener() {
                 @Override

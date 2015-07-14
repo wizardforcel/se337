@@ -2,7 +2,6 @@ package com.wizard.myapplication;
 
 import android.app.Activity;
 
-import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
 
@@ -157,27 +156,11 @@ public class BuildingActivity extends Activity {
 
     private void addComment(String un, String co)
     {
-        LinearLayout linear = new LinearLayout(this);
-        linear.setOrientation(LinearLayout.VERTICAL);
-        linear.setPadding(10, 10, 10, 10);
-        linear.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-
-        TextView unText = new TextView(this);
-        unText.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
+        LinearLayout linear = (LinearLayout) getLayoutInflater().inflate(R.layout.building_comment_linear, null);
+        TextView unText = (TextView) linear.findViewById(R.id.unText);
         unText.setText(un + ":");
-
-        TextView coText = new TextView(this);
-        coText.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
+        TextView coText = (TextView) linear.findViewById(R.id.contentText);
         coText.setText(co);
-
-        linear.addView(unText);
-        linear.addView(coText);
         commentPage.addView(linear);
     }
 
