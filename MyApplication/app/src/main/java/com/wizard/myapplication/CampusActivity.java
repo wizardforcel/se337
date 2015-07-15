@@ -61,7 +61,7 @@ public class CampusActivity extends Activity {
         tHost.addTab(tHost.newTabSpec("简介").setIndicator("简介").setContent(R.id.contentPage));
         tHost.addTab(tHost.newTabSpec("景点").setIndicator("景点").setContent(R.id.buildingsPage));
         tHost.addTab(tHost.newTabSpec("活动").setIndicator("活动").setContent(R.id.activityPage));
-        tHost.setCurrentTab(0);
+        tHost.setCurrentTab(1);
 
         Intent i = getIntent();
         campus = (Campus) i.getSerializableExtra("campus");

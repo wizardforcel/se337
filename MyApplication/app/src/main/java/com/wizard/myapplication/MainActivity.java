@@ -36,6 +36,7 @@ import com.wizard.myapplication.view.SlideMenu;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +47,7 @@ public class MainActivity extends Activity {
     private static final int ACTIVITY_LOGIN = 1;
     private static final int ACTIVITY_BUILDING = 2;
     private static final int ACTIVITY_CAMPUS = 3;
+    private static final int ACTIVITY_SEARCH = 4;
 
     private static final int GET_CAMPUS_SUCCESS = 0;
     private static final int GET_CAMPUS_FAIL = 1;
@@ -72,6 +74,7 @@ public class MainActivity extends Activity {
     private TextView accomMenuItem;
     private TextView rankMenuItem;
     private TextView exchangeMenuItem;
+    private TextView searchMenuItem;
 
     private Campus campus;
     private User user;
@@ -108,7 +111,6 @@ public class MainActivity extends Activity {
         {
             case GET_CAMPUS_SUCCESS:
                 Toast.makeText(this, "获取校园信息成功！", Toast.LENGTH_SHORT).show();
-                campusMenuItem.setVisibility(View.VISIBLE);
                 setCampusOnMap();
                 break;
             case GET_CAMPUS_FAIL:
@@ -143,9 +145,11 @@ public class MainActivity extends Activity {
         accomMenuItem = (TextView) slideMenu.findViewById(R.id.acconMenu);
         rankMenuItem = (TextView) slideMenu.findViewById(R.id.rankMenu);
         exchangeMenuItem = (TextView) slideMenu.findViewById(R.id.exchangeMenu);
+        searchMenuItem = (TextView) slideMenu.findViewById(R.id.searchMenu);
 
         setMenuStatus(false);
         campusMenuItem.setVisibility(View.GONE);
+        searchMenuItem.setVisibility(View.GONE);
 
         loginMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -199,6 +203,10 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) { exchangeMenuItemOnClick(); }
         });
+        searchMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {  searchMenuItemOnClick(); }
+        });
     }
 
     //初始化地图
@@ -246,6 +254,9 @@ public class MainActivity extends Activity {
 
     private void setCampusOnMap()
     {
+        campusMenuItem.setVisibility(View.VISIBLE);
+        searchMenuItem.setVisibility(View.VISIBLE);
+
         //设置中心点
         double lat = campus.getLatitude();
         double lng = campus.getLongitude();
@@ -470,6 +481,14 @@ public class MainActivity extends Activity {
         startActivity(i);
     }
 
+    private void searchMenuItemOnClick()
+    {
+        Intent i = new Intent(this, SearchActivity.class);
+        i.putExtra("buildings", (Serializable) campus.getBuildings());
+        startActivityForResult(i, ACTIVITY_SEARCH);
+        slideMenu.closeMenu();
+    }
+
     private void exchangeMenuItemOnClick()
     {
         Intent i = new Intent(this, ExchangeActivity.class);
@@ -581,6 +600,10 @@ public class MainActivity extends Activity {
             user = (User) i.getSerializableExtra("user");
             setMenuStatus(true);
         }
+        else if(requestCode == ACTIVITY_SEARCH && resultCode == RESULT_OK) {
+            int resultId = i.getIntExtra("resultId", 0);
+            searchActivityOnOk(resultId);
+        }
     }
 
     private void setMenuStatus(boolean isLogin) {
@@ -625,4 +648,20 @@ public class MainActivity extends Activity {
 
         return null;
     }
+
+    private void searchActivityOnOk(int id)
+    {
+        Marker m = null;
+        for(Marker m2 : markers)
+        {
+            if(Integer.parseInt(m2.getTitle()) == id)
+            {
+                m = m2;
+                break;
+            }
+        }
+        baiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(m.getPosition()));
+        baiduMapOnMarkerClick(m);
+    }
+
 }
