@@ -13,6 +13,5 @@
             android:focusableInTouchMode="false"
             android:id="@+id/buildingsPage">
 
-
         </LinearLayout>
     </ScrollView>

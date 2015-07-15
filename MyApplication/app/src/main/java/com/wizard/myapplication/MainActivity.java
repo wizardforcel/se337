@@ -108,6 +108,7 @@ public class MainActivity extends Activity {
         {
             case GET_CAMPUS_SUCCESS:
                 Toast.makeText(this, "获取校园信息成功！", Toast.LENGTH_SHORT).show();
+                campusMenuItem.setVisibility(View.VISIBLE);
                 setCampusOnMap();
                 break;
             case GET_CAMPUS_FAIL:
@@ -144,6 +145,7 @@ public class MainActivity extends Activity {
         exchangeMenuItem = (TextView) slideMenu.findViewById(R.id.exchangeMenu);
 
         setMenuStatus(false);
+        campusMenuItem.setVisibility(View.GONE);
 
         loginMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override

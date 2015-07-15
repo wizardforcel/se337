@@ -43,7 +43,7 @@ public class CampusActivity extends Activity {
     private Campus campus;
     private List<Building> buildings;
     private User user;
-    boolean imgLoaded = false;
+    boolean loaded = false;
 
 
     @Override
@@ -66,9 +66,10 @@ public class CampusActivity extends Activity {
         Intent i = getIntent();
         campus = (Campus) i.getSerializableExtra("campus");
         buildings = campus.getBuildings();
-        user = (User) i.getSerializableExtra("user");
         contentText.setText(campus.getContent());
         setBuildingTable();
+        user = (User) i.getSerializableExtra("user");
+
 
         TextView tv = (TextView) findViewById(R.id.titlebar_name);
         tv.setText(campus.getName());
@@ -87,7 +88,7 @@ public class CampusActivity extends Activity {
         };
 
 
-        if(!imgLoaded) {
+        if(!loaded) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -104,7 +105,7 @@ public class CampusActivity extends Activity {
         switch(type)
         {
             case GET_IMAGE_SUCCESS:
-                imgLoaded = true;
+                loaded = true;
                 byte[] img = b.getByteArray("img");
                 collegeImage.setImageBitmap(BitmapFactory.decodeByteArray(img, 0, img.length));
                 break;
