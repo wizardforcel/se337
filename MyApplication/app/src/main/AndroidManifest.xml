@@ -69,6 +69,14 @@
             android:name=".SearchActivity"
             android:label="@string/title_activity_search" >
         </activity>
+        <activity
+            android:name=".PreferenceActivity"
+            android:label="@string/title_activity_search" >
+        </activity>
+        <activity
+            android:name=".EventActivity"
+            android:label="@string/title_activity_search" >
+        </activity>
     </application>
 
     <!-- 这个权限用于进行网络定位 -->

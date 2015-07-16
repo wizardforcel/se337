@@ -46,8 +46,7 @@ public class CampusActivity extends Activity {
 
     private Campus campus;
     private List<Building> buildings;
-    private List<Event> events
-            = new ArrayList<Event>();;
+    private List<Event> events;
     private User user;
     boolean loaded = false;
 
@@ -74,10 +73,10 @@ public class CampusActivity extends Activity {
         Intent i = getIntent();
         campus = (Campus) i.getSerializableExtra("campus");
         buildings = campus.getBuildings();
+        events = campus.getEvents();
         contentText.setText(campus.getContent());
         setBuildingTable();
         user = (User) i.getSerializableExtra("user");
-
 
         TextView tv = (TextView) findViewById(R.id.titlebar_name);
         tv.setText(campus.getName());
@@ -141,7 +140,11 @@ public class CampusActivity extends Activity {
 
     private void eventTextOnClick(Event e)
     {
-
+        Log.d("event", e.getName());
+        Intent intent = new Intent(CampusActivity.this, EventActivity.class);
+        intent.putExtra("event", e);
+        intent.putExtra("user", user);
+        startActivityForResult(intent, 0);
     }
 
     private void threadLoadData()
@@ -160,21 +163,6 @@ public class CampusActivity extends Activity {
                 String imgPath = retJson.getString("path");
                 imgPath = "http://" + UrlConfig.HOST + "/picture/" + imgPath.replace(".", "/");
                 imgData  = http.httpGetData(imgPath);
-            }
-
-            String date = new java.text.SimpleDateFormat("yyyyMMddHHmmss").format(new java.util.Date());
-            retStr = http.httpGet(
-                    "http://" + UrlConfig.HOST + "/activity/university/" + campus.getId() + "/date/" + date);
-            retArr = new JSONArray(retStr);
-            events.clear();
-            for(int i = 0; i < retArr.length(); i++){
-                JSONObject json = retArr.getJSONObject(i);
-                Event event = new Event();
-                event.setId(json.getInt("id"));
-                event.setName(json.getString("name"));
-                event.setContent(json.getString("description"));
-                event.setDate(json.getString("date"));
-                events.add(event);
             }
 
             Bundle b = new Bundle();

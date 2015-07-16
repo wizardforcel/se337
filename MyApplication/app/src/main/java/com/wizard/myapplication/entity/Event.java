@@ -1,9 +1,11 @@
 package com.wizard.myapplication.entity;
 
+import java.io.Serializable;
+
 /**
  * Created by Wizard on 2015/7/16.
  */
-public class Event
+public class Event implements Serializable
 {
     private int id;
     private String name;

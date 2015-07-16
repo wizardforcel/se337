@@ -52,15 +52,6 @@ public class Campus implements Serializable
         this.radius = radius;
     }
 
-    public List<String> getPictures() {
-        return pictures;
-    }
-
-    public void setPictures(List<String> pictures) {
-        this.pictures = pictures;
-    }
-
-
     public double getLatitude() {
         return latitude;
     }
@@ -77,6 +68,14 @@ public class Campus implements Serializable
         this.longitude = longitude;
     }
 
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
+    }
+
     private int id;
     private String name;
     private String content;
@@ -85,7 +84,7 @@ public class Campus implements Serializable
     private double radius;
     private List<Building> buildings
             = new ArrayList<Building>();
-    private List<String> pictures
-            = new ArrayList<String>();
+    private List<Event> events
+            = new ArrayList<Event>();
 
 }

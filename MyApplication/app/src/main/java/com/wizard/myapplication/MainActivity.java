@@ -27,6 +27,7 @@ import com.baidu.navisdk.BNaviEngineManager;
 import com.baidu.navisdk.BaiduNaviManager;
 import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.Campus;
+import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.NaviNode;
 import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.util.UrlConfig;
@@ -38,6 +39,7 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 
@@ -75,6 +77,7 @@ public class MainActivity extends Activity {
     private TextView rankMenuItem;
     private TextView exchangeMenuItem;
     private TextView searchMenuItem;
+    private TextView preferenceMenuItem;
 
     private Campus campus;
     private User user;
@@ -146,6 +149,7 @@ public class MainActivity extends Activity {
         rankMenuItem = (TextView) slideMenu.findViewById(R.id.rankMenu);
         exchangeMenuItem = (TextView) slideMenu.findViewById(R.id.exchangeMenu);
         searchMenuItem = (TextView) slideMenu.findViewById(R.id.searchMenu);
+        preferenceMenuItem = (TextView) slideMenu.findViewById(R.id.preferenceMenu);
 
         setMenuStatus(false);
         campusMenuItem.setVisibility(View.GONE);
@@ -206,6 +210,10 @@ public class MainActivity extends Activity {
         searchMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {  searchMenuItemOnClick(); }
+        });
+        preferenceMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { preferenceMenuItemOnClick(); }
         });
     }
 
@@ -369,6 +377,24 @@ public class MainActivity extends Activity {
                 buildings.add(b);
             }
             c.setBuildings(buildings);
+
+            String date = new java.text.SimpleDateFormat("yyyyMMddHHmmss")
+                    .format(Calendar.getInstance().getTime());
+            Log.d("date", date);
+            retStr = http.httpGet(
+                    "http://" + UrlConfig.HOST + "/activity/university/" + c.getId() + "/date/" + date);
+            retArr = new JSONArray(retStr);
+            List<Event> events = new ArrayList<Event>();
+            for(int i = 0; i < retArr.length(); i++) {
+                JSONObject json = retArr.getJSONObject(i);
+                Event event = new Event();
+                event.setId(json.getInt("id"));
+                event.setName(json.getString("name"));
+                event.setContent(json.getString("description"));
+                event.setDate(json.getString("date"));
+                events.add(event);
+            }
+            c.setEvents(events);
             campus = c;
 
             Bundle b = new Bundle();
@@ -379,6 +405,7 @@ public class MainActivity extends Activity {
         }
         catch(Exception ex)
         {
+            ex.printStackTrace();
             Bundle b = new Bundle();
             b.putInt("type", GET_CAMPUS_FAIL);
             b.putSerializable("errmsg", ex.getMessage());
@@ -453,19 +480,6 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        /*getMenuInflater().inflate(R.menu.main, menu);
-
-        loginMenuItem = menu.findItem(R.id.login_settings);
-        regMenuItem = menu.findItem(R.id.reg_settings);
-        selectMenuItem = menu.findItem(R.id.select_settings);
-        locMenuItem = menu.findItem(R.id.loc_settings);
-        userMenuItem = menu.findItem(R.id.user_settings);
-        naviMenuItem = menu.findItem(R.id.navi_settings);
-        logoutMenuItem = menu.findItem(R.id.logout_settings);
-        followMenuItem = menu.findItem(R.id.follow_settings);
-        setMenuStatus(false);*/
-
         return true;
     }
 
@@ -554,39 +568,18 @@ public class MainActivity extends Activity {
         startActivity(i);
     }
 
+    private void preferenceMenuItemOnClick()
+    {
+        Intent i = new Intent(this, PreferenceActivity.class);
+        i.putExtra("user", user);
+        startActivity(i);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        /*Log.v("Menu", item.getTitle().toString());
-
-        if(item.getItemId() == loginMenuItem.getItemId())
-        {
-            loginMenuItemOnClick();
-            return true;
-        }
-        if(item.getItemId() == regMenuItem.getItemId())
-        {
-            regMenuItemOnClick();
-            return true;
-        }
-        if(item.getItemId() == logoutMenuItem.getItemId())
-        {
-            logoutMenuItemOnClick();
-            return true;
-        }
-        if(item.getItemId() == locMenuItem.getItemId())
-        {
-            locMenuItemOnClick();
-            return true;
-        }
-        if(item.getItemId() == followMenuItem.getItemId())
-        {
-            followMenuItemOnClick();
-            return true;
-        }*/
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -607,12 +600,15 @@ public class MainActivity extends Activity {
     }
 
     private void setMenuStatus(boolean isLogin) {
+        //登录后
         userMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
         logoutMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
         accomMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
         exchangeMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
         rankMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
+        preferenceMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
 
+        //登录前
         loginMenuItem.setVisibility(!isLogin ? TextView.VISIBLE : TextView.GONE);
         regMenuItem.setVisibility(!isLogin ? TextView.VISIBLE : TextView.GONE);
     }
