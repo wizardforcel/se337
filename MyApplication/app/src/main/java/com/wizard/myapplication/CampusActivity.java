@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.Campus;
+import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
@@ -27,21 +28,26 @@ import com.wizard.myapplication.util.WizardHTTP;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CampusActivity extends Activity {
 
-    private static final int GET_IMAGE_SUCCESS = 0;
-    private static final int GET_IMAGE_FAIL = 1;
+    private static final int LOAD_DATA_SUCCESS = 0;
+    private static final int LOAD_DATA_FAIL = 1;
 
     private ImageView collegeImage;
     private TextView contentText;
     private LinearLayout buildingPage;
+    private LinearLayout eventPage;
     private Handler handler;
     private TabHost tHost;
+    private Button addEventButton;
 
     private Campus campus;
     private List<Building> buildings;
+    private List<Event> events
+            = new ArrayList<Event>();;
     private User user;
     boolean loaded = false;
 
@@ -54,14 +60,16 @@ public class CampusActivity extends Activity {
 
         contentText = (TextView) findViewById(R.id.contentText);
         buildingPage = (LinearLayout) findViewById(R.id.buildingsPage);
+        eventPage = (LinearLayout) findViewById(R.id.eventPage);
         collegeImage = (ImageView) findViewById(R.id.collegeImage);
+        addEventButton = (Button) findViewById(R.id.addEventButton);
 
         tHost = (TabHost) findViewById(R.id.tabHost);
         tHost.setup();
         tHost.addTab(tHost.newTabSpec("简介").setIndicator("简介").setContent(R.id.contentPage));
         tHost.addTab(tHost.newTabSpec("景点").setIndicator("景点").setContent(R.id.buildingsPage));
-        tHost.addTab(tHost.newTabSpec("活动").setIndicator("活动").setContent(R.id.activityPage));
-        tHost.setCurrentTab(1);
+        tHost.addTab(tHost.newTabSpec("活动").setIndicator("活动").setContent(R.id.eventPage0));
+        tHost.setCurrentTab(0);
 
         Intent i = getIntent();
         campus = (Campus) i.getSerializableExtra("campus");
@@ -87,12 +95,11 @@ public class CampusActivity extends Activity {
             }
         };
 
-
         if(!loaded) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    threadGetImage();
+                    threadLoadData();
                 }
             }).start();
         }
@@ -104,36 +111,75 @@ public class CampusActivity extends Activity {
         int type = b.getInt("type");
         switch(type)
         {
-            case GET_IMAGE_SUCCESS:
+            case LOAD_DATA_SUCCESS:
                 loaded = true;
                 byte[] img = b.getByteArray("img");
-                collegeImage.setImageBitmap(BitmapFactory.decodeByteArray(img, 0, img.length));
+                if(img != null)
+                    collegeImage.setImageBitmap(BitmapFactory.decodeByteArray(img, 0, img.length));
+                setEvents();
                 break;
-            case GET_IMAGE_FAIL:
+            case LOAD_DATA_FAIL:
                 Toast.makeText(CampusActivity.this, "图片加载失败！" + b.getString("srrmag"), Toast.LENGTH_SHORT).show();
                 break;
         }
     }
 
-    private void threadGetImage()
+    private void setEvents()
+    {
+        for(int i = 0; i < events.size(); i++){
+            final Event e = events.get(i);
+            TextView tv
+                    = (TextView) getLayoutInflater().inflate(R.layout.campus_building_text, null);
+            tv.setText(e.getName());
+            tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) { eventTextOnClick(e); }
+            });
+            eventPage.addView(tv);
+        }
+    }
+
+    private void eventTextOnClick(Event e)
+    {
+
+    }
+
+    private void threadLoadData()
     {
         try
         {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
+            http.setCharset("utf-8");
             String retStr = http.httpGet("http://" + UrlConfig.HOST + "/picture/university/" + campus.getId());
             JSONArray retArr = new JSONArray(retStr);
-            if(retArr.length() == 0)
-                return;
 
-            JSONObject retJson = retArr.getJSONObject(0);
-            String imgPath = retJson.getString("path");
-            imgPath = "http://" + UrlConfig.HOST + "/picture/" + imgPath.replace(".", "/");
-            byte[] imgData = http.httpGetData(imgPath);
+            byte[] imgData = null;
+            if(retArr.length() != 0) {
+                JSONObject retJson = retArr.getJSONObject(0);
+                String imgPath = retJson.getString("path");
+                imgPath = "http://" + UrlConfig.HOST + "/picture/" + imgPath.replace(".", "/");
+                imgData  = http.httpGetData(imgPath);
+            }
+
+            String date = new java.text.SimpleDateFormat("yyyyMMddHHmmss").format(new java.util.Date());
+            retStr = http.httpGet(
+                    "http://" + UrlConfig.HOST + "/activity/university/" + campus.getId() + "/date/" + date);
+            retArr = new JSONArray(retStr);
+            events.clear();
+            for(int i = 0; i < retArr.length(); i++){
+                JSONObject json = retArr.getJSONObject(i);
+                Event event = new Event();
+                event.setId(json.getInt("id"));
+                event.setName(json.getString("name"));
+                event.setContent(json.getString("description"));
+                event.setDate(json.getString("date"));
+                events.add(event);
+            }
 
             Bundle b = new Bundle();
             b.putByteArray("img", imgData);
-            b.putInt("type", GET_IMAGE_SUCCESS);
+            b.putInt("type", LOAD_DATA_SUCCESS);
             Message msg = handler.obtainMessage();
             msg.setData(b);
             handler.sendMessage(msg);
@@ -142,7 +188,7 @@ public class CampusActivity extends Activity {
         {
             ex.printStackTrace();
             Bundle b = new Bundle();
-            b.putInt("type", GET_IMAGE_FAIL);
+            b.putInt("type", LOAD_DATA_FAIL);
             b.putString("errmsg", ex.getMessage());
             Message msg = handler.obtainMessage();
             msg.setData(b);
@@ -160,9 +206,7 @@ public class CampusActivity extends Activity {
             buildingText.setText(building.getName());
             buildingText.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
-                    buildingTextOnClick(building);
-                }
+                public void onClick(View v) { buildingTextOnClick(building); }
             });
             buildingPage.addView(buildingText);
         }
