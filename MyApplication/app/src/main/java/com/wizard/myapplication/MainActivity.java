@@ -78,6 +78,7 @@ public class MainActivity extends Activity {
     private TextView exchangeMenuItem;
     private TextView searchMenuItem;
     private TextView preferenceMenuItem;
+    private TextView sjtuBusMenuItem;
 
     private Campus campus;
     private User user;
@@ -150,6 +151,7 @@ public class MainActivity extends Activity {
         exchangeMenuItem = (TextView) slideMenu.findViewById(R.id.exchangeMenu);
         searchMenuItem = (TextView) slideMenu.findViewById(R.id.searchMenu);
         preferenceMenuItem = (TextView) slideMenu.findViewById(R.id.preferenceMenu);
+        sjtuBusMenuItem = (TextView) findViewById(R.id.sjtuBusMenu);
 
         setMenuStatus(false);
         campusMenuItem.setVisibility(View.GONE);
@@ -214,6 +216,10 @@ public class MainActivity extends Activity {
         preferenceMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { preferenceMenuItemOnClick(); }
+        });
+        sjtuBusMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { sjtuBusMenuItemOnClick(); }
         });
     }
 
@@ -377,24 +383,6 @@ public class MainActivity extends Activity {
                 buildings.add(b);
             }
             c.setBuildings(buildings);
-
-            String date = new java.text.SimpleDateFormat("yyyyMMddHHmmss")
-                    .format(Calendar.getInstance().getTime());
-            Log.d("date", date);
-            retStr = http.httpGet(
-                    "http://" + UrlConfig.HOST + "/activity/university/" + c.getId() + "/date/" + date);
-            retArr = new JSONArray(retStr);
-            List<Event> events = new ArrayList<Event>();
-            for(int i = 0; i < retArr.length(); i++) {
-                JSONObject json = retArr.getJSONObject(i);
-                Event event = new Event();
-                event.setId(json.getInt("id"));
-                event.setName(json.getString("name"));
-                event.setContent(json.getString("description"));
-                event.setDate(json.getString("date"));
-                events.add(event);
-            }
-            c.setEvents(events);
             campus = c;
 
             Bundle b = new Bundle();
@@ -565,6 +553,12 @@ public class MainActivity extends Activity {
         myLoc.setLat(lastLoc.latitude);
         myLoc.setLng(lastLoc.longitude);
         i.putExtra("myLoc", myLoc);
+        startActivity(i);
+    }
+
+    private void sjtuBusMenuItemOnClick()
+    {
+        Intent i = new Intent(this, WebActivity.class);
         startActivity(i);
     }
 

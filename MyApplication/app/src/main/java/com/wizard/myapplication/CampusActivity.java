@@ -29,12 +29,18 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class CampusActivity extends Activity {
 
     private static final int LOAD_DATA_SUCCESS = 0;
     private static final int LOAD_DATA_FAIL = 1;
+
+    private static final int ACTIVITY_BUILDING = 0;
+    private static final int ACTIVITY_EVENT = 1;
+    private static final int ACTIVITY_ADD_EVENT = 2;
+    private static final int ACTIVITY_LOGIN = 3;
 
     private ImageView collegeImage;
     private TextView contentText;
@@ -46,7 +52,8 @@ public class CampusActivity extends Activity {
 
     private Campus campus;
     private List<Building> buildings;
-    private List<Event> events;
+    private List<Event> events
+            = new ArrayList<Event>();
     private User user;
     boolean loaded = false;
 
@@ -62,6 +69,10 @@ public class CampusActivity extends Activity {
         eventPage = (LinearLayout) findViewById(R.id.eventPage);
         collegeImage = (ImageView) findViewById(R.id.collegeImage);
         addEventButton = (Button) findViewById(R.id.addEventButton);
+        addEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { addEventButtonOnClick(); }
+        });
 
         tHost = (TabHost) findViewById(R.id.tabHost);
         tHost.setup();
@@ -73,9 +84,8 @@ public class CampusActivity extends Activity {
         Intent i = getIntent();
         campus = (Campus) i.getSerializableExtra("campus");
         buildings = campus.getBuildings();
-        events = campus.getEvents();
         contentText.setText(campus.getContent());
-        setBuildingTable();
+        setBuildings();
         user = (User) i.getSerializableExtra("user");
 
         TextView tv = (TextView) findViewById(R.id.titlebar_name);
@@ -165,6 +175,23 @@ public class CampusActivity extends Activity {
                 imgData  = http.httpGetData(imgPath);
             }
 
+            String date = new java.text.SimpleDateFormat("yyyyMMddHHmmss")
+                    .format(Calendar.getInstance().getTime());
+            Log.d("date", date);
+            retStr = http.httpGet(
+                    "http://" + UrlConfig.HOST + "/activity/university/" + campus.getId() + "/date/" + date);
+            retArr = new JSONArray(retStr);
+            events.clear();
+            for(int i = 0; i < retArr.length(); i++) {
+                JSONObject json = retArr.getJSONObject(i);
+                Event event = new Event();
+                event.setId(json.getInt("id"));
+                event.setName(json.getString("name"));
+                event.setContent(json.getString("description"));
+                event.setDate(json.getString("date"));
+                events.add(event);
+            }
+
             Bundle b = new Bundle();
             b.putByteArray("img", imgData);
             b.putInt("type", LOAD_DATA_SUCCESS);
@@ -184,7 +211,7 @@ public class CampusActivity extends Activity {
         }
     }
 
-    private void setBuildingTable(){
+    private void setBuildings(){
         for(int row = 0; row < buildings.size(); row++){
             final Building building = buildings.get(row);
             Log.v("building", building.getName());
@@ -212,9 +239,40 @@ public class CampusActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == Activity.RESULT_OK){
+        if((requestCode == ACTIVITY_BUILDING || requestCode == ACTIVITY_EVENT ||
+            requestCode == ACTIVITY_LOGIN) &&
+            resultCode == Activity.RESULT_OK){
+            user = (User) data.getSerializableExtra("user");
             setResult(Activity.RESULT_OK, data);
         }
+        else if(requestCode == ACTIVITY_ADD_EVENT && resultCode == RESULT_OK)
+        {
+            final Event e = (Event) data.getSerializableExtra("event");
+            TextView tv
+                    = (TextView) getLayoutInflater().inflate(R.layout.campus_building_text, null);
+            tv.setText(e.getName());
+            tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) { eventTextOnClick(e); }
+            });
+            eventPage.addView(tv);
+        }
+    }
+
+    private void addEventButtonOnClick()
+    {
+        if(user == null)
+        {
+            Intent i = new Intent(this, LoginActivity.class);
+            startActivityForResult(i, ACTIVITY_LOGIN);
+        }
+        else {
+            Intent i = new Intent(this, AddEventActivity.class);
+            i.putExtra("user", user);
+            i.putExtra("campus", campus);
+            startActivityForResult(i, ACTIVITY_ADD_EVENT);
+        }
+
     }
 
     @Override

@@ -17,5 +17,6 @@
     <string name="title_activity_navi">NaviActivity</string>
     <string name="title_activity_campus">CampusActivity</string>
     <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_web">WebActivity</string>
 
 </resources>
