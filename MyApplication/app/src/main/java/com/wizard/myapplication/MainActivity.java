@@ -156,6 +156,7 @@ public class MainActivity extends Activity {
         setMenuStatus(false);
         campusMenuItem.setVisibility(View.GONE);
         searchMenuItem.setVisibility(View.GONE);
+        sjtuBusMenuItem.setVisibility(View.GONE);
 
         loginMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -35,7 +35,9 @@
                 android:id="@+id/showDate"
                 android:layout_weight="8"
                 android:textAppearance="@android:style/TextAppearance.Medium"
-                android:layout_gravity="center_vertical" />
+                android:layout_gravity="center_vertical"
+                android:text="2015-01-01"
+                android:paddingTop="10dp" />
 
             <Button
                 android:layout_width="0dp"
@@ -58,7 +60,8 @@
                 android:layout_weight="8"
                 android:textAppearance="@android:style/TextAppearance.Medium"
                 android:layout_gravity="center_vertical"
-                android:text="  " />
+                android:text="00:00"
+                android:paddingTop="10dp" />
 
             <Button
                 android:layout_width="0dp"
