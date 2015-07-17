@@ -35,7 +35,9 @@
                 android:textSize="20dp"
                 android:textStyle="bold"
                 android:layout_gravity="center_horizontal"
-                android:gravity="center" />
+                android:gravity="center"
+                android:background="#ff9966"
+                android:textColor="#fff" />
         </LinearLayout>
 
     </com.wizard.myapplication.view.SlideMenu>

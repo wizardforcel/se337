@@ -1,7 +1,9 @@
 package com.wizard.myapplication;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,6 +39,11 @@ public class EventActivity extends Activity {
     private static final int LOAD_DATA_FAIL = 1;
     private static final int ADD_COMMENT_FAIL = 2;
     private static final int ADD_COMMENT_SUCCESS = 3;
+    private static final int ZAN_SUCCESS = 4;
+    private static final int ZAN_FAIL = 5;
+    private static final int CAI_SUCCESS = 6;
+    private static final int CAI_FAIL = 7;
+
 
     private static final int ACTIVITY_LOGIN = 0;
 
@@ -45,13 +52,16 @@ public class EventActivity extends Activity {
     private EditText commentInput;
     private TextView contentText;
     private TabHost tHost;
+    AlertDialog voteDialog;
     private Handler handler;
+    private TextView currentVoteText;
 
     private User user;
     private Event e;
     private String myComment;
     private List<Comment> comments
             = new ArrayList<Comment>();
+    private Comment currentComment;
 
 
     @Override
@@ -79,6 +89,10 @@ public class EventActivity extends Activity {
         user = (User) i.getSerializableExtra("user");
         e = (Event) i.getSerializableExtra("event");
         contentText.setText(e.getContent());
+        TextView unText = (TextView) findViewById(R.id.unText);
+        unText.setText(e.getUn());
+        TextView dateText = (TextView) findViewById(R.id.dateText);
+        dateText.setText(e.getDate());
 
         TextView tv = (TextView) findViewById(R.id.titlebar_name);
         tv.setText(e.getName());
@@ -89,6 +103,22 @@ public class EventActivity extends Activity {
         });
 
         closeKeyboard();
+
+        LinearLayout voteLinear = (LinearLayout) getLayoutInflater().inflate(R.layout.vote_linear, null);
+        Button zanButton = (Button) voteLinear.findViewById(R.id.zanButton);
+        Button caiButton = (Button) voteLinear.findViewById(R.id.caiButton);
+        zanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { voteDialogZanButtonOnClick(); }
+        });
+        caiButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { voteDialogCaiButtonOnClick(); }
+        });
+        voteDialog = new AlertDialog.Builder(this)
+                .setView(voteLinear)
+                .setNegativeButton("取消", null)
+                .create();
 
         handler = new Handler()
         {
@@ -111,7 +141,7 @@ public class EventActivity extends Activity {
         switch(type) {
             case LOAD_DATA_SUCCESS:
                 for (Comment c : comments)
-                    addComment(c.getUn(), c.getContent());
+                    addComment(c);
                 break;
             case LOAD_DATA_FAIL:
                 Toast.makeText(EventActivity.this, "数据加载失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
@@ -121,11 +151,32 @@ public class EventActivity extends Activity {
                 break;
             case ADD_COMMENT_SUCCESS:
                 Toast.makeText(EventActivity.this, "评论成功！", Toast.LENGTH_SHORT).show();
-                addComment(user.getUn(), myComment);
+                addComment(comments.get(comments.size() - 1));
                 closeKeyboard();
                 commentInput.setText("");
                 break;
+            case ZAN_SUCCESS:
+                Toast.makeText(EventActivity.this, "点赞成功！", Toast.LENGTH_SHORT).show();
+                refreshCurrenVoteText();
+                voteDialog.hide();
+                break;
+            case ZAN_FAIL:
+                Toast.makeText(EventActivity.this, "点赞失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
+                break;
+            case CAI_SUCCESS:
+                Toast.makeText(EventActivity.this, "点踩成功！", Toast.LENGTH_SHORT).show();
+                refreshCurrenVoteText();
+                voteDialog.hide();
+                break;
+            case CAI_FAIL:
+                Toast.makeText(EventActivity.this, "点踩失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
+                break;
         }
+    }
+
+    private void refreshCurrenVoteText()
+    {
+        currentVoteText.setText(currentComment.getLike() + "/" + currentComment.getDislike());
     }
 
     private void closeKeyboard()
@@ -156,14 +207,42 @@ public class EventActivity extends Activity {
         })).start();
     }
 
-    private void addComment(String un, String co)
+    private void addComment(Comment c)
     {
         LinearLayout linear = (LinearLayout) getLayoutInflater().inflate(R.layout.comment_linear, null);
         TextView unText = (TextView) linear.findViewById(R.id.unText);
-        unText.setText(un + ":");
+        unText.setText(c.getUid() + ":");
         TextView coText = (TextView) linear.findViewById(R.id.contentText);
-        coText.setText(co);
+        coText.setText(c.getContent());
+        TextView voteText = (TextView) linear.findViewById(R.id.voteText);
+        voteText.setText(c.getLike() + "/" + c.getDislike());
+        final Comment finalComment = c;
+        final TextView finalVoteText = voteText;
+        voteText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentComment = finalComment;
+                currentVoteText = finalVoteText;
+                voteDialog.show();
+            }
+        });
         commentPage.addView(linear);
+    }
+
+    private void voteDialogZanButtonOnClick()
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() { threadZan(); }
+        }).start();
+    }
+
+    private void voteDialogCaiButtonOnClick()
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() { threadCai(); }
+        }).start();
     }
 
     private void threadAddComment()
@@ -176,7 +255,7 @@ public class EventActivity extends Activity {
 
             JSONObject postJson = new JSONObject();
             postJson.put("activityId", e.getId());
-            postJson.put("type", "view");
+            postJson.put("type", "activity");
             postJson.put("content", myComment);
             postJson.put("userId", user.getId());
 
@@ -242,6 +321,64 @@ public class EventActivity extends Activity {
             ex.printStackTrace();
             Bundle b = new Bundle();
             b.putInt("type", LOAD_DATA_FAIL);
+            b.putString("errmag", ex.getMessage());
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+    }
+
+    private void threadZan()
+    {
+        try
+        {
+            WizardHTTP http = new WizardHTTP();
+            http.setDefHeader(false);
+            http.setCharset("utf-8");
+
+            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/comment/like/" + currentComment.getId());
+            currentComment.setLike(currentComment.getLike() + 1);
+
+            Bundle b = new Bundle();
+            b.putInt("type", ZAN_SUCCESS);
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            Bundle b = new Bundle();
+            b.putInt("type", ZAN_FAIL);
+            b.putString("errmag", ex.getMessage());
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+    }
+
+    private void threadCai()
+    {
+        try
+        {
+            WizardHTTP http = new WizardHTTP();
+            http.setDefHeader(false);
+            http.setCharset("utf-8");
+
+            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/comment/dislike/" + currentComment.getId());
+            currentComment.setDislike(currentComment.getDislike() + 1);
+
+            Bundle b = new Bundle();
+            b.putInt("type", CAI_SUCCESS);
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            Bundle b = new Bundle();
+            b.putInt("type", CAI_FAIL);
             b.putString("errmag", ex.getMessage());
             Message msg = handler.obtainMessage();
             msg.setData(b);

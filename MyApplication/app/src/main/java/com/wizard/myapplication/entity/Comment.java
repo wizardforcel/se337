@@ -13,6 +13,7 @@ public class Comment implements Serializable
     private String un;
     private String content;
     private int like;
+    private int dislike;
 
     public String getUn() {
         return un;
@@ -62,5 +63,4 @@ public class Comment implements Serializable
         this.dislike = dislike;
     }
 
-    private int dislike;
 }

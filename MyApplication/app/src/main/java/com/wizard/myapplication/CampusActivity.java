@@ -189,6 +189,7 @@ public class CampusActivity extends Activity {
                 event.setName(json.getString("name"));
                 event.setContent(json.getString("description"));
                 event.setDate(json.getString("date"));
+                //event.setUid(json.getInt("userId"));
                 events.add(event);
             }
 

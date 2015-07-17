@@ -217,6 +217,9 @@ public class MainActivity extends Activity {
         mapView = (MapView) findViewById(R.id.bmapView);
         mapView.showScaleControl(false);
         mapView.showZoomControls(false);
+        View child = mapView.getChildAt(1);
+        if(child != null && child instanceof  ImageView)
+            child.setVisibility(View.GONE);
 
         baiduMap = mapView.getMap();
         //普通地图

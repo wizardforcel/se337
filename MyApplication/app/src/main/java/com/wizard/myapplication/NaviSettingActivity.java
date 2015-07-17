@@ -84,7 +84,7 @@ public class NaviSettingActivity extends Activity {
         srcButton.setText(srcList.get(currentSrc));
         destButton.setText(destList.get(currentDest));
 
-        srcDialog = new AlertDialog.Builder(this).setTitle("请输入提醒方式")
+        srcDialog = new AlertDialog.Builder(this).setTitle("请选择出发地点")
                 .setSingleChoiceItems(srcList.toArray(new String[0]), currentSrc,
                         new DialogInterface.OnClickListener()
                         {
@@ -94,7 +94,7 @@ public class NaviSettingActivity extends Activity {
                 .setNegativeButton("取消", null)
                 .create();
 
-        destDialog = new AlertDialog.Builder(this).setTitle("请输入提醒方式")
+        destDialog = new AlertDialog.Builder(this).setTitle("请选择目标地点")
                 .setSingleChoiceItems(destList.toArray(new String[0]), currentDest,
                         new DialogInterface.OnClickListener()
                         {

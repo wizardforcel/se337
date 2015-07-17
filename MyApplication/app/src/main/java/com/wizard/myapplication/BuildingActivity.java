@@ -136,7 +136,7 @@ public class BuildingActivity extends Activity {
                 if(img != null)
                     image.setImageBitmap(BitmapFactory.decodeByteArray(img, 0, img.length));
                 for(Comment c : comments)
-                    addComment(c.getUn(), c.getContent());
+                    addComment(c);
                 break;
             case LOAD_DATA_FAIL:
                 Toast.makeText(BuildingActivity.this, "数据加载失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
@@ -146,20 +146,20 @@ public class BuildingActivity extends Activity {
                 break;
             case ADD_COMMENT_SUCCESS:
                 Toast.makeText(BuildingActivity.this, "评论成功！", Toast.LENGTH_SHORT).show();
-                addComment(user.getUn(), myComment);
+                addComment(comments.get(comments.size() - 1));
                 closeKeyboard();
                 commentInput.setText("");
                 break;
         }
     }
 
-    private void addComment(String un, String co)
+    private void addComment(Comment c)
     {
         LinearLayout linear = (LinearLayout) getLayoutInflater().inflate(R.layout.comment_linear, null);
         TextView unText = (TextView) linear.findViewById(R.id.unText);
-        unText.setText(un + ":");
+        unText.setText(c.getUid() + ":");
         TextView coText = (TextView) linear.findViewById(R.id.contentText);
-        coText.setText(co);
+        coText.setText(c.getContent());
         commentPage.addView(linear);
     }
 

@@ -9,14 +9,35 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:id="@+id/contentPage">
+        android:id="@+id/contentPage"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/unText"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/dateText"
+                android:layout_weight="1"
+                android:gravity="right" />
+        </LinearLayout>
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:textAppearance="@android:style/TextAppearance.Medium"
-            android:id="@+id/contentText"
-            android:padding="10dp" />
+            android:id="@+id/contentText" />
 
     </LinearLayout>
 </ScrollView>
