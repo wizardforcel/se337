@@ -16,64 +16,79 @@ import java.util.*;
  */
 public class WizardHTTP 
 {
-    private HashMap<String, String> header
-    = new HashMap<String, String>();
-    private Map<String, String> retHeader
-    = new HashMap<String, String>();
+    private HashMap<String, String> headers
+        = new HashMap<String, String>();
+    private Map<String, String> retHeaders
+        = new HashMap<String, String>();
     private Proxy proxy;
     private int timeout = 4000;
     private String charset = "GBK";
-    
+
+    @Deprecated
     public String getHeader(String name)
     {
-        return header.get(name);
+        return headers.get(name);
     }
-    
+    @Deprecated
     public void setHeader(String name, String value)
     {
-        header.put(name, value);
+        headers.put(name, value);
     }
-    
+    @Deprecated
     public void delHeader(String name)
     {
-        header.remove(name);
+        headers.remove(name);
     }
+    @Deprecated
     public void clearHeader()
     {
-        header.clear();
+        headers.clear();
     }
+
+    public void setDefHeader() { setDefHeader(false); }
     public void setDefHeader(boolean mobile)
     {
-        header.put("Accept", "*/*");
-        header.put("Accept-Language", "zh-cn");
+        headers.put("Accept", "*/*");
+        headers.put("Accept-Language", "zh-cn");
         if(mobile)
-            header.put("User-Agent", "Dalvik/1.1.0 (Linux; U; Android 2.1; sdk Build/ERD79)");
+            headers.put("User-Agent", "Dalvik/1.1.0 (Linux; U; Android 2.1; sdk Build/ERD79)");
         else
-            header.put("User-Agent", "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)");
-        header.put("Content-Type", "application/x-www-form-urlencoded");
-        header.put("Cache-Control", "no-cache");
+            headers.put("User-Agent", "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)");
+        headers.put("Content-Type", "application/x-www-form-urlencoded");
+        headers.put("Cache-Control", "no-cache");
     }
-    
+
+    public Map<String, String> getRetHeaders() {
+        return retHeaders;
+    }
+    public HashMap<String, String> getHeaders() {
+        return headers;
+    }
+    public void setHeaders(HashMap<String, String> headers) {
+        this.headers = headers;
+    }
+    public int getTimeout() {
+        return timeout;
+    }
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
     public String getRetHeader(String name)
     {
-        return retHeader.get(name);
+        return retHeaders.get(name);
     }
-    
     public String getCharset()
     {
         return charset;
     }
-    
     public void setCharset(String cs)
     {
         charset = cs;
     }
-    
     public Proxy getProxy()
     {
         return proxy;
     }
-    
     public void setProxy(Proxy proxy)
     {
         this.proxy = proxy;
@@ -90,8 +105,8 @@ public class WizardHTTP
             conn = (HttpURLConnection) url.openConnection(proxy);
         conn.setConnectTimeout(timeout);
         conn.setReadTimeout(timeout);
-        for(String k : header.keySet())
-            conn.setRequestProperty(k, header.get(k));
+        for(String k : headers.keySet())
+            conn.setRequestProperty(k, headers.get(k));
         if(method.equals("POST"))
         {
             conn.setDoOutput(true);
@@ -102,7 +117,7 @@ public class WizardHTTP
             sw.close();
         }
         conn.connect();
-        retHeader.clear();
+        retHeaders.clear();
         Map<String, List<String>> oriRetHeader = conn.getHeaderFields();
         for(String k : oriRetHeader.keySet())
         {
@@ -112,7 +127,7 @@ public class WizardHTTP
                 sb.append(s).append(",");
             if(sb.length() != 0)
                 sb.setLength(sb.length() - 1);
-            retHeader.put(k, sb.toString());
+            retHeaders.put(k, sb.toString());
         }
         return conn.getInputStream();
     }
@@ -122,9 +137,9 @@ public class WizardHTTP
     {
         StreamReader sr
           = new StreamReader(getResponseStream(method, tar, postdata), charset);
-        String retstr = sr.readToEnd();
+        String retStr = sr.readToEnd();
         sr.close();
-        return retstr;
+        return retStr;
     }
 
     private byte[] httpSubmitData(String method, String tar, String postdata)
