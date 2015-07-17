@@ -47,51 +47,27 @@ public class AccomAdapter extends BaseAdapter {
             MyIBtn1.setText(mThumbNames[position]);
             //MyIBtn1.setTextSize(24.0f);
             MyIBtn1.setProgressBar(10, 5);
-            MyIBtn1.setLayoutParams(new GridView.LayoutParams(350, 500));
+            //MyIBtn1.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         }
         else
         {
-           MyIBtn1 =(GallaryLayout) convertView;
+            MyIBtn1 =(GallaryLayout) convertView;
         }
 
         return MyIBtn1;
     }
     private Integer[] mThumbIds={//显示的图片数组
+            R.drawable.meishi,R.drawable.xueba,
+            R.drawable.wenyi,R.drawable.yundong,
+            R.drawable.zhainan,R.drawable.xiaoyuan,
+            R.drawable.shenghuo,R.drawable.shejiao,
 
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
-            R.drawable.ic_launcher,R.drawable.ic_launcher,
     };
 
     private String[] mThumbNames ={//显示的图片数组
-            "任务1","任务2",
-            "任务3","任务4",
-            "任务5","任务6",
-            "任务6","任务7",
-            "任务8","任务9",
-            "任务10","任务11",
-            "任务12","任务13",
-            "任务14","任务15",
-            "ic_launcher","ic_launcher",
-            "ic_launcher","ic_launcher",
-            "ic_launcher","ic_launcher",
-            "ic_launcher","ic_launcher",
-            "ic_launcher","ic_launcher",
-            "ic_launcher","ic_launcher",
-            "ic_launcher","ic_launcher",
-            "ic_launcher","ic_launcher",
+            "美食家\n品尝食堂美食\n3/5","大学霸\n在图书馆学习3次\n1/3",
+            "文艺青年\n大礼堂签到3次\n0/3","运动健将\n体育场签到3次\n3/3",
+            "阳光御宅\n1天未在寝室楼以外签到\n0/1","校园达人\n去过10个以上建筑\n3/10",
+            "热爱生活\n教育超市签到3次\n2/3","社交达人\n小组活动室签到3次\n0/3",
     };
 }

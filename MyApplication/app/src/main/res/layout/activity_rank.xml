@@ -8,6 +8,8 @@
 
     <include layout="@layout/titlebar_other" />
 
+    <include layout="@layout/header" />
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
