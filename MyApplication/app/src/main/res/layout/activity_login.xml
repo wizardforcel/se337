@@ -2,50 +2,57 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:weightSum="1">
 
     <include layout="@layout/titlebar_other" />
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/login"
         android:orientation="vertical"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_top_margin"
         android:paddingBottom="@dimen/activity_vertical_margin"
         tools:context=".application"
-        android:paddingLeft="@dimen/activity_horizontal_margin">
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:weightSum="1">
 
         <EditText
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="215dp"
+            android:layout_height="34dp"
             android:inputType="textPersonName"
             android:ems="10"
-            android:id="@+id/userName"
+            android:id="@+id/unText"
             android:layout_above="@+id/passWord"
             android:layout_centerHorizontal="true"
             android:background="#ffffffff"
             android:minHeight="50dp"
-            android:layout_marginBottom="5dp"
-            android:hint="用户名:" />
+            android:layout_marginBottom="10dp"
+            android:hint="用户名:"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.02"
+            android:layout_marginTop="130dp" />
 
         <EditText
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="215dp"
+            android:layout_height="34dp"
             android:inputType="textPassword"
             android:ems="10"
             android:id="@+id/passWord"
             android:layout_above="@+id/login"
-            android:layout_alignLeft="@+id/userName"
-            android:layout_alignStart="@+id/userName"
+            android:layout_alignLeft="@+id/unText"
+            android:layout_alignStart="@+id/unText"
             android:background="#ffffffff"
             android:minHeight="50dp"
-            android:layout_marginBottom="5dp"
-            android:hint="密码:" />
+            android:layout_marginBottom="10dp"
+            android:hint="密码:"
+            android:layout_gravity="center_horizontal" />
 
         <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="215dp"
+            android:layout_height="38dp"
             android:text="登录"
             android:id="@+id/login"
             android:layout_centerVertical="true"
@@ -53,13 +60,15 @@
             android:layout_alignEnd="@+id/passWord"
             android:layout_alignLeft="@+id/passWord"
             android:layout_alignStart="@+id/passWord"
-            android:background="#2672b2"
-            android:layout_marginBottom="5dp"
-            android:textColor="#ffffff" />
+            android:background="#4591fb"
+            android:layout_marginBottom="10dp"
+            android:textColor="#ffffff"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="4dp" />
 
         <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="215dp"
+            android:layout_height="38dp"
             android:text="注册"
             android:id="@+id/signup"
             android:layout_below="@+id/login"
@@ -67,8 +76,9 @@
             android:layout_alignStart="@+id/login"
             android:layout_alignRight="@+id/login"
             android:layout_alignEnd="@+id/login"
-            android:background="#2672b2"
-            android:textColor="#ffffff" />
+            android:background="#4591fb"
+            android:textColor="#ffffff"
+            android:layout_gravity="center_horizontal" />
 
     </LinearLayout>
 

@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:text="添加活动"
         android:id="@+id/addEventButton"
-        android:background="#2672b2"
+        android:background="#ff9966"
         android:textColor="#fff"
         android:layout_margin="5dp" />
 </LinearLayout>

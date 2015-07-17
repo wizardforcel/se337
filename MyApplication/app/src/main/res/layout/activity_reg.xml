@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent">
 
     <include layout="@layout/titlebar_other" />
 
@@ -10,6 +10,7 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:background="@drawable/register"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:longClickable="false"
         android:weightSum="1"
@@ -19,20 +20,21 @@
         android:paddingBottom="@dimen/activity_vertical_margin">
 
         <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="215dp"
+            android:layout_height="34dp"
             android:inputType="textPersonName"
             android:ems="10"
-            android:id="@+id/userName"
+            android:id="@+id/unText"
             android:layout_gravity="center_horizontal"
             android:hint="请输入用户名:"
             android:minHeight="50dp"
             android:background="#ffffffff"
-            android:layout_marginBottom="5dp" />
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="115dp" />
 
         <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="215dp"
+            android:layout_height="34dp"
             android:inputType="textPassword"
             android:ems="10"
             android:id="@+id/passWord"
@@ -40,11 +42,11 @@
             android:hint="请输入密码:"
             android:minHeight="50dp"
             android:background="#ffffffff"
-            android:layout_marginBottom="5dp" />
+            android:layout_marginBottom="10dp" />
 
         <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="215dp"
+            android:layout_height="34dp"
             android:inputType="textPassword"
             android:ems="10"
             android:id="@+id/passWord2"
@@ -52,17 +54,18 @@
             android:hint="请再次输入密码:"
             android:minHeight="50dp"
             android:background="#ffffffff"
-            android:layout_marginBottom="5dp" />
+            android:layout_marginBottom="10dp" />
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="215dp"
+            android:layout_height="38dp"
             android:text="提交"
             android:id="@+id/signup"
             android:layout_gravity="center_horizontal"
             android:textStyle="bold"
-            android:background="#2672b2"
-            android:textColor="#ffffff" />
+            android:background="#4591fb"
+            android:textColor="#ffffff"
+            android:layout_marginTop="5dp" />
     </LinearLayout>
 
     </LinearLayout>

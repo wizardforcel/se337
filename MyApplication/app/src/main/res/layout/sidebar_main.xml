@@ -1,13 +1,13 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="240dip"
     android:layout_height="fill_parent"
-    android:background="@drawable/ic_top_divider"
+    android:background="#000"
     android:id="@+id/scrollView" >
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/ic_top_divider"
+        android:background="#000"
         android:orientation="vertical" >
 
         <TextView
@@ -147,86 +147,6 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/sjtuBusMenu"
-            android:layout_marginBottom="2dp" />
-
-        <TextView
-            android:layout_width="240dip"
-            android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
-            android:clickable="true"
-            android:drawableLeft="@drawable/ic_category_mark"
-            android:drawablePadding="1.0dip"
-            android:gravity="center_vertical"
-            android:paddingLeft="15.0dip"
-            android:paddingRight="10.0dip"
-            android:text="任务"
-            android:textColor="#ff959595"
-            android:textSize="16.0sp"
-            android:id="@+id/acconMenu"
-            android:layout_marginBottom="2dp" />
-
-        <TextView
-            android:layout_width="240dip"
-            android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
-            android:clickable="true"
-            android:drawableLeft="@drawable/ic_category_mark"
-            android:drawablePadding="1.0dip"
-            android:gravity="center_vertical"
-            android:paddingLeft="15.0dip"
-            android:paddingRight="10.0dip"
-            android:text="成就"
-            android:textColor="#ff959595"
-            android:textSize="16.0sp"
-            android:id="@+id/rankMenu"
-            android:layout_marginBottom="2dp" />
-
-        <TextView
-            android:layout_width="240dip"
-            android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
-            android:clickable="true"
-            android:drawableLeft="@drawable/ic_category_mark"
-            android:drawablePadding="1.0dip"
-            android:gravity="center_vertical"
-            android:paddingLeft="15.0dip"
-            android:paddingRight="10.0dip"
-            android:text="积分商城"
-            android:textColor="#ff959595"
-            android:textSize="16.0sp"
-            android:id="@+id/exchangeMenu"
-            android:layout_marginBottom="2dp" />
-
-        <TextView
-            android:layout_width="240dip"
-            android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
-            android:clickable="true"
-            android:drawableLeft="@drawable/ic_category_mark"
-            android:drawablePadding="1.0dip"
-            android:gravity="center_vertical"
-            android:paddingLeft="15.0dip"
-            android:paddingRight="10.0dip"
-            android:text="搜索"
-            android:textColor="#ff959595"
-            android:textSize="16.0sp"
-            android:id="@+id/searchMenu"
-            android:layout_marginBottom="2dp" />
-
-        <TextView
-            android:layout_width="240dip"
-            android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
-            android:clickable="true"
-            android:drawableLeft="@drawable/ic_category_mark"
-            android:drawablePadding="1.0dip"
-            android:gravity="center_vertical"
-            android:paddingLeft="15.0dip"
-            android:paddingRight="10.0dip"
-            android:text="偏好设置"
-            android:textColor="#ff959595"
-            android:textSize="16.0sp"
-            android:id="@+id/preferenceMenu"
             android:layout_marginBottom="2dp" />
 
         <TextView

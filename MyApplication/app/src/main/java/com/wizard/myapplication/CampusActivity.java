@@ -138,7 +138,7 @@ public class CampusActivity extends Activity {
         for(int i = 0; i < events.size(); i++){
             final Event e = events.get(i);
             TextView tv
-                    = (TextView) getLayoutInflater().inflate(R.layout.campus_building_text, null);
+                    = (TextView) getLayoutInflater().inflate(R.layout.text, null);
             tv.setText(e.getName());
             tv.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -217,7 +217,7 @@ public class CampusActivity extends Activity {
             Log.v("building", building.getName());
 
             TextView buildingText
-                    = (TextView) getLayoutInflater().inflate(R.layout.campus_building_text, null);
+                    = (TextView) getLayoutInflater().inflate(R.layout.text, null);
             buildingText.setText(building.getName());
             buildingText.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -249,7 +249,7 @@ public class CampusActivity extends Activity {
         {
             final Event e = (Event) data.getSerializableExtra("event");
             TextView tv
-                    = (TextView) getLayoutInflater().inflate(R.layout.campus_building_text, null);
+                    = (TextView) getLayoutInflater().inflate(R.layout.text, null);
             tv.setText(e.getName());
             tv.setOnClickListener(new View.OnClickListener() {
                 @Override

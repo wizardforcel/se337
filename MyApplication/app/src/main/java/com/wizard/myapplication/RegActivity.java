@@ -46,7 +46,7 @@ public class RegActivity extends Activity {
         TextView titlebarText = (TextView) findViewById(R.id.titlebar_name);
         titlebarText.setText("注册");
 
-        usernameText = (EditText) findViewById(R.id.userName);
+        usernameText = (EditText) findViewById(R.id.unText);
         passwordText = (EditText) findViewById(R.id.passWord);
         password2Text = (EditText) findViewById(R.id.passWord2);
         regButton = (Button) findViewById(R.id.signup);

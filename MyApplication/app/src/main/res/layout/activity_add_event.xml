@@ -22,12 +22,14 @@
             android:layout_height="wrap_content"
             android:id="@+id/eventTitle"
             android:hint="请输入活动主题"
-            android:textAppearance="@android:style/TextAppearance.Medium" />
+            android:textAppearance="@android:style/TextAppearance.Medium"
+            android:layout_marginBottom="5dp" />
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -44,14 +46,17 @@
                 android:layout_height="fill_parent"
                 android:text="选择日期"
                 android:id="@+id/pickDate"
-                android:layout_weight="4" />
+                android:layout_weight="4"
+                android:textColor="#fff"
+                android:background="#ff9966" />
 
         </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -68,7 +73,9 @@
                 android:layout_height="fill_parent"
                 android:text="选择时间"
                 android:id="@+id/pickTime"
-                android:layout_weight="4" />
+                android:layout_weight="4"
+                android:background="#ff9966"
+                android:textColor="#fff" />
 
         </LinearLayout>
 
@@ -79,13 +86,17 @@
             android:hint="请输入活动内容"
             android:layout_weight="1"
             android:textAppearance="@android:style/TextAppearance.Medium"
-            android:layout_gravity="top" />
+            android:layout_gravity="top"
+            android:gravity="top"
+            android:layout_marginBottom="5dp" />
 
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="确认添加"
-            android:id="@+id/addButton" />
+            android:id="@+id/addButton"
+            android:textColor="#fff"
+            android:background="#ff9966" />
     </LinearLayout>
 
 

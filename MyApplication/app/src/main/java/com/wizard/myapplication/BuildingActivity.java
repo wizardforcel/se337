@@ -155,7 +155,7 @@ public class BuildingActivity extends Activity {
 
     private void addComment(String un, String co)
     {
-        LinearLayout linear = (LinearLayout) getLayoutInflater().inflate(R.layout.building_comment_linear, null);
+        LinearLayout linear = (LinearLayout) getLayoutInflater().inflate(R.layout.comment_linear, null);
         TextView unText = (TextView) linear.findViewById(R.id.unText);
         unText.setText(un + ":");
         TextView coText = (TextView) linear.findViewById(R.id.contentText);

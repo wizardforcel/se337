@@ -1,7 +1,6 @@
 package com.wizard.myapplication;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -13,7 +12,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +27,6 @@ import com.wizard.myapplication.util.WizardHTTP;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,19 +39,17 @@ public class PreferenceActivity extends Activity {
     private static final int GET_PRE_SUCCESS = 2;
     private static final int GET_PRE_FAIL = 3;
 
-    private TextView sportText;
-    private TextView foodText;
-    private TextView viewText;
-    private TextView historyText;
-    private TextView academicText;
     private Button addButton;
+    private ListView preListView;
+    private Spinner toAddSpinner;
     private Handler handler;
 
     private User user;
-    private HashMap<String, View.OnClickListener> preMap
-            = new HashMap<String, View.OnClickListener>();
-    private HashSet<String> preferences = new HashSet<String>();
+    private List<String> pres = new ArrayList<String>();
+    private List<String> toAdds = new ArrayList<String>();
     private String toAdd = "";
+
+    private static final String[] preTable = {"SPORT", "FOOD", "SCENE", "HISTORY", "ACADEMIC"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,21 +60,31 @@ public class PreferenceActivity extends Activity {
         Intent i = getIntent();
         user = (User) i.getSerializableExtra("user");
 
-        sportText = (TextView) findViewById(R.id.sportText);
-        foodText = (TextView) findViewById(R.id.foodText);
-        viewText = (TextView) findViewById(R.id.viewText);
-        historyText = (TextView) findViewById(R.id.historyText);
-        academicText = (TextView) findViewById(R.id.academicText);
-        addButton = (Button) findViewById(R.id.addPreferenceButton);
+        addButton = (Button) findViewById(R.id.addButton);
+        preListView = (ListView) findViewById(R.id.preListView);
+        toAddSpinner = (Spinner) findViewById(R.id.toAddSpinner);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { addButtonOnClick(); }
+        });
+
         TextView titlebar_name = (TextView) findViewById(R.id.titlebar_name);
         Button retButton = (Button) findViewById(R.id.titlebar_return);
-
         titlebar_name.setText("偏好");
         retButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
+        });
+
+        toAddSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                toAddSpinnerOnItemSelected(adapterView, view, i, l);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) { }
         });
 
         handler = new Handler(){
@@ -84,54 +94,6 @@ public class PreferenceActivity extends Activity {
             }
         };
 
-        setAllGray();
-
-        sportText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { sportTextOnClick(); }
-        });
-        foodText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { foodTextOnClick(); }
-        });
-        viewText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { viewTextOnClick(); }
-        });
-        historyText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { historyTextOnClick(); }
-        });
-        academicText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { academicTextOnClick(); }
-        });
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { addButtonOnClick(); }
-        });
-
-        preMap.put("SPORT", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { sportTextOnClick(); }
-        });
-        preMap.put("FOOD", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { foodTextOnClick(); }
-        });
-        preMap.put("SCENE", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { viewTextOnClick(); }
-        });
-        preMap.put("HiSTORY", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { historyTextOnClick(); }
-        });
-        preMap.put("ACADEMIC", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { academicTextOnClick(); }
-        });
-
         new Thread(new Runnable() {
             @Override
             public void run() { threadGetPreference(); }
@@ -140,48 +102,23 @@ public class PreferenceActivity extends Activity {
 
     private void addButtonOnClick()
     {
+        if(toAdd.equals(""))
+        {
+            Toast.makeText(this, "未选中任何偏好！", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         new Thread(new Runnable() {
             @Override
             public void run() { threadSetPreference(); }
         }).start();
     }
 
-    private void academicTextOnClick()
+    private void toAddSpinnerOnItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3)
     {
-        setRed(academicText);
-        preferences.add("ACADEMIC");
-    }
-
-    private void sportTextOnClick()
-    {
-        setRed(sportText);
-        preferences.add("SPORT");
-    }
-
-    private void foodTextOnClick()
-    {
-        setRed(foodText);
-        preferences.add("FOOD") ;
-    }
-
-    private void viewTextOnClick()
-    {
-        setRed(viewText);
-        preferences.add("SCENE");
-    }
-
-    private void setRed(TextView view)
-    {
-        Resources resources = getBaseContext().getResources();
-        Drawable borderDrawable = resources.getDrawable(R.drawable.textview_border_red);
-        view.setBackgroundDrawable(borderDrawable);
-        view.setTextColor(Color.RED);
-    }
-
-    private void historyTextOnClick()
-    {
-        setRed(historyText);
-        preferences.add("HISTORY");
+        Toast.makeText(this, arg2 + "", Toast.LENGTH_SHORT).show();
+        toAdd = toAdds.get(arg2);
+        arg0.setVisibility(View.VISIBLE);
     }
 
     private void handleMessage(Message msg){
@@ -190,6 +127,10 @@ public class PreferenceActivity extends Activity {
         switch(type){
             case SET_PRE_SUCCESS:
                 Toast.makeText(this, "设置成功！", Toast.LENGTH_SHORT).show();
+                pres.add(toAdd);
+                toAdds.remove(toAdd);
+                toAdd = "";
+                refreshWidget();
                 break;
             case SET_PRE_FAIL:
                 Toast.makeText(this, "设置失败" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
@@ -198,13 +139,24 @@ public class PreferenceActivity extends Activity {
                 Toast.makeText(this, "获取失败" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
                 break;
             case GET_PRE_SUCCESS:
-                for(String preference : preferences) {
-                    if (preMap.containsKey(preference))
-                        preMap.get(preference).onClick(null);
+                for(String s : preTable)
+                {
+                    if(!pres.contains(s))
+                        toAdds.add(s);
                 }
+                refreshWidget();
                 break;
         }
     }
+
+    private void refreshWidget()
+    {
+        preListView.setAdapter(
+                new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, pres));
+        toAddSpinner.setAdapter(
+                new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, toAdds));
+    }
+
     private void threadSetPreference(){
         try
         {
@@ -212,10 +164,8 @@ public class PreferenceActivity extends Activity {
             http.setDefHeader(false);
             http.setHeader("Content-Type", "application/json");
 
-            for(String preference : preferences) {
-                String retStr
-                       = http.httpGet("http://" + UrlConfig.HOST + "/user/" + user.getId() + "/addpreference/" + preference);
-            }
+            String retStr
+                   = http.httpGet("http://" + UrlConfig.HOST + "/user/" + user.getId() + "/addpreference/" + toAdd);
 
             Bundle b = new Bundle();
             b.putInt("type", SET_PRE_SUCCESS);
@@ -247,7 +197,7 @@ public class PreferenceActivity extends Activity {
             for(int i = 0; i < retArr.length(); i++)
             {
                 JSONObject json = retArr.getJSONObject(i);
-                preferences.add(json.getJSONObject("preference").getString("type"));
+                pres.add(json.getJSONObject("preference").getString("type"));
             }
 
             Bundle b = new Bundle();
@@ -266,21 +216,6 @@ public class PreferenceActivity extends Activity {
             msg.setData(b);
             handler.sendMessage(msg);
         }
-    }
-
-    private void setAllGray(){
-        Resources resources = getBaseContext().getResources();
-        Drawable borderDrawable = resources.getDrawable(R.drawable.textview_border_gray);
-        sportText.setBackgroundDrawable(borderDrawable);
-        sportText.setTextColor(Color.GRAY);
-        foodText.setBackgroundDrawable(borderDrawable);
-        foodText.setTextColor(Color.GRAY);
-        viewText.setBackgroundDrawable(borderDrawable);
-        viewText.setTextColor(Color.GRAY);
-        historyText.setBackgroundDrawable(borderDrawable);
-        historyText.setTextColor(Color.GRAY);
-        academicText.setBackgroundDrawable(borderDrawable);
-        academicText.setTextColor(Color.GRAY);
     }
 
 

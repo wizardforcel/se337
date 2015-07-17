@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="45dp"
-    android:background="@drawable/bg_title_bar"
+    android:background="#ff9966"
     android:gravity="center_vertical"
     android:clickable="false">
 
@@ -16,13 +16,7 @@
         android:gravity="center"
         android:src="@drawable/ic_top_bar_category" />
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_toRightOf="@id/titlebar_menu_btn"
-        android:background="@drawable/ic_top_divider"
-        android:adjustViewBounds="false"
-        android:id="@+id/imageView" />
+
 
     <TextView
         android:id="@+id/titlebar_name"
@@ -38,5 +32,14 @@
         android:textSize="22sp"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+    <ImageView
+        android:id="@+id/titlebar_menu_search"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:src="@drawable/search"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

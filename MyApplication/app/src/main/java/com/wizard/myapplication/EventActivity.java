@@ -3,11 +3,9 @@ package com.wizard.myapplication;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,13 +14,11 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Comment;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.User;
@@ -162,7 +158,7 @@ public class EventActivity extends Activity {
 
     private void addComment(String un, String co)
     {
-        LinearLayout linear = (LinearLayout) getLayoutInflater().inflate(R.layout.building_comment_linear, null);
+        LinearLayout linear = (LinearLayout) getLayoutInflater().inflate(R.layout.comment_linear, null);
         TextView unText = (TextView) linear.findViewById(R.id.unText);
         unText.setText(un + ":");
         TextView coText = (TextView) linear.findViewById(R.id.contentText);

@@ -48,7 +48,7 @@ public class LoginActivity extends Activity {
         TextView titlebarText = (TextView) findViewById(R.id.titlebar_name);
         titlebarText.setText("登录");
 
-        usernameText = (EditText) findViewById(R.id.userName);
+        usernameText = (EditText) findViewById(R.id.unText);
         passwordText = (EditText) findViewById(R.id.passWord);
         loginButton = (Button) findViewById(R.id.login);
         regButton = (Button) findViewById(R.id.signup);

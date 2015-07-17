@@ -85,6 +85,10 @@
             android:name=".AddEventActivity"
             android:label="@string/title_activity_web" >
         </activity>
+        <activity
+            android:name=".UserActivity"
+            android:label="@string/title_activity_web" >
+        </activity>
     </application>
 
     <!-- 这个权限用于进行网络定位 -->

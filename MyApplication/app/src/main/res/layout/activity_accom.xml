@@ -7,8 +7,6 @@
 
     <include layout="@layout/titlebar_other" />
 
-    <include layout="@layout/header" />
-
     <!--include layout="@layout/header" /-->
 
     <!--TextView

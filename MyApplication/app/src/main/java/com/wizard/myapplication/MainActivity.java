@@ -62,6 +62,7 @@ public class MainActivity extends Activity {
     private Handler handler;
     private SlideMenu slideMenu;
     private ImageView menuButton;
+    private ImageView searchButton;
     private LinearLayout mapLinear;
     private TextView buildingText;
 
@@ -73,11 +74,6 @@ public class MainActivity extends Activity {
     private TextView naviMenuItem;
     private TextView logoutMenuItem;
     private TextView followMenuItem;
-    private TextView accomMenuItem;
-    private TextView rankMenuItem;
-    private TextView exchangeMenuItem;
-    private TextView searchMenuItem;
-    private TextView preferenceMenuItem;
     private TextView sjtuBusMenuItem;
 
     private Campus campus;
@@ -137,6 +133,11 @@ public class MainActivity extends Activity {
                     slideMenu.closeMenu();
             }
         });
+        searchButton = (ImageView) findViewById(R.id.titlebar_menu_search);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { searchMenuItemOnClick(); }
+        });
 
         loginMenuItem = (TextView) slideMenu.findViewById(R.id.loginMenu);
         regMenuItem = (TextView) slideMenu.findViewById(R.id.regMenu);
@@ -146,16 +147,10 @@ public class MainActivity extends Activity {
         userMenuItem = (TextView) slideMenu.findViewById(R.id.userMenu);
         naviMenuItem = (TextView) slideMenu.findViewById(R.id.naviMenu);
         logoutMenuItem = (TextView) slideMenu.findViewById(R.id.logoutMenu);
-        accomMenuItem = (TextView) slideMenu.findViewById(R.id.acconMenu);
-        rankMenuItem = (TextView) slideMenu.findViewById(R.id.rankMenu);
-        exchangeMenuItem = (TextView) slideMenu.findViewById(R.id.exchangeMenu);
-        searchMenuItem = (TextView) slideMenu.findViewById(R.id.searchMenu);
-        preferenceMenuItem = (TextView) slideMenu.findViewById(R.id.preferenceMenu);
         sjtuBusMenuItem = (TextView) findViewById(R.id.sjtuBusMenu);
 
         setMenuStatus(false);
         campusMenuItem.setVisibility(View.GONE);
-        searchMenuItem.setVisibility(View.GONE);
         sjtuBusMenuItem.setVisibility(View.GONE);
 
         loginMenuItem.setOnClickListener(new View.OnClickListener() {
@@ -198,29 +193,13 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) { campusMenuItemOnClick(); }
         });
-        rankMenuItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) { rankMenuItemOnClick(); }
-        });
-        accomMenuItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) { accomMenuItemOnClick(); }
-        });
-        exchangeMenuItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) { exchangeMenuItemOnClick(); }
-        });
-        searchMenuItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {  searchMenuItemOnClick(); }
-        });
-        preferenceMenuItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) { preferenceMenuItemOnClick(); }
-        });
         sjtuBusMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { sjtuBusMenuItemOnClick(); }
+        });
+        userMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { userMenuItemOnClick(); }
         });
     }
 
@@ -270,7 +249,6 @@ public class MainActivity extends Activity {
     private void setCampusOnMap()
     {
         campusMenuItem.setVisibility(View.VISIBLE);
-        searchMenuItem.setVisibility(View.VISIBLE);
 
         //设置中心点
         double lat = campus.getLatitude();
@@ -472,30 +450,12 @@ public class MainActivity extends Activity {
         return true;
     }
 
-    private void accomMenuItemOnClick()
-    {
-        Intent i = new Intent(this, AccomActivity.class);
-        startActivity(i);
-    }
-
-    private void rankMenuItemOnClick()
-    {
-        Intent i = new Intent(this, RankActivity.class);
-        startActivity(i);
-    }
-
     private void searchMenuItemOnClick()
     {
         Intent i = new Intent(this, SearchActivity.class);
         i.putExtra("buildings", (Serializable) campus.getBuildings());
         startActivityForResult(i, ACTIVITY_SEARCH);
         slideMenu.closeMenu();
-    }
-
-    private void exchangeMenuItemOnClick()
-    {
-        Intent i = new Intent(this, ExchangeActivity.class);
-        startActivity(i);
     }
 
     private void loginMenuItemOnClick() {
@@ -557,16 +517,16 @@ public class MainActivity extends Activity {
         startActivity(i);
     }
 
-    private void sjtuBusMenuItemOnClick()
+    private void userMenuItemOnClick()
     {
-        Intent i = new Intent(this, WebActivity.class);
+        Intent i = new Intent(this, UserActivity.class);
+        i.putExtra("user", user);
         startActivity(i);
     }
 
-    private void preferenceMenuItemOnClick()
+    private void sjtuBusMenuItemOnClick()
     {
-        Intent i = new Intent(this, PreferenceActivity.class);
-        i.putExtra("user", user);
+        Intent i = new Intent(this, WebActivity.class);
         startActivity(i);
     }
 
@@ -598,10 +558,6 @@ public class MainActivity extends Activity {
         //登录后
         userMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
         logoutMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
-        accomMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
-        exchangeMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
-        rankMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
-        preferenceMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
 
         //登录前
         loginMenuItem.setVisibility(!isLogin ? TextView.VISIBLE : TextView.GONE);
