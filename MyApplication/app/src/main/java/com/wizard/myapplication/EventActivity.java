@@ -3,11 +3,11 @@ package com.wizard.myapplication;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,7 +52,7 @@ public class EventActivity extends Activity {
     private EditText commentInput;
     private TextView contentText;
     private TabHost tHost;
-    AlertDialog voteDialog;
+    private AlertDialog voteDialog;
     private Handler handler;
     private TextView currentVoteText;
 
@@ -157,7 +157,7 @@ public class EventActivity extends Activity {
                 break;
             case ZAN_SUCCESS:
                 Toast.makeText(EventActivity.this, "点赞成功！", Toast.LENGTH_SHORT).show();
-                refreshCurrenVoteText();
+                refreshCurrentVoteText();
                 voteDialog.hide();
                 break;
             case ZAN_FAIL:
@@ -165,7 +165,7 @@ public class EventActivity extends Activity {
                 break;
             case CAI_SUCCESS:
                 Toast.makeText(EventActivity.this, "点踩成功！", Toast.LENGTH_SHORT).show();
-                refreshCurrenVoteText();
+                refreshCurrentVoteText();
                 voteDialog.hide();
                 break;
             case CAI_FAIL:
@@ -174,7 +174,7 @@ public class EventActivity extends Activity {
         }
     }
 
-    private void refreshCurrenVoteText()
+    private void refreshCurrentVoteText()
     {
         currentVoteText.setText(currentComment.getLike() + "/" + currentComment.getDislike());
     }
@@ -211,7 +211,7 @@ public class EventActivity extends Activity {
     {
         LinearLayout linear = (LinearLayout) getLayoutInflater().inflate(R.layout.comment_linear, null);
         TextView unText = (TextView) linear.findViewById(R.id.unText);
-        unText.setText(c.getUid() + ":");
+        unText.setText(c.getUn() + ":");
         TextView coText = (TextView) linear.findViewById(R.id.contentText);
         coText.setText(c.getContent());
         TextView voteText = (TextView) linear.findViewById(R.id.voteText);
@@ -264,9 +264,11 @@ public class EventActivity extends Activity {
             Comment c = new Comment();
             c.setId(retJson.getInt("id"));
             c.setUid(user.getId());
-            c.setUn(user.getName());
+            c.setUn(user.getUn());
             c.setContent(myComment);
             comments.add(c);
+            Log.d("EventAddComment",
+                  "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
 
             Bundle b = new Bundle();
             b.putInt("type", ADD_COMMENT_SUCCESS);
@@ -302,12 +304,15 @@ public class EventActivity extends Activity {
                 JSONObject o = retArr.getJSONObject(i);
                 Comment c = new Comment();
                 c.setId(o.getInt("id"));
-                //c.setUn(o.getJSONObject("user").getString("username"));
-                c.setUid(o.getInt("userId"));
+                int uid = o.getInt("userId");
+                c.setUid(uid);
+                String un = http.httpGet("http://" + UrlConfig.HOST + "/user/" + uid + "/userName/");
+                c.setUn(un);
                 c.setContent(o.getString("content"));
                 c.setLike(o.getInt("likes"));
                 c.setDislike(o.getInt("dislike"));
                 comments.add(c);
+                Log.d("EventComment", "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
             }
 
             Bundle b = new Bundle();

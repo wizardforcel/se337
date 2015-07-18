@@ -221,7 +221,6 @@ public class AddEventActivity extends Activity {
             json.put("universityId", campus.getId());
             String postStr = json.toString();
             String retStr = http.httpPost("http://" + UrlConfig.HOST + "/activity/add/", postStr);
-            Log.d("ret", retStr);
             JSONObject retJson = new JSONObject(retStr);
 
             Event e = new Event();
@@ -229,6 +228,10 @@ public class AddEventActivity extends Activity {
             e.setName(name);
             e.setContent(content);
             e.setId(retJson.getInt("id"));
+            e.setUid(user.getId());
+            e.setUn(user.getUn());
+            Log.d("AddEvent", "id: " + e.getId() + " uid: " + e.getUid() +
+                  " un: " + e.getUn() + " date: " + e.getDate());
 
             Bundle b = new Bundle();
             b.putInt("type", ADD_EVENT_SUCCESS);

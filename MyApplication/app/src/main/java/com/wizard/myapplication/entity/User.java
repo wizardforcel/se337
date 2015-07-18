@@ -10,7 +10,6 @@ public class User implements Serializable
     private int id;
     private String un;
     private String pw;
-    private String name;
 
     public int getId() {
         return id;
@@ -34,13 +33,5 @@ public class User implements Serializable
 
     public void setPw(String pw) {
         this.pw = pw;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

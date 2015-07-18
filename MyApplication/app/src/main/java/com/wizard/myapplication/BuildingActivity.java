@@ -2,6 +2,7 @@ package com.wizard.myapplication;
 
 import android.app.Activity;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 
@@ -42,6 +43,10 @@ public class BuildingActivity extends Activity {
     private static final int LOAD_DATA_FAIL = 1;
     private static final int ADD_COMMENT_SUCCESS = 2;
     private static final int ADD_COMMENT_FAIL = 3;
+    private static final int ZAN_SUCCESS = 4;
+    private static final int ZAN_FAIL = 5;
+    private static final int CAI_SUCCESS = 6;
+    private static final int CAI_FAIL = 7;
 
     private final static int ACTIVITY_LOGIN = 1;
 
@@ -52,13 +57,16 @@ public class BuildingActivity extends Activity {
     private ImageView image;
     private Handler handler;
     private TabHost tHost;
+    private AlertDialog voteDialog;
+    private TextView currentVoteText;
 
     private Building building;
     private User user;
     private List<Comment> comments
             = new ArrayList<Comment>();
     private boolean loaded = false;
-    String myComment;
+    private String myComment;
+    private Comment currentComment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +90,22 @@ public class BuildingActivity extends Activity {
         tHost.addTab(tHost.newTabSpec("简介").setIndicator("简介").setContent(R.id.contentPage));
         tHost.addTab(tHost.newTabSpec("评论").setIndicator("评论").setContent(R.id.commentPage0));
         tHost.setCurrentTab(0);
+
+        LinearLayout voteLinear = (LinearLayout) getLayoutInflater().inflate(R.layout.vote_linear, null);
+        Button zanButton = (Button) voteLinear.findViewById(R.id.zanButton);
+        Button caiButton = (Button) voteLinear.findViewById(R.id.caiButton);
+        zanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { voteDialogZanButtonOnClick(); }
+        });
+        caiButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { voteDialogCaiButtonOnClick(); }
+        });
+        voteDialog = new AlertDialog.Builder(this)
+                .setView(voteLinear)
+                .setNegativeButton("取消", null)
+                .create();
 
         closeKeyboard(); //强行隐藏键盘
 
@@ -150,17 +174,66 @@ public class BuildingActivity extends Activity {
                 closeKeyboard();
                 commentInput.setText("");
                 break;
+            case ZAN_SUCCESS:
+                Toast.makeText(BuildingActivity.this, "点赞成功！", Toast.LENGTH_SHORT).show();
+                refreshCurrentVoteText();
+                voteDialog.hide();
+                break;
+            case ZAN_FAIL:
+                Toast.makeText(BuildingActivity.this, "点赞失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
+                break;
+            case CAI_SUCCESS:
+                Toast.makeText(BuildingActivity.this, "点踩成功！", Toast.LENGTH_SHORT).show();
+                refreshCurrentVoteText();
+                voteDialog.hide();
+                break;
+            case CAI_FAIL:
+                Toast.makeText(BuildingActivity.this, "点踩失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
+                break;
         }
+    }
+
+    private void refreshCurrentVoteText()
+    {
+        currentVoteText.setText(currentComment.getLike() + "/" + currentComment.getDislike());
     }
 
     private void addComment(Comment c)
     {
         LinearLayout linear = (LinearLayout) getLayoutInflater().inflate(R.layout.comment_linear, null);
         TextView unText = (TextView) linear.findViewById(R.id.unText);
-        unText.setText(c.getUid() + ":");
+        unText.setText(c.getUn() + ":");
         TextView coText = (TextView) linear.findViewById(R.id.contentText);
         coText.setText(c.getContent());
+        TextView voteText = (TextView) linear.findViewById(R.id.voteText);
+        voteText.setText(c.getLike() + "/" + c.getDislike());
+        final Comment finalComment = c;
+        final TextView finalVoteText = voteText;
+        voteText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentComment = finalComment;
+                currentVoteText = finalVoteText;
+                voteDialog.show();
+            }
+        });
         commentPage.addView(linear);
+    }
+
+    private void voteDialogZanButtonOnClick()
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() { threadZan(); }
+        }).start();
+    }
+
+    private void voteDialogCaiButtonOnClick()
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() { threadCai(); }
+        }).start();
     }
 
     private void addCommentButtonOnClick()
@@ -184,6 +257,64 @@ public class BuildingActivity extends Activity {
         })).start();
     }
 
+    private void threadZan()
+    {
+        try
+        {
+            WizardHTTP http = new WizardHTTP();
+            http.setDefHeader(false);
+            http.setCharset("utf-8");
+
+            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/comment/like/" + currentComment.getId());
+            currentComment.setLike(currentComment.getLike() + 1);
+
+            Bundle b = new Bundle();
+            b.putInt("type", ZAN_SUCCESS);
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            Bundle b = new Bundle();
+            b.putInt("type", ZAN_FAIL);
+            b.putString("errmag", ex.getMessage());
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+    }
+
+    private void threadCai()
+    {
+        try
+        {
+            WizardHTTP http = new WizardHTTP();
+            http.setDefHeader(false);
+            http.setCharset("utf-8");
+
+            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/comment/dislike/" + currentComment.getId());
+            currentComment.setDislike(currentComment.getDislike() + 1);
+
+            Bundle b = new Bundle();
+            b.putInt("type", CAI_SUCCESS);
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            Bundle b = new Bundle();
+            b.putInt("type", CAI_FAIL);
+            b.putString("errmag", ex.getMessage());
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+    }
+
     private void threadAddComment()
     {
         try
@@ -203,9 +334,11 @@ public class BuildingActivity extends Activity {
             Comment c = new Comment();
             c.setId(retJson.getInt("id"));
             c.setUid(user.getId());
-            c.setUn(user.getName());
+            c.setUn(user.getUn());
             c.setContent(myComment);
             comments.add(c);
+            Log.d("BuildingAddComment",
+                  "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
 
             Bundle b = new Bundle();
             b.putInt("type", ADD_COMMENT_SUCCESS);
@@ -239,7 +372,7 @@ public class BuildingActivity extends Activity {
                 JSONObject retJson = retArr.getJSONObject(0);
                 String imgPath = retJson.getString("path");
                 imgPath = "http://" + UrlConfig.HOST + "/picture/" + imgPath.replace(".", "/");
-                Log.d("img", imgPath);
+                Log.d("BuildingImg", imgPath);
                 imgData = http.httpGetData(imgPath);
             }
 
@@ -252,12 +385,15 @@ public class BuildingActivity extends Activity {
                 JSONObject o = retArr.getJSONObject(i);
                 Comment c = new Comment();
                 c.setId(o.getInt("id"));
-                //c.setUn(o.getJSONObject("user").getString("username"));
-                c.setUid(o.getInt("userId"));
+                int uid = o.getInt("userId");
+                c.setUid(uid);
+                String un = http.httpGet("http://" + UrlConfig.HOST + "/user/" + uid + "/userName/");
+                c.setUn(un);
                 c.setContent(o.getString("content"));
                 c.setLike(o.getInt("likes"));
                 c.setDislike(o.getInt("dislike"));
                 comments.add(c);
+                Log.d("BuildingComment", "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
             }
 
             Bundle b = new Bundle();

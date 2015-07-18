@@ -28,6 +28,7 @@ import com.wizard.myapplication.util.WizardHTTP;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -150,7 +151,6 @@ public class CampusActivity extends Activity {
 
     private void eventTextOnClick(Event e)
     {
-        Log.d("event", e.getName());
         Intent intent = new Intent(CampusActivity.this, EventActivity.class);
         intent.putExtra("event", e);
         intent.putExtra("user", user);
@@ -173,11 +173,11 @@ public class CampusActivity extends Activity {
                 String imgPath = retJson.getString("path");
                 imgPath = "http://" + UrlConfig.HOST + "/picture/" + imgPath.replace(".", "/");
                 imgData  = http.httpGetData(imgPath);
+                Log.d("CampusImg", imgPath);
             }
 
             String date = new java.text.SimpleDateFormat("yyyyMMddHHmmss")
                     .format(Calendar.getInstance().getTime());
-            Log.d("date", date);
             retStr = http.httpGet(
                     "http://" + UrlConfig.HOST + "/activity/university/" + campus.getId() + "/date/" + date);
             retArr = new JSONArray(retStr);
@@ -189,8 +189,13 @@ public class CampusActivity extends Activity {
                 event.setName(json.getString("name"));
                 event.setContent(json.getString("description"));
                 event.setDate(json.getString("date"));
-                //event.setUid(json.getInt("userId"));
+                int uid = json.getInt("userId");
+                event.setUid(uid);
+                String un = http.httpGet("http://" + UrlConfig.HOST + "/user/" + uid + "/userName/");
+                event.setUn(un);
                 events.add(event);
+                Log.d("Event", "id: " + event.getId() + " uid: " + event.getUid() +
+                      " un: " + event.getUn() + " date: " + event.getDate());
             }
 
             Bundle b = new Bundle();
@@ -230,7 +235,6 @@ public class CampusActivity extends Activity {
 
     private void buildingTextOnClick(Building b)
     {
-        Log.d("building", b.getName());
         Intent intent = new Intent(CampusActivity.this, BuildingActivity.class);
         intent.putExtra("building", b);
         intent.putExtra("user", user);

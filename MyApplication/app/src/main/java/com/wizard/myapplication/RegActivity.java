@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -128,7 +129,7 @@ public class RegActivity extends Activity {
             user.setId(retJson.getInt("id"));
             user.setUn(retJson.getString("username"));
             user.setPw(retJson.getString("password"));
-            user.setName(retJson.getString("name"));
+            Log.d("UserReg", "id: " + user.getId() + " un: " + user.getUn() + " pw: " + user.getPw());
 
             Bundle b = new Bundle();
             b.putInt("type", REG_SUCCESS);

@@ -60,7 +60,7 @@ public class UserActivity extends Activity {
         taskText = (TextView) findViewById(R.id.taskText);
         exchangeText = (TextView) findViewById(R.id.exchangeText);
 
-        unText.setText(user.getName());
+        unText.setText(user.getUn());
         preText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

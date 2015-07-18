@@ -252,6 +252,7 @@ public class MainActivity extends Activity {
     private void setCampusOnMap()
     {
         campusMenuItem.setVisibility(View.VISIBLE);
+        sjtuBusMenuItem.setVisibility(View.VISIBLE);
 
         //设置中心点
         double lat = campus.getLatitude();
@@ -347,6 +348,7 @@ public class MainActivity extends Activity {
             c.setRadius(retJson.getDouble("radius"));
             c.setLatitude(retJson.getDouble("latitude"));
             c.setLongitude(retJson.getDouble("longitude"));
+            Log.d("Campus", "id: " + c.getId() + " name: " + c.getName());
 
             retStr = http.httpGet("http://" + UrlConfig.HOST + "/view/university/" + c.getId());
             retArr = new JSONArray(retStr);
@@ -363,6 +365,7 @@ public class MainActivity extends Activity {
                 b.setLongitude(o.getDouble("longitude"));
                 b.setRadius(o.getDouble("radius"));
                 buildings.add(b);
+                Log.d("Building", "id: " + b.getId() + " name: " + b.getName());
             }
             c.setBuildings(buildings);
             campus = c;
