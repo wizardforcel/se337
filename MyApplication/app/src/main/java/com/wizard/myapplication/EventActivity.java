@@ -56,6 +56,7 @@ public class EventActivity extends Activity {
     private Handler handler;
     private TextView currentVoteText;
 
+    private int campusId;
     private User user;
     private Event e;
     private String myComment;
@@ -69,6 +70,11 @@ public class EventActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_event);
+
+        Intent i = getIntent();
+        user = (User) i.getSerializableExtra("user");
+        e = (Event) i.getSerializableExtra("event");
+        campusId = i.getIntExtra("campusId", -1);
 
         commentPage = (LinearLayout) findViewById(R.id.commentPage);
         addCommentButton = (Button) findViewById(R.id.addComment);
@@ -85,15 +91,10 @@ public class EventActivity extends Activity {
         tHost.addTab(tHost.newTabSpec("评论").setIndicator("评论").setContent(R.id.commentPage0));
         tHost.setCurrentTab(0);
 
-        Intent i = getIntent();
-        user = (User) i.getSerializableExtra("user");
-        e = (Event) i.getSerializableExtra("event");
-        contentText.setText(e.getContent());
         TextView unText = (TextView) findViewById(R.id.unText);
         unText.setText(e.getUn());
         TextView dateText = (TextView) findViewById(R.id.dateText);
         dateText.setText(e.getDate());
-
         TextView tv = (TextView) findViewById(R.id.titlebar_name);
         tv.setText(e.getName());
         Button returnButton = (Button) findViewById(R.id.titlebar_return);
@@ -101,6 +102,8 @@ public class EventActivity extends Activity {
             @Override
             public void onClick(View v) { finish(); }
         });
+
+        contentText.setText(e.getContent());
 
         closeKeyboard();
 
@@ -189,8 +192,8 @@ public class EventActivity extends Activity {
     private void addCommentButtonOnClick()
     {
         if (user == null) {
-            Intent intent = new Intent();
-            intent.setClass(this, LoginActivity.class);
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.putExtra("campusId", campusId);
             startActivityForResult(intent, ACTIVITY_LOGIN);
             return;
         }

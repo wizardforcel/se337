@@ -22,6 +22,8 @@ import java.util.List;
 
 public class NaviSettingActivity extends Activity {
 
+    private static final double DIFF = 0.0065;
+
     private Button srcButton;
     private Button destButton;
     private Button okButton;
@@ -40,6 +42,7 @@ public class NaviSettingActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_navi_setting);
@@ -140,8 +143,8 @@ public class NaviSettingActivity extends Activity {
         setResult(Activity.RESULT_OK, intent);
         finish();*/
 
-        BNaviPoint startPoint = new BNaviPoint(src.getLng(), src.getLat(), src.getName());
-        BNaviPoint endPoint = new BNaviPoint(dest.getLng(), dest.getLat(), dest.getName());
+        BNaviPoint startPoint = new BNaviPoint(src.getLng() - DIFF, src.getLat() - DIFF, src.getName());
+        BNaviPoint endPoint = new BNaviPoint(dest.getLng() - DIFF, dest.getLat() - DIFF, dest.getName());
 
         BaiduNaviManager.getInstance().launchNavigator(this, startPoint, endPoint,
                 RoutePlanParams.NE_RoutePlan_Mode.ROUTE_PLAN_MOD_MIN_DIST, 		 //算路方式

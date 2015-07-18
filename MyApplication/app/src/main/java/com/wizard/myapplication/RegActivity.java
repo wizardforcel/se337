@@ -123,6 +123,16 @@ public class RegActivity extends Activity {
             json.put("password", pw);
             String postStr = json.toString();
             String retStr = http.httpPost("http://" + UrlConfig.HOST + "/user/register/", postStr);
+            if(retStr.equals(""))
+            {
+                Bundle b = new Bundle();
+                b.putInt("type", REG_FAIL);
+                b.putSerializable("errmsg", "用户名或密码错误");
+                Message msg = handler.obtainMessage();
+                msg.setData(b);
+                handler.sendMessage(msg);
+                return;
+            }
             JSONObject retJson = new JSONObject(retStr);
 
             User user = new User();

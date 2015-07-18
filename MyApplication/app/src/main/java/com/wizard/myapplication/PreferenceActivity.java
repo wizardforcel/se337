@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class PreferenceActivity extends Activity {
 
@@ -49,7 +50,17 @@ public class PreferenceActivity extends Activity {
     private List<String> toAdds = new ArrayList<String>();
     private String toAdd = "";
 
-    private static final String[] preTable = {"SPORT", "FOOD", "SCENE", "HISTORY", "ACADEMIC"};
+    private static final Map<String, String> enToZhMap =
+            new HashMap<String, String>();
+
+    static
+    {
+        enToZhMap.put("SPORT", "运动");
+        enToZhMap.put("FOOD", "美食");
+        enToZhMap.put("SCENE", "风景");
+        enToZhMap.put("HISTORY", "历史");
+        enToZhMap.put("ACADEMIC", "学术");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +150,7 @@ public class PreferenceActivity extends Activity {
                 Toast.makeText(this, "获取失败" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
                 break;
             case GET_PRE_SUCCESS:
-                for(String s : preTable)
+                for(String s : enToZhMap.keySet())
                 {
                     if(!pres.contains(s))
                         toAdds.add(s);
@@ -151,10 +162,17 @@ public class PreferenceActivity extends Activity {
 
     private void refreshWidget()
     {
+        List<String> presZh = new ArrayList<String>();
+        for(String s : pres)
+            presZh.add(enToZhMap.get(s));
+        List<String> toAddsZh = new ArrayList<String>();
+        for(String s :toAdds)
+            toAddsZh.add(s);
+
         preListView.setAdapter(
-                new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, pres));
+                new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, presZh));
         toAddSpinner.setAdapter(
-                new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, toAdds));
+                new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, toAddsZh));
     }
 
     private void threadSetPreference(){
@@ -197,7 +215,9 @@ public class PreferenceActivity extends Activity {
             for(int i = 0; i < retArr.length(); i++)
             {
                 JSONObject json = retArr.getJSONObject(i);
-                pres.add(json.getJSONObject("preference").getString("type"));
+                String type = json.getJSONObject("preference").getString("type");
+                if(enToZhMap.containsKey(type))
+                    pres.add(type);
             }
 
             Bundle b = new Bundle();

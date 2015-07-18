@@ -75,6 +75,7 @@ public class SearchActivity extends Activity {
             return;
         }
 
+        resultId.clear();
         List<String> resultText = new ArrayList<String>();
         for(Building b : buildings)
         {

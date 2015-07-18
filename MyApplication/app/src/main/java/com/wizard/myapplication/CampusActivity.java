@@ -22,6 +22,7 @@ import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.TabUtil;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
 
@@ -81,6 +82,11 @@ public class CampusActivity extends Activity {
         tHost.addTab(tHost.newTabSpec("景点").setIndicator("景点").setContent(R.id.buildingsPage));
         tHost.addTab(tHost.newTabSpec("活动").setIndicator("活动").setContent(R.id.eventPage0));
         tHost.setCurrentTab(0);
+        TabUtil.updateTab(tHost);
+        tHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String s) { TabUtil.updateTab(CampusActivity.this.tHost); }
+        });
 
         Intent i = getIntent();
         campus = (Campus) i.getSerializableExtra("campus");
@@ -154,6 +160,7 @@ public class CampusActivity extends Activity {
         Intent intent = new Intent(CampusActivity.this, EventActivity.class);
         intent.putExtra("event", e);
         intent.putExtra("user", user);
+        intent.putExtra("campusId", campus.getId());
         startActivityForResult(intent, 0);
     }
 
@@ -238,6 +245,7 @@ public class CampusActivity extends Activity {
         Intent intent = new Intent(CampusActivity.this, BuildingActivity.class);
         intent.putExtra("building", b);
         intent.putExtra("user", user);
+        intent.putExtra("campusId", campus.getId());
         startActivityForResult(intent, 0);
     }
 
@@ -269,6 +277,7 @@ public class CampusActivity extends Activity {
         if(user == null)
         {
             Intent i = new Intent(this, LoginActivity.class);
+            i.putExtra("campusId", campus.getId());
             startActivityForResult(i, ACTIVITY_LOGIN);
         }
         else {

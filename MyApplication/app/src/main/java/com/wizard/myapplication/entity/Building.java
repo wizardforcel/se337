@@ -44,7 +44,6 @@ public class Building implements Serializable
         this.radius = radius;
     }
 
-
     public double getLatitude() {
         return latitude;
     }
@@ -61,11 +60,22 @@ public class Building implements Serializable
         this.longitude = longitude;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Building)) return false;
+        Building building = (Building) o;
+        return id != building.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
     private int id;
     private String name;
     private String content;
     private double latitude;
     private double longitude;
     private double radius;
-
 }

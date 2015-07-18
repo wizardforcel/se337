@@ -40,7 +40,9 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class MainActivity extends Activity {
@@ -50,6 +52,7 @@ public class MainActivity extends Activity {
     private static final int ACTIVITY_BUILDING = 2;
     private static final int ACTIVITY_CAMPUS = 3;
     private static final int ACTIVITY_SEARCH = 4;
+    private static final int ACTIVITY_HISTORY = 5;
 
     private static final int GET_CAMPUS_SUCCESS = 0;
     private static final int GET_CAMPUS_FAIL = 1;
@@ -75,6 +78,7 @@ public class MainActivity extends Activity {
     private TextView logoutMenuItem;
     private TextView followMenuItem;
     private TextView sjtuBusMenuItem;
+    private TextView historyMenuItem;
 
     private Campus campus;
     private User user;
@@ -82,6 +86,8 @@ public class MainActivity extends Activity {
     private boolean firstLoc = true;
     private LatLng lastLoc;
     private Building currentBuilding;
+    private Set<Building> covered
+            = new HashSet<Building>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,10 +154,12 @@ public class MainActivity extends Activity {
         naviMenuItem = (TextView) slideMenu.findViewById(R.id.naviMenu);
         logoutMenuItem = (TextView) slideMenu.findViewById(R.id.logoutMenu);
         sjtuBusMenuItem = (TextView) findViewById(R.id.sjtuBusMenu);
+        historyMenuItem = (TextView) findViewById(R.id.historyMenu);
 
         setMenuStatus(false);
         campusMenuItem.setVisibility(View.GONE);
         sjtuBusMenuItem.setVisibility(View.GONE);
+        historyMenuItem.setVisibility(View.GONE);
 
         loginMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,6 +208,10 @@ public class MainActivity extends Activity {
         userMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { userMenuItemOnClick(); }
+        });
+        historyMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { historyMenuItemOnClick(); }
         });
     }
 
@@ -253,6 +265,7 @@ public class MainActivity extends Activity {
     {
         campusMenuItem.setVisibility(View.VISIBLE);
         sjtuBusMenuItem.setVisibility(View.VISIBLE);
+        historyMenuItem.setVisibility(View.VISIBLE);
 
         //设置中心点
         double lat = campus.getLatitude();
@@ -301,29 +314,74 @@ public class MainActivity extends Activity {
     }
 
     private void baiduMapOnReceiveLocation(BDLocation location) {
-        Log.v("Location", "Location");
 
         LatLng ll = new LatLng(location.getLatitude(),
                 location.getLongitude());
         lastLoc = ll;
+        Log.d("Location", "lat: " + ll.latitude + " lng: " + ll.longitude);
 
         MyLocationData locData = new MyLocationData.Builder()
-                .accuracy(location.getRadius())
-                        // 此处设置开发者获取到的方向信息，顺时针0-360
-                .direction(100).latitude(location.getLatitude())
+                // 此处设置开发者获取到的方向信息，顺时针0-360
+                .accuracy(location.getRadius()).direction(100)
+                .latitude(location.getLatitude())
                 .longitude(location.getLongitude()).build();
         baiduMap.setMyLocationData(locData);
 
-        if (onFollow)
+        if (onFollow) //跟随模式
             baiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(ll));
 
-        if(firstLoc)
+        if(firstLoc) //首次定位时获取校园信息
         {
             firstLoc = false;
             new Thread(new Runnable() {
                 @Override
                 public void run() { threadGetCampus(); }
             }).start();
+        }
+
+        //记录游览历史
+        if(campus != null && user != null)
+        {
+            Building b = null;
+            for(Building b2 : campus.getBuildings())
+            {
+                double diff = Math.sqrt(Math.pow(b2.getLatitude() - ll.latitude, 2) +
+                        Math.pow(b2.getLongitude() - ll.longitude, 2));
+                if(diff < 0.0001) {
+                    Log.d("Covered", "id: " + b2.getId() + " name: " + b.getName());
+                    b = b2;
+                    break;
+                }
+            }
+            if(b != null && !covered.contains(b))
+            {
+                covered.add(b);
+                currentBuilding = b;
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() { threadAddHistory(); }
+                }).start();
+            }
+        }
+    }
+
+    private void threadAddHistory()
+    {
+        try
+        {
+            WizardHTTP http = new WizardHTTP();
+            http.setDefHeader();
+
+            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/addusertoview/view/" + currentBuilding.getId() + "/user/" + user.getId());
+            if(retStr.equals(""))
+                Log.d("AddHistoryFail", "uid: " + user.getId() + " viewId: " + currentBuilding.getId());
+            else
+                Log.d("AddHistorySuccess", "uid: " + user.getId() + " viewId: " + currentBuilding.getId());
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            Log.d("AddHistoryFail", "uid: " + user.getId() + " viewId: " + currentBuilding.getId());
         }
     }
 
@@ -335,6 +393,8 @@ public class MainActivity extends Activity {
             http.setDefHeader(false);
             http.setHeader("Content-Type", "application/json");
             http.setCharset("utf-8");
+
+            //获取校园信息
             String url = String.format("http://%s/university/findByGPS/longitude/%6f/latitude/%6f",
                                        UrlConfig.HOST, lastLoc.longitude, lastLoc.latitude);
             String retStr = http.httpGet(url);
@@ -350,6 +410,7 @@ public class MainActivity extends Activity {
             c.setLongitude(retJson.getDouble("longitude"));
             Log.d("Campus", "id: " + c.getId() + " name: " + c.getName());
 
+            //获取景点信息
             retStr = http.httpGet("http://" + UrlConfig.HOST + "/view/university/" + c.getId());
             retArr = new JSONArray(retStr);
 
@@ -369,6 +430,26 @@ public class MainActivity extends Activity {
             }
             c.setBuildings(buildings);
             campus = c;
+
+            //获取游览历史
+            if(user != null) {
+                retStr = http.httpGet("http://" + UrlConfig.HOST + "/view/usertoview/" + user.getId());
+                retArr = new JSONArray(retStr);
+                for (int i = 0; i < retArr.length(); i++) {
+                    JSONObject o = retArr.getJSONObject(i).getJSONObject("view");
+                    if(o.getJSONObject("university").getInt("id") != c.getId())
+                        continue;
+                    Building b = new Building();
+                    b.setId(o.getInt("id"));
+                    b.setName(o.getString("name"));
+                    b.setContent(o.getString("description"));
+                    b.setLatitude(o.getDouble("latitude"));
+                    b.setLongitude(o.getDouble("longitude"));
+                    b.setRadius(o.getDouble("radius"));
+                    covered.add(b);
+                    Log.d("History", "id: " + b.getId() + " name: " + b.getName());
+                }
+            }
 
             Bundle b = new Bundle();
             b.putInt("type", GET_CAMPUS_SUCCESS);
@@ -466,6 +547,8 @@ public class MainActivity extends Activity {
 
     private void loginMenuItemOnClick() {
         Intent i = new Intent(this, LoginActivity.class);
+        if(campus != null)
+            i.putExtra("campusId", campus.getId());
         startActivityForResult(i, ACTIVITY_LOGIN);
     }
 
@@ -482,6 +565,7 @@ public class MainActivity extends Activity {
     private void locMenuItemOnClick() {
         if (lastLoc != null)
             baiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(lastLoc));
+        covered.clear();
         slideMenu.closeMenu();
     }
 
@@ -523,6 +607,15 @@ public class MainActivity extends Activity {
         startActivity(i);
     }
 
+    private void historyMenuItemOnClick()
+    {
+        List<Building> coveredList = new ArrayList<Building>(covered);
+        Intent i = new Intent(this, HistoryActivity.class);
+        i.putExtra("covered", (Serializable) coveredList);
+        i.putExtra("rate", 100 * covered.size() / campus.getBuildings().size());
+        startActivityForResult(i, ACTIVITY_HISTORY);
+    }
+
     private void userMenuItemOnClick()
     {
         Intent i = new Intent(this, UserActivity.class);
@@ -552,9 +645,13 @@ public class MainActivity extends Activity {
              requestCode == ACTIVITY_BUILDING || requestCode == ACTIVITY_CAMPUS) &&
                 resultCode == Activity.RESULT_OK) {
             user = (User) i.getSerializableExtra("user");
+            List<Building> history = (List<Building>) i.getSerializableExtra("history");
+            if(history != null)
+                covered.addAll(history);
             setMenuStatus(true);
         }
-        else if(requestCode == ACTIVITY_SEARCH && resultCode == RESULT_OK) {
+        else if((requestCode == ACTIVITY_SEARCH || requestCode == ACTIVITY_HISTORY) &&
+                 resultCode == RESULT_OK) {
             int resultId = i.getIntExtra("resultId", 0);
             searchActivityOnOk(resultId);
         }
