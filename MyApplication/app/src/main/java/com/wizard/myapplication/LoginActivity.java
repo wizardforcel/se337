@@ -148,6 +148,7 @@ public class LoginActivity extends Activity {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
             http.setHeader("Content-Type", "application/json");
+            http.setCharset("utf-8");
 
             //登录
             JSONObject json = new JSONObject();
@@ -174,7 +175,6 @@ public class LoginActivity extends Activity {
             Log.d("UserLogin", "id: " + user.getId() + " un: " + user.getUn() + " pw: " + user.getPw());
 
             //获取游览历史
-            List<Building> history = new ArrayList<Building>();
             if(campusId != -1) {
                 retStr = http.httpGet("http://" + UrlConfig.HOST + "/view/usertoview/" + user.getId());
                 JSONArray retArr = new JSONArray(retStr);

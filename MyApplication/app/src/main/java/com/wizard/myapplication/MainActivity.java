@@ -159,7 +159,6 @@ public class MainActivity extends Activity {
         setMenuStatus(false);
         campusMenuItem.setVisibility(View.GONE);
         sjtuBusMenuItem.setVisibility(View.GONE);
-        historyMenuItem.setVisibility(View.GONE);
 
         loginMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -265,7 +264,6 @@ public class MainActivity extends Activity {
     {
         campusMenuItem.setVisibility(View.VISIBLE);
         sjtuBusMenuItem.setVisibility(View.VISIBLE);
-        historyMenuItem.setVisibility(View.VISIBLE);
 
         //设置中心点
         double lat = campus.getLatitude();
@@ -661,6 +659,7 @@ public class MainActivity extends Activity {
         //登录后
         userMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
         logoutMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
+        historyMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
 
         //登录前
         loginMenuItem.setVisibility(!isLogin ? TextView.VISIBLE : TextView.GONE);
