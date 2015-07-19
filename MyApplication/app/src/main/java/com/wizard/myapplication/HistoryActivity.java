@@ -3,6 +3,9 @@ package com.wizard.myapplication;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,19 +15,33 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wizard.myapplication.entity.Building;
+import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.UrlConfig;
+import com.wizard.myapplication.util.WizardHTTP;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HistoryActivity extends Activity {
 
-    private List<Building> covered;
-    private int rate;
+    private List<Building> covered
+            = new ArrayList<Building>();
+    private User user;
+    private int campusId;
+    private int allCount;
 
     private TextView rateText;
     private ListView coveredList;
+    private Handler handler;
+
+    private static final int GET_HIS_SUCCESS = 0;
+    private static final int GET_HIS_FAIL = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,23 +58,94 @@ public class HistoryActivity extends Activity {
         titlebarText.setText("游览历史");
 
         Intent i = getIntent();
-        covered = (List<Building>) i.getSerializableExtra("covered");
-        rate = i.getIntExtra("rate", 0);
+        user = (User) i.getSerializableExtra("user");
+        campusId = i.getIntExtra("campusId", -1);
+        allCount = i.getIntExtra("allCount", Integer.MAX_VALUE);
 
         rateText = (TextView) findViewById(R.id.rateText);
         coveredList = (ListView) findViewById(R.id.buildingList);
-        rateText.setText(rate + "%");
-        List<String> coveredText = new ArrayList<String>();
-        for(Building b : covered)
-            coveredText.add(b.getName());
-        coveredList.setAdapter(
-                new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, coveredText));
-        coveredList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        handler = new Handler()
+        {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                coveredListOnItemClick(adapterView, view, i, l);
+            public void handleMessage(android.os.Message msg)
+            {
+                HistoryActivity.this.handleMessage(msg);
             }
-        });
+        };
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() { threadGetHistory(); }
+        }).start();
+    }
+
+    private void handleMessage(android.os.Message msg)
+    {
+        Bundle b = msg.getData();
+        int type = b.getInt("type");
+        switch(type)
+        {
+            case GET_HIS_SUCCESS:
+                List<String> coveredText = new ArrayList<String>();
+                for(Building building : covered)
+                    coveredText.add(building.getName());
+                coveredList.setAdapter(
+                        new ArrayAdapter<String>(HistoryActivity.this, android.R.layout.simple_expandable_list_item_1, coveredText));
+                int rate = covered.size() * 100 / allCount;
+                rateText.setText(rate + "%");
+                break;
+            case GET_HIS_FAIL:
+                Toast.makeText(HistoryActivity.this, "历史获取失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
+
+    private void threadGetHistory()
+    {
+        try
+        {
+            WizardHTTP http = new WizardHTTP();
+            http.setDefHeader(false);
+            http.setHeader("Content-Type", "application/json");
+            http.setCharset("utf-8");
+
+            //获取游览历史
+            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/view/usertoview/" + user.getId());
+            JSONArray retArr = new JSONArray(retStr);
+            for (int i = 0; i < retArr.length(); i++) {
+                JSONObject o = retArr.getJSONObject(i).getJSONObject("view");
+                if (o.getJSONObject("university").getInt("id") != campusId)
+                    continue;
+                Building b = new Building();
+                b.setId(o.getInt("id"));
+                b.setName(o.getString("name"));
+                b.setContent(o.getString("description"));
+                b.setLatitude(o.getDouble("latitude"));
+                b.setLongitude(o.getDouble("longitude"));
+                b.setRadius(o.getDouble("radius"));
+                covered.add(b);
+                Log.d("History", "id: " + b.getId() + " name: " + b.getName());
+            }
+
+            Bundle b = new Bundle();
+            b.putInt("type", GET_HIS_SUCCESS);
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            Bundle b = new Bundle();
+            b.putInt("type", GET_HIS_FAIL);
+            b.putSerializable("errmsg", ex.getMessage());
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+
     }
 
     private void coveredListOnItemClick(AdapterView<?> adapterView, View view, int i, long l)

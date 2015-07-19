@@ -86,8 +86,6 @@ public class MainActivity extends Activity {
     private boolean firstLoc = true;
     private LatLng lastLoc;
     private Building currentBuilding;
-    private Set<Building> covered
-            = new HashSet<Building>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -351,9 +349,8 @@ public class MainActivity extends Activity {
                     break;
                 }
             }
-            if(b != null && !covered.contains(b))
+            if(b != null)
             {
-                covered.add(b);
                 currentBuilding = b;
                 new Thread(new Runnable() {
                     @Override
@@ -428,26 +425,6 @@ public class MainActivity extends Activity {
             }
             c.setBuildings(buildings);
             campus = c;
-
-            //获取游览历史
-            if(user != null) {
-                retStr = http.httpGet("http://" + UrlConfig.HOST + "/view/usertoview/" + user.getId());
-                retArr = new JSONArray(retStr);
-                for (int i = 0; i < retArr.length(); i++) {
-                    JSONObject o = retArr.getJSONObject(i).getJSONObject("view");
-                    if(o.getJSONObject("university").getInt("id") != c.getId())
-                        continue;
-                    Building b = new Building();
-                    b.setId(o.getInt("id"));
-                    b.setName(o.getString("name"));
-                    b.setContent(o.getString("description"));
-                    b.setLatitude(o.getDouble("latitude"));
-                    b.setLongitude(o.getDouble("longitude"));
-                    b.setRadius(o.getDouble("radius"));
-                    covered.add(b);
-                    Log.d("History", "id: " + b.getId() + " name: " + b.getName());
-                }
-            }
 
             Bundle b = new Bundle();
             b.putInt("type", GET_CAMPUS_SUCCESS);
@@ -545,8 +522,6 @@ public class MainActivity extends Activity {
 
     private void loginMenuItemOnClick() {
         Intent i = new Intent(this, LoginActivity.class);
-        if(campus != null)
-            i.putExtra("campusId", campus.getId());
         startActivityForResult(i, ACTIVITY_LOGIN);
     }
 
@@ -563,7 +538,6 @@ public class MainActivity extends Activity {
     private void locMenuItemOnClick() {
         if (lastLoc != null)
             baiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(lastLoc));
-        covered.clear();
         slideMenu.closeMenu();
     }
 
@@ -607,10 +581,15 @@ public class MainActivity extends Activity {
 
     private void historyMenuItemOnClick()
     {
-        List<Building> coveredList = new ArrayList<Building>(covered);
+        if(campus == null)
+        {
+            Toast.makeText(this, "获取校园信息失败！", Toast.LENGTH_SHORT).show();
+            return;
+        }
         Intent i = new Intent(this, HistoryActivity.class);
-        i.putExtra("covered", (Serializable) coveredList);
-        i.putExtra("rate", 100 * covered.size() / campus.getBuildings().size());
+        i.putExtra("campusId", campus.getId());
+        i.putExtra("allCount", campus.getBuildings().size());
+        i.putExtra("user", user);
         startActivityForResult(i, ACTIVITY_HISTORY);
     }
 
@@ -643,9 +622,6 @@ public class MainActivity extends Activity {
              requestCode == ACTIVITY_BUILDING || requestCode == ACTIVITY_CAMPUS) &&
                 resultCode == Activity.RESULT_OK) {
             user = (User) i.getSerializableExtra("user");
-            List<Building> history = (List<Building>) i.getSerializableExtra("history");
-            if(history != null)
-                covered.addAll(history);
             setMenuStatus(true);
         }
         else if((requestCode == ACTIVITY_SEARCH || requestCode == ACTIVITY_HISTORY) &&
@@ -670,7 +646,7 @@ public class MainActivity extends Activity {
         //初始化导航引擎
 //		BaiduNaviManager.getInstance().initEngine(this, getSdcardDir(),
 //		        mNaviEngineInitListener, ACCESS_KEY, mKeyVerifyListener);
-        BaiduNaviManager.getInstance().initEngine(this, getSdcardDir(),
+        BaiduNaviManager.getInstance().initEngine(this, MainApplication.getSdcardDir(),
                 new BNaviEngineManager.NaviEngineInitListener() {
                     public void engineInitSuccess() {}
                     public void engineInitStart() {}
@@ -688,14 +664,6 @@ public class MainActivity extends Activity {
                     }
                 }
         );
-    }
-
-    private String getSdcardDir() {
-        if (Environment.getExternalStorageState().equalsIgnoreCase(
-                Environment.MEDIA_MOUNTED))
-            return Environment.getExternalStorageDirectory().toString();
-
-        return null;
     }
 
     private void searchActivityOnOk(int id)

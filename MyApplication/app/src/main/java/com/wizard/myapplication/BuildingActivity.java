@@ -60,7 +60,6 @@ public class BuildingActivity extends Activity {
     private AlertDialog voteDialog;
     private TextView currentVoteText;
 
-    private int campusId;
     private Building building;
     private User user;
     private List<Comment> comments
@@ -78,7 +77,6 @@ public class BuildingActivity extends Activity {
         Intent i = getIntent();
         building = (Building) i.getSerializableExtra("building");
         user = (User) i.getSerializableExtra("user");
-        campusId = i.getIntExtra("campusId", -1);
 
         TextView title = (TextView) findViewById(R.id.titlebar_name);
         title.setText(building.getName());
@@ -241,7 +239,6 @@ public class BuildingActivity extends Activity {
     {
         if (user == null) {
             Intent intent = new Intent(BuildingActivity.this, LoginActivity.class);
-            intent.putExtra("campusId", campusId);
             startActivityForResult(intent, ACTIVITY_LOGIN);
             return;
         }

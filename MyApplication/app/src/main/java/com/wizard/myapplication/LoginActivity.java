@@ -37,9 +37,6 @@ public class LoginActivity extends Activity {
 
     private String un;
     private String pw;
-    private int campusId;
-    private List<Building> history
-            = new ArrayList<Building>();
 
     private static final int LOGIN_SUCCESS = 0;
     private static final int LOGIN_FAIL = 1;
@@ -49,9 +46,6 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
-
-        Intent i = getIntent();
-        campusId = i.getIntExtra("campusId", -1);
 
         Button returnButton = (Button) findViewById(R.id.titlebar_return);
         returnButton.setOnClickListener(new View.OnClickListener() {
@@ -111,7 +105,6 @@ public class LoginActivity extends Activity {
                 User u = (User) b.getSerializable("user");
                 Intent i = new Intent();
                 i.putExtra("user", u);
-                i.putExtra("history", (java.io.Serializable) history);
                 setResult(Activity.RESULT_OK, i);
                 finish();
                 break;
@@ -174,30 +167,9 @@ public class LoginActivity extends Activity {
             user.setPw(retJson.getString("password"));
             Log.d("UserLogin", "id: " + user.getId() + " un: " + user.getUn() + " pw: " + user.getPw());
 
-            //获取游览历史
-            if(campusId != -1) {
-                retStr = http.httpGet("http://" + UrlConfig.HOST + "/view/usertoview/" + user.getId());
-                JSONArray retArr = new JSONArray(retStr);
-                for (int i = 0; i < retArr.length(); i++) {
-                    JSONObject o = retArr.getJSONObject(i).getJSONObject("view");
-                    if(o.getJSONObject("university").getInt("id") != campusId)
-                        continue;
-                    Building b = new Building();
-                    b.setId(o.getInt("id"));
-                    b.setName(o.getString("name"));
-                    b.setContent(o.getString("description"));
-                    b.setLatitude(o.getDouble("latitude"));
-                    b.setLongitude(o.getDouble("longitude"));
-                    b.setRadius(o.getDouble("radius"));
-                    history.add(b);
-                    Log.d("History", "id: " + b.getId() + " name: " + b.getName());
-                }
-            }
-
             Bundle b = new Bundle();
             b.putInt("type", LOGIN_SUCCESS);
             b.putSerializable("user", user);
-            b.putSerializable("history", (java.io.Serializable) history);
             Message msg = handler.obtainMessage();
             msg.setData(b);
             handler.sendMessage(msg);

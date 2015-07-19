@@ -277,7 +277,6 @@ public class CampusActivity extends Activity {
         if(user == null)
         {
             Intent i = new Intent(this, LoginActivity.class);
-            i.putExtra("campusId", campus.getId());
             startActivityForResult(i, ACTIVITY_LOGIN);
         }
         else {

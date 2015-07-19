@@ -56,7 +56,6 @@ public class EventActivity extends Activity {
     private Handler handler;
     private TextView currentVoteText;
 
-    private int campusId;
     private User user;
     private Event e;
     private String myComment;
@@ -74,7 +73,6 @@ public class EventActivity extends Activity {
         Intent i = getIntent();
         user = (User) i.getSerializableExtra("user");
         e = (Event) i.getSerializableExtra("event");
-        campusId = i.getIntExtra("campusId", -1);
 
         commentPage = (LinearLayout) findViewById(R.id.commentPage);
         addCommentButton = (Button) findViewById(R.id.addComment);
@@ -193,7 +191,6 @@ public class EventActivity extends Activity {
     {
         if (user == null) {
             Intent intent = new Intent(this, LoginActivity.class);
-            intent.putExtra("campusId", campusId);
             startActivityForResult(intent, ACTIVITY_LOGIN);
             return;
         }
