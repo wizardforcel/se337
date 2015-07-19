@@ -77,6 +77,7 @@ public class UserActivity extends Activity {
                 rankTextOnClick();
             }
         });
+        rankText.setVisibility(View.GONE);
         exchangeText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

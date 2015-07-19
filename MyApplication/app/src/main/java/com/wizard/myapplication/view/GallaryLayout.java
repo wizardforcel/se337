@@ -3,6 +3,8 @@ package com.wizard.myapplication.view;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -21,6 +23,7 @@ public class GallaryLayout extends GridLayout {
     private TextView mTextView = null;
     private Context mContext;
     private ProgressBar progressBar = null;
+    private Button button;
 
 
     public GallaryLayout(Context context, AttributeSet attrs) {
@@ -32,6 +35,8 @@ public class GallaryLayout extends GridLayout {
         mTextView = (TextView)findViewById(R.id.text);
         mImgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
+        button = new Button(context, null);
+        button.setText("Get it");
         setPadding(0,10,0,10);
     }
 
@@ -61,6 +66,14 @@ public class GallaryLayout extends GridLayout {
         mTextView.append("\n\n" + String.valueOf(num) + "/" + String.valueOf(max));
     }
 
+    private void getFinished(int num, int tot) {
+        if(num >= tot) {
+            button.setVisibility(View.GONE);
+        } else {
+            setProgressBar(tot, num);
+        }
+
+    }
 //     /*设置触摸接口*/
 //    public void setOnTouch(OnTouchListener listen){
 //        mImgView.setOnTouchListener(listen);

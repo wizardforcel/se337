@@ -37,41 +37,8 @@ public class ExchangeActivity extends Activity {
         titlebarText.setText("积分商城");
 
         gridView=(GridView)findViewById(R.id.exchangeView);
-        gridView.setAdapter(new ImageAdapter(this));
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                new AlertDialog.Builder(ExchangeActivity.this).setTitle("系统提示")//设置对话框标题
-
-                        .setMessage("是否确认兑换")//设置显示的内容
-
-                        .setPositiveButton("确认", new DialogInterface.OnClickListener() {//添加确定按钮
-
-
-                            @Override
-
-                            public void onClick(DialogInterface dialog, int which) {//确定按钮的响应事件
-
-                                // TODO Auto-generated method stub
-                                finish();
-
-                            }
-
-                        }).setNegativeButton("放弃", new DialogInterface.OnClickListener() {//添加返回按钮
-
-
-                            @Override
-
-                            public void onClick(DialogInterface dialog, int which) {//响应事件
-
-                                // TODO Auto-generated method stub
-
-                                Log.i("alertdialog", " 请保存数据！");
-
-                            }
-
-                        }).show();//在按键响应事件中显示此对话框
-            }
-        });
+        gridView.setAdapter(new ExchangeAdapter(this));
+        gridView.setPadding(30,20,20,20);
     }
 
 

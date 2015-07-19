@@ -8,7 +8,6 @@
     <include layout="@layout/titlebar_other" />
 
     <!--include layout="@layout/header" /-->
-
     <!--TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -22,6 +21,5 @@
         android:layout_height="wrap_content"
         android:id="@+id/accomView"
         android:layout_gravity="center_horizontal"
-        android:numColumns="2"
-        android:layout_weight="1" />
+        android:numColumns="2" />
 </LinearLayout>

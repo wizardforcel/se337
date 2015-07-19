@@ -9,6 +9,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +39,7 @@ public class AccomActivity extends Activity{
 
         gridView=(GridView)findViewById(R.id.accomView);
         gridView.setAdapter(new AccomAdapter(this));
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(gridView.getContext(), "" + position, Toast.LENGTH_SHORT).show();
             }
