@@ -19,11 +19,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.wizard.myapplication.entity.Building;
+import com.wizard.myapplication.entity.BuildingType;
 import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -166,6 +168,18 @@ public class LoginActivity extends Activity {
             user.setUn(retJson.getString("username"));
             user.setPw(retJson.getString("password"));
             Log.d("UserLogin", "id: " + user.getId() + " un: " + user.getUn() + " pw: " + user.getPw());
+
+            //获取偏好
+            retStr = http.httpGet("http://" + UrlConfig.HOST + "/user/" + user.getId() +"/preference/");
+            JSONArray retArr = new JSONArray(retStr);
+            List<String> pres = user.getPres();
+            for(int i = 0; i < retArr.length(); i++)
+            {
+                JSONObject o = retArr.getJSONObject(i);
+                String type = o.getJSONObject("preference").getString("type");
+                if(Arrays.asList(BuildingType.TYPES).contains(type))
+                    pres.add(type);
+            }
 
             Bundle b = new Bundle();
             b.putInt("type", LOGIN_SUCCESS);

@@ -20,6 +20,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wizard.myapplication.entity.BuildingType;
 import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
@@ -28,6 +29,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,8 +40,6 @@ public class PreferenceActivity extends Activity {
 
     private static final int SET_PRE_SUCCESS = 0;
     private static final int SET_PRE_FAIL = 1;
-    private static final int GET_PRE_SUCCESS = 2;
-    private static final int GET_PRE_FAIL = 3;
 
     private Button addButton;
     private ListView preListView;
@@ -46,21 +47,9 @@ public class PreferenceActivity extends Activity {
     private Handler handler;
 
     private User user;
-    private List<String> pres = new ArrayList<String>();
+    private List<String> pres;
     private List<String> toAdds = new ArrayList<String>();
     private String toAdd = "";
-
-    private static final Map<String, String> enToZhMap =
-            new HashMap<String, String>();
-
-    static
-    {
-        enToZhMap.put("SPORT", "运动");
-        enToZhMap.put("FOOD", "美食");
-        enToZhMap.put("SCENE", "风景");
-        enToZhMap.put("HISTORY", "历史");
-        enToZhMap.put("ACADEMIC", "学术");
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +59,7 @@ public class PreferenceActivity extends Activity {
 
         Intent i = getIntent();
         user = (User) i.getSerializableExtra("user");
+        pres = user.getPres();
 
         addButton = (Button) findViewById(R.id.addButton);
         preListView = (ListView) findViewById(R.id.preListView);
@@ -98,17 +88,19 @@ public class PreferenceActivity extends Activity {
             public void onNothingSelected(AdapterView<?> adapterView) { }
         });
 
+        for(String s : BuildingType.TYPES)
+        {
+            if(!pres.contains(s))
+                toAdds.add(s);
+        }
+        refreshWidget();
+
         handler = new Handler(){
             @Override
             public void handleMessage(Message msg){
                 PreferenceActivity.this.handleMessage(msg);
             }
         };
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() { threadGetPreference(); }
-        }).start();
     }
 
     private void addButtonOnClick()
@@ -141,22 +133,25 @@ public class PreferenceActivity extends Activity {
                 pres.add(toAdd);
                 toAdds.remove(toAdd);
                 toAdd = "";
+                Intent i = new Intent();
+                i.putExtra("pres", (java.io.Serializable) pres);
+                setResult(RESULT_OK, i);
                 refreshWidget();
                 break;
             case SET_PRE_FAIL:
                 Toast.makeText(this, "设置失败" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
                 break;
-            case GET_PRE_FAIL:
+            /*case GET_PRE_FAIL:
                 Toast.makeText(this, "获取失败" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
                 break;
             case GET_PRE_SUCCESS:
-                for(String s : enToZhMap.keySet())
+                for(String s : BuildingType.TYPES)
                 {
                     if(!pres.contains(s))
                         toAdds.add(s);
                 }
                 refreshWidget();
-                break;
+                break;*/
         }
     }
 
@@ -164,10 +159,10 @@ public class PreferenceActivity extends Activity {
     {
         List<String> presZh = new ArrayList<String>();
         for(String s : pres)
-            presZh.add(enToZhMap.get(s));
+            presZh.add(BuildingType.enToZhMap.get(s));
         List<String> toAddsZh = new ArrayList<String>();
         for(String s :toAdds)
-            toAddsZh.add(s);
+            toAddsZh.add(BuildingType.enToZhMap.get(s));
 
         preListView.setAdapter(
                 new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, presZh));
@@ -203,7 +198,7 @@ public class PreferenceActivity extends Activity {
         }
     }
 
-    private void threadGetPreference(){
+    /*private void threadGetPreference(){
         try
         {
             WizardHTTP http = new WizardHTTP();
@@ -216,7 +211,7 @@ public class PreferenceActivity extends Activity {
             {
                 JSONObject json = retArr.getJSONObject(i);
                 String type = json.getJSONObject("preference").getString("type");
-                if(enToZhMap.containsKey(type))
+                if(Arrays.asList(BuildingType.TYPES).contains(type))
                     pres.add(type);
             }
 
@@ -236,7 +231,7 @@ public class PreferenceActivity extends Activity {
             msg.setData(b);
             handler.sendMessage(msg);
         }
-    }
+    }*/
 
 
     @Override

@@ -1,6 +1,8 @@
 package com.wizard.myapplication.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Wizard on 2015/7/13.
@@ -10,6 +12,9 @@ public class User implements Serializable
     private int id;
     private String un;
     private String pw;
+
+    private List<String> pres
+            = new ArrayList<String>();
 
     public int getId() {
         return id;
@@ -33,5 +38,13 @@ public class User implements Serializable
 
     public void setPw(String pw) {
         this.pw = pw;
+    }
+
+    public List<String> getPres() {
+        return pres;
+    }
+
+    public void setPres(List<String> pres) {
+        this.pres = pres;
     }
 }

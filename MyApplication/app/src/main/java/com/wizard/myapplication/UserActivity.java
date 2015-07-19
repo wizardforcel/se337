@@ -19,6 +19,8 @@ import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
 import com.wizard.myapplication.view.CircularImage;
 
+import java.util.List;
+
 public class UserActivity extends Activity {
 
     private CircularImage userImage;
@@ -33,6 +35,8 @@ public class UserActivity extends Activity {
 
     private static final int LOAD_IMG_SUCCESS = 0;
     private static final int LOAD_IMG_FAIL = 1;
+
+    private static final int ACTIVITY_PRE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +124,7 @@ public class UserActivity extends Activity {
     private void preTextOnClick(){
         Intent i = new Intent(this, PreferenceActivity.class);
         i.putExtra("user", user);
-        startActivity(i);
+        startActivityForResult(i, ACTIVITY_PRE);
     }
 
     private void threadGetUserPhoto(){
@@ -176,5 +180,15 @@ public class UserActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent i) {
+        if(requestCode == ACTIVITY_PRE && resultCode == RESULT_OK)
+        {
+            List<String> pres = (List<String>) i.getSerializableExtra("pres");
+            user.setPres(pres);
+            setResult(RESULT_OK, i);
+        }
     }
 }

@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.wizard.myapplication.entity.Comment;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.TabUtil;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
 
@@ -88,6 +89,11 @@ public class EventActivity extends Activity {
         tHost.addTab(tHost.newTabSpec("简介").setIndicator("简介").setContent(R.id.contentPage));
         tHost.addTab(tHost.newTabSpec("评论").setIndicator("评论").setContent(R.id.commentPage0));
         tHost.setCurrentTab(0);
+        TabUtil.updateTab(tHost);
+        tHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String s) { TabUtil.updateTab(EventActivity.this.tHost); }
+        });
 
         TextView unText = (TextView) findViewById(R.id.unText);
         unText.setText(e.getUn());

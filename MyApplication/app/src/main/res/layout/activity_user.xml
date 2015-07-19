@@ -41,23 +41,21 @@
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
             android:gravity="center_vertical"
-            android:paddingLeft="15.0dip"
             android:paddingRight="10.0dip"
             android:text="偏好"
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/preText"
-            android:layout_marginBottom="2dp" />
+            android:background="@drawable/border_style_orange"
+            android:paddingLeft="15.0dip" />
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
@@ -68,12 +66,11 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/taskText"
-            android:layout_marginBottom="2dp" />
+            android:background="@drawable/border_style_orange" />
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
@@ -84,12 +81,11 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/rankText"
-            android:layout_marginBottom="2dp" />
+            android:background="@drawable/border_style_orange" />
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
@@ -100,7 +96,7 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/exchangeText"
-            android:layout_marginBottom="2dp" />
+            android:background="@drawable/border_style_orange" />
     </LinearLayout>
 
 

@@ -1,19 +1,19 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="240dip"
     android:layout_height="fill_parent"
-    android:background="#000"
-    android:id="@+id/scrollView" >
+    android:id="@+id/scrollView"
+    android:background="#fff">
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#000"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:background="#ff9966">
 
         <TextView
             android:layout_width="240dip"
             android:layout_height="28.0dip"
-            android:background="#ff313131"
+            android:background="#ff9966"
             android:gravity="center_vertical"
             android:paddingLeft="15.0dip"
             android:text="选项"
@@ -24,7 +24,7 @@
         <TextView
             android:layout_width="240dip"
             android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
+            android:background="#fff"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
@@ -40,7 +40,7 @@
         <TextView
             android:layout_width="240dip"
             android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
+            android:background="#fff"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
@@ -56,7 +56,7 @@
         <TextView
             android:layout_width="240dip"
             android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
+            android:background="#fff"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
@@ -72,7 +72,7 @@
         <TextView
             android:layout_width="240dip"
             android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
+            android:background="#fff"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
@@ -88,7 +88,7 @@
         <TextView
             android:layout_width="240dip"
             android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
+            android:background="#fff"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
@@ -104,7 +104,7 @@
         <TextView
             android:layout_width="240dip"
             android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
+            android:background="#fff"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
@@ -120,7 +120,7 @@
         <TextView
             android:layout_width="240dip"
             android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
+            android:background="#fff"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
@@ -136,7 +136,7 @@
         <TextView
             android:layout_width="240dip"
             android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
+            android:background="#fff"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
@@ -152,7 +152,23 @@
         <TextView
             android:layout_width="240dip"
             android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
+            android:background="#fff"
+            android:clickable="true"
+            android:drawableLeft="@drawable/ic_category_mark"
+            android:drawablePadding="1.0dip"
+            android:gravity="center_vertical"
+            android:paddingLeft="15.0dip"
+            android:paddingRight="10.0dip"
+            android:text="显示推荐"
+            android:textColor="#ff959595"
+            android:textSize="16.0sp"
+            android:id="@+id/presMenu"
+            android:layout_marginBottom="2dp" />
+
+        <TextView
+            android:layout_width="240dip"
+            android:layout_height="50.0dip"
+            android:background="#fff"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
@@ -168,7 +184,7 @@
         <TextView
             android:layout_width="240dip"
             android:layout_height="50.0dip"
-            android:background="@drawable/selector_category_item"
+            android:background="#fff"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
@@ -180,7 +196,6 @@
             android:textSize="16.0sp"
             android:id="@+id/logoutMenu"
             android:layout_marginBottom="2dp" />
-
 
 
         <!--             end              -->

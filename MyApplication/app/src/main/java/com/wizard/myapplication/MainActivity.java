@@ -26,6 +26,7 @@ import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.navisdk.BNaviEngineManager;
 import com.baidu.navisdk.BaiduNaviManager;
 import com.wizard.myapplication.entity.Building;
+import com.wizard.myapplication.entity.BuildingType;
 import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.NaviNode;
@@ -40,8 +41,10 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -53,6 +56,7 @@ public class MainActivity extends Activity {
     private static final int ACTIVITY_CAMPUS = 3;
     private static final int ACTIVITY_SEARCH = 4;
     private static final int ACTIVITY_HISTORY = 5;
+    private static final int ACTIVITY_PRE = 6;
 
     private static final int GET_CAMPUS_SUCCESS = 0;
     private static final int GET_CAMPUS_FAIL = 1;
@@ -79,11 +83,13 @@ public class MainActivity extends Activity {
     private TextView followMenuItem;
     private TextView sjtuBusMenuItem;
     private TextView historyMenuItem;
+    private TextView presMenuItem;
 
     private Campus campus;
     private User user;
     private boolean onFollow = false;
     private boolean firstLoc = true;
+    private boolean presShown = false;
     private LatLng lastLoc;
     private Building currentBuilding;
 
@@ -153,6 +159,7 @@ public class MainActivity extends Activity {
         logoutMenuItem = (TextView) slideMenu.findViewById(R.id.logoutMenu);
         sjtuBusMenuItem = (TextView) findViewById(R.id.sjtuBusMenu);
         historyMenuItem = (TextView) findViewById(R.id.historyMenu);
+        presMenuItem = (TextView) findViewById(R.id.presMenu);
 
         setMenuStatus(false);
         campusMenuItem.setVisibility(View.GONE);
@@ -209,6 +216,10 @@ public class MainActivity extends Activity {
         historyMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { historyMenuItemOnClick(); }
+        });
+        presMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { presMenuItemOnClick(); }
         });
     }
 
@@ -579,6 +590,29 @@ public class MainActivity extends Activity {
         startActivity(i);
     }
 
+    private void presMenuItemOnClick()
+    {
+        if(campus == null)
+        {
+            Toast.makeText(this, "校园信息获取失败！", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(presShown)
+        {
+            hidePres();
+            presMenuItem.setText("显示推荐");
+        }
+        else
+        {
+            showPres();
+            presMenuItem.setText("隐藏推荐");
+        }
+
+        presShown = !presShown;
+        slideMenu.closeMenu();
+    }
+
     private void historyMenuItemOnClick()
     {
         if(campus == null)
@@ -597,7 +631,7 @@ public class MainActivity extends Activity {
     {
         Intent i = new Intent(this, UserActivity.class);
         i.putExtra("user", user);
-        startActivity(i);
+        startActivityForResult(i, ACTIVITY_PRE);
     }
 
     private void sjtuBusMenuItemOnClick()
@@ -629,6 +663,11 @@ public class MainActivity extends Activity {
             int resultId = i.getIntExtra("resultId", 0);
             searchActivityOnOk(resultId);
         }
+        else if(requestCode == ACTIVITY_PRE && resultCode == RESULT_OK)
+        {
+            List<String> pres = (List<String>) i.getSerializableExtra("pres");
+            user.setPres(pres);
+        }
     }
 
     private void setMenuStatus(boolean isLogin) {
@@ -636,6 +675,7 @@ public class MainActivity extends Activity {
         userMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
         logoutMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
         historyMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
+        presMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
 
         //登录前
         loginMenuItem.setVisibility(!isLogin ? TextView.VISIBLE : TextView.GONE);
@@ -679,6 +719,42 @@ public class MainActivity extends Activity {
         }
         baiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(m.getPosition()));
         baiduMapOnMarkerClick(m);
+    }
+
+    private void showPres()
+    {
+        Map<Integer, Building> buildingIndexMap = new HashMap<Integer, Building>();
+        for(Building b : campus.getBuildings())
+            buildingIndexMap.put(b.getId(), b);
+        Map<String, Integer> typeToIconMap = new HashMap<String, Integer>();
+        typeToIconMap.put(BuildingType.HISTORY, R.drawable.icon_mark_history);
+        typeToIconMap.put(BuildingType.ACADAMIC, R.drawable.icon_mark_academic);
+        typeToIconMap.put(BuildingType.FOOD, R.drawable.icon_mark_food);
+        typeToIconMap.put(BuildingType.SCENE, R.drawable.icon_mark_scene);
+        typeToIconMap.put(BuildingType.SPORT, R.drawable.icon_mark_sports);
+
+        for(Marker m : markers)
+        {
+            Building b = buildingIndexMap.get(Integer.parseInt(m.getTitle()));
+            if(b == null) continue;
+            if(!typeToIconMap.containsKey(b.getType()))
+                continue;
+            if(!user.getPres().contains(b.getType()))
+                continue;
+            int resId = typeToIconMap.get(b.getType());
+            BitmapDescriptor bitmap = BitmapDescriptorFactory
+                    .fromResource(resId);
+            m.setIcon(bitmap);
+        }
+
+    }
+
+    private void hidePres()
+    {
+        BitmapDescriptor bitmap = BitmapDescriptorFactory
+                .fromResource(R.drawable.icon_mark);
+        for(Marker m : markers)
+            m.setIcon(bitmap);
     }
 
 }
