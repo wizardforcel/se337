@@ -26,8 +26,11 @@
             android:id="@+id/unText"
             android:layout_gravity="center_horizontal"
             android:gravity="center"
-            android:textColor="#ff959595"
-            android:layout_weight="0.09" />
+            android:textColor="#fff"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:text="test"
+            android:textAppearance="@android:style/TextAppearance.Medium" />
     </LinearLayout>
 
     <LinearLayout
@@ -49,7 +52,7 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/preText"
-            android:background="@drawable/border_style_orange"
+            android:background="@drawable/border_style"
             android:paddingLeft="15.0dip" />
 
         <TextView
@@ -65,7 +68,7 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/taskText"
-            android:background="@drawable/border_style_orange" />
+            android:background="@drawable/border_style" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -80,7 +83,7 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/rankText"
-            android:background="@drawable/border_style_orange" />
+            android:background="@drawable/border_style" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -95,7 +98,7 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/exchangeText"
-            android:background="@drawable/border_style_orange" />
+            android:background="@drawable/border_style" />
     </LinearLayout>
 
 

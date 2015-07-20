@@ -1,6 +1,7 @@
 package com.wizard.myapplication;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -65,14 +66,11 @@ public class MainActivity extends Activity {
     private BaiduMap baiduMap;
     private List<Marker> markers = new ArrayList<Marker>();
     private LocationClient mLocationClient;
-
-    private Handler handler;
-    private SlideMenu slideMenu;
-    private ImageView menuButton;
-    private ImageView searchButton;
-    private LinearLayout mapLinear;
     private TextView buildingText;
+    private Handler handler;
+    private LinearLayout mapLinear;
 
+    private SlideMenu slideMenu;
     private TextView loginMenuItem;
     private TextView regMenuItem;
     private TextView campusMenuItem;
@@ -84,6 +82,13 @@ public class MainActivity extends Activity {
     private TextView sjtuBusMenuItem;
     private TextView historyMenuItem;
     private TextView presMenuItem;
+    private TextView mapTypeMenuItem;
+
+    private AlertDialog mapTypeDialog;
+    private Button _2DButton;
+    private Button _3DButton;
+    private Button normalButton;
+    private Button satiButton;
 
     private Campus campus;
     private User user;
@@ -98,6 +103,33 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+
+        LinearLayout mapTypeLinear = (LinearLayout) getLayoutInflater().inflate(R.layout.map_options_linear, null);
+        normalButton = (Button) mapTypeLinear.findViewById(R.id.normalButton);
+        satiButton = (Button) mapTypeLinear.findViewById(R.id.satiButton);
+        _2DButton = (Button) mapTypeLinear.findViewById(R.id._2DButton);
+        _3DButton = (Button) mapTypeLinear.findViewById(R.id._3DButton);
+        normalButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { normalButtonOnClick(); }
+        });
+        satiButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { satiButtonOnClick(); }
+        });
+        _2DButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { _2DButtonOnClick(); }
+        });
+        _3DButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { _3DButtonOnClick(); }
+        });
+
+        mapTypeDialog = new AlertDialog.Builder(this)
+                            .setView(mapTypeLinear)
+                            .setNegativeButton("取消", null)
+                            .create();
 
         initSideBar();
         initBaiduMap();
@@ -132,7 +164,7 @@ public class MainActivity extends Activity {
     //初始化侧栏
     private void initSideBar() {
         slideMenu = (SlideMenu) findViewById(R.id.slide_menu);
-        menuButton = (ImageView) findViewById(R.id.titlebar_menu_btn);
+        ImageView menuButton = (ImageView) findViewById(R.id.titlebar_menu_btn);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,10 +175,12 @@ public class MainActivity extends Activity {
                     slideMenu.closeMenu();
             }
         });
-        searchButton = (ImageView) findViewById(R.id.titlebar_menu_search);
+        ImageView searchButton = (ImageView) findViewById(R.id.titlebar_menu_search);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) { searchMenuItemOnClick(); }
+            public void onClick(View view) {
+                searchMenuItemOnClick();
+            }
         });
 
         loginMenuItem = (TextView) slideMenu.findViewById(R.id.loginMenu);
@@ -160,6 +194,7 @@ public class MainActivity extends Activity {
         sjtuBusMenuItem = (TextView) findViewById(R.id.sjtuBusMenu);
         historyMenuItem = (TextView) findViewById(R.id.historyMenu);
         presMenuItem = (TextView) findViewById(R.id.presMenu);
+        mapTypeMenuItem = (TextView) findViewById(R.id.mapTypeMenu);
 
         setMenuStatus(false);
         campusMenuItem.setVisibility(View.GONE);
@@ -220,6 +255,10 @@ public class MainActivity extends Activity {
         presMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { presMenuItemOnClick(); }
+        });
+        mapTypeMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { mapTypeMenuItemOnClick(); }
         });
     }
 
@@ -534,16 +573,19 @@ public class MainActivity extends Activity {
     private void loginMenuItemOnClick() {
         Intent i = new Intent(this, LoginActivity.class);
         startActivityForResult(i, ACTIVITY_LOGIN);
+        slideMenu.closeMenu();
     }
 
     private void regMenuItemOnClick() {
         Intent i = new Intent(this, RegActivity.class);
         startActivityForResult(i, ACTIVITY_REG);
+        slideMenu.closeMenu();
     }
 
     private void logoutMenuItemOnClick() {
         user = null;
         setMenuStatus(false);
+        slideMenu.closeMenu();
     }
 
     private void locMenuItemOnClick() {
@@ -564,6 +606,7 @@ public class MainActivity extends Activity {
         i.putExtra("campus", campus);
         i.putExtra("user", user);
         startActivityForResult(i, ACTIVITY_CAMPUS);
+        slideMenu.closeMenu();
     }
 
     private void naviMenuItemOnClick() {
@@ -588,6 +631,7 @@ public class MainActivity extends Activity {
         myLoc.setLng(lastLoc.longitude);
         i.putExtra("myLoc", myLoc);
         startActivity(i);
+        slideMenu.closeMenu();
     }
 
     private void presMenuItemOnClick()
@@ -625,6 +669,7 @@ public class MainActivity extends Activity {
         i.putExtra("allCount", campus.getBuildings().size());
         i.putExtra("user", user);
         startActivityForResult(i, ACTIVITY_HISTORY);
+        slideMenu.closeMenu();
     }
 
     private void userMenuItemOnClick()
@@ -632,12 +677,14 @@ public class MainActivity extends Activity {
         Intent i = new Intent(this, UserActivity.class);
         i.putExtra("user", user);
         startActivityForResult(i, ACTIVITY_PRE);
+        slideMenu.closeMenu();
     }
 
     private void sjtuBusMenuItemOnClick()
     {
         Intent i = new Intent(this, WebActivity.class);
         startActivity(i);
+        slideMenu.closeMenu();
     }
 
     @Override
@@ -755,6 +802,37 @@ public class MainActivity extends Activity {
                 .fromResource(R.drawable.icon_mark);
         for(Marker m : markers)
             m.setIcon(bitmap);
+    }
+
+    private void mapTypeMenuItemOnClick()
+    {
+        mapTypeDialog.show();
+        slideMenu.closeMenu();
+    }
+
+    private void _2DButtonOnClick()
+    {
+        baiduMap.setMapStatus(
+                MapStatusUpdateFactory.newMapStatus(new MapStatus.Builder().overlook(0).build()));
+        mapTypeDialog.hide();
+    }
+
+    private void _3DButtonOnClick()
+    {
+        baiduMap.setMapStatus(
+                MapStatusUpdateFactory.newMapStatus(new MapStatus.Builder().overlook(-45).build()));
+        mapTypeDialog.hide();
+    }
+    private void normalButtonOnClick()
+    {
+        baiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
+        mapTypeDialog.hide();
+    }
+
+    private void satiButtonOnClick()
+    {
+        baiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);
+        mapTypeDialog.hide();
     }
 
 }

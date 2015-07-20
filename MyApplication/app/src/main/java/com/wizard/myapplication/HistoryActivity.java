@@ -64,6 +64,12 @@ public class HistoryActivity extends Activity {
 
         rateText = (TextView) findViewById(R.id.rateText);
         coveredList = (ListView) findViewById(R.id.buildingList);
+        coveredList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                coveredListOnItemClick(adapterView, view, i, l);
+            }
+        });
 
         handler = new Handler()
         {
@@ -154,6 +160,7 @@ public class HistoryActivity extends Activity {
         Intent intent = new Intent();
         intent.putExtra("resultId", id);
         setResult(RESULT_OK, intent);
+        finish();
     }
 
     @Override

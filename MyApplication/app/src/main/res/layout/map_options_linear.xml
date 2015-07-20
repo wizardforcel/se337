@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="fill_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="普通地图"
+        android:id="@+id/normalButton"
+        android:background="@drawable/border_style"
+        android:layout_marginTop="0dp"
+        android:textColor="#999" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="卫星地图"
+        android:id="@+id/satiButton"
+        android:background="@drawable/border_style"
+        android:layout_marginTop="0dp"
+        android:textColor="#999" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="2D"
+        android:id="@+id/_2DButton"
+        android:background="@drawable/border_style"
+        android:layout_marginTop="0dp"
+        android:textColor="#999" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="3D"
+        android:id="@+id/_3DButton"
+        android:background="@drawable/border_style"
+        android:layout_marginTop="0dp"
+        android:textColor="#999" />
+</LinearLayout>
