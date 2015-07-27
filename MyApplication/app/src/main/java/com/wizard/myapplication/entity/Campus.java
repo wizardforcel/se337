@@ -76,12 +76,21 @@ public class Campus implements Serializable
         this.events = events;
     }
 
+    public byte[] getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
+    }
+
     private int id;
     private String name;
     private String content;
     private double latitude;
     private double longitude;
     private double radius;
+    private byte[] avatar;
     private List<Building> buildings
             = new ArrayList<Building>();
     private List<Event> events

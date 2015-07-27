@@ -11,9 +11,18 @@ public class Comment implements Serializable
     private int id;
     private int uid;
     private String un;
+    private byte[] avatar;
     private String content;
     private int like;
     private int dislike;
+
+    public byte[] getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
+    }
 
     public String getUn() {
         return un;

@@ -33,8 +33,8 @@ public class UserActivity extends Activity {
     private User user;
     private Handler handler;
 
-    private static final int LOAD_IMG_SUCCESS = 0;
-    private static final int LOAD_IMG_FAIL = 1;
+    //private static final int LOAD_IMG_SUCCESS = 0;
+    //private static final int LOAD_IMG_FAIL = 1;
 
     private static final int ACTIVITY_PRE = 0;
 
@@ -65,6 +65,7 @@ public class UserActivity extends Activity {
         exchangeText = (TextView) findViewById(R.id.exchangeText);
 
         unText.setText(user.getUn());
+        userImage.setImageBitmap(BitmapFactory.decodeByteArray(user.getAvatar(), 0, user.getAvatar().length));
         preText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,7 +92,7 @@ public class UserActivity extends Activity {
             }
         });
 
-        new Thread(new Runnable() {
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 threadGetUserPhoto();
@@ -103,10 +104,10 @@ public class UserActivity extends Activity {
             public void handleMessage(Message msg) {
                 UserActivity.this.handleMessage(msg);
             }
-        };
+        };*/
     }
 
-    private void handleMessage(Message msg){
+    /*private void handleMessage(Message msg){
         Bundle b = msg.getData();
         int type = b.getInt("type");
         switch (type){
@@ -120,7 +121,7 @@ public class UserActivity extends Activity {
                 Toast.makeText(UserActivity.this, "获取头像失败", Toast.LENGTH_SHORT).show();
                 break;
         }
-    }
+    }*/
 
     private void preTextOnClick(){
         Intent i = new Intent(this, PreferenceActivity.class);
@@ -128,7 +129,7 @@ public class UserActivity extends Activity {
         startActivityForResult(i, ACTIVITY_PRE);
     }
 
-    private void threadGetUserPhoto(){
+    /*private void threadGetUserPhoto(){
         try {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
@@ -149,7 +150,7 @@ public class UserActivity extends Activity {
             msg.setData(b);
             handler.sendMessage(msg);
         }
-    }
+    }*/
 
     private void exchangeTextOnClick()
     {

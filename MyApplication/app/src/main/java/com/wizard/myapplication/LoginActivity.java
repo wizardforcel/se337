@@ -181,6 +181,11 @@ public class LoginActivity extends Activity {
                     pres.add(type);
             }
 
+            //获取头像
+            byte[] imgData
+                   = http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + user.getId());
+            user.setAvatar(imgData);
+
             Bundle b = new Bundle();
             b.putInt("type", LOGIN_SUCCESS);
             b.putSerializable("user", user);

@@ -455,6 +455,18 @@ public class MainActivity extends Activity {
             c.setLongitude(retJson.getDouble("longitude"));
             Log.d("Campus", "id: " + c.getId() + " name: " + c.getName());
 
+            //获取校园图片
+            retStr = http.httpGet("http://" + UrlConfig.HOST + "/picture/university/" + c.getId());
+            retArr = new JSONArray(retStr);
+            if(retArr.length() != 0) {
+                JSONObject imgJson = retArr.getJSONObject(0);
+                String imgPath = imgJson.getString("path");
+                imgPath = "http://" + UrlConfig.HOST + "/picture/" + imgPath.replace(".", "/");
+                byte[] imgData  = http.httpGetData(imgPath);
+                c.setAvatar(imgData);
+                Log.d("CampusImg", imgPath);
+            }
+
             //获取景点信息
             retStr = http.httpGet("http://" + UrlConfig.HOST + "/view/university/" + c.getId());
             retArr = new JSONArray(retStr);
@@ -462,16 +474,30 @@ public class MainActivity extends Activity {
             List<Building> buildings = new ArrayList<Building>();
             for(int i = 0; i < retArr.length(); i++)
             {
-                JSONObject o = retArr.getJSONObject(i);
+                JSONObject buildingJson = retArr.getJSONObject(i);
                 Building b = new Building();
-                b.setId(o.getInt("id"));
-                b.setName(o.getString("name"));
-                b.setContent(o.getString("description"));
-                b.setLatitude(o.getDouble("latitude"));
-                b.setLongitude(o.getDouble("longitude"));
-                b.setRadius(o.getDouble("radius"));
+                b.setId(buildingJson.getInt("id"));
+                b.setName(buildingJson.getString("name"));
+                b.setContent(buildingJson.getString("description"));
+                b.setLatitude(buildingJson.getDouble("latitude"));
+                b.setLongitude(buildingJson.getDouble("longitude"));
+                b.setRadius(buildingJson.getDouble("radius"));
                 buildings.add(b);
                 Log.d("Building", "id: " + b.getId() + " name: " + b.getName());
+
+                //获取景点图片
+                /*String retStr2 = http.httpGet("http://" + UrlConfig.HOST + "/picture/view/" + b.getId());
+                JSONArray retArr2 = new JSONArray(retStr2);
+                if(retArr2.length() != 0) {
+                    JSONObject imgJson = retArr2.getJSONObject(0);
+                    String imgPath = imgJson.getString("path");
+                    imgPath = "http://" + UrlConfig.HOST + "/picture/" + imgPath.replace(".", "/");
+                    Log.d("BuildingImg", imgPath);
+                    try {
+                        byte[] imgData = http.httpGetData(imgPath);
+                        b.setAvatar(imgData);
+                    } catch(Exception ex) {}
+                }*/
             }
             c.setBuildings(buildings);
             campus = c;

@@ -65,7 +65,6 @@ public class BuildingActivity extends Activity {
     private User user;
     private List<Comment> comments
             = new ArrayList<Comment>();
-    private boolean loaded = false;
     private String myComment;
     private Comment currentComment;
 
@@ -92,6 +91,10 @@ public class BuildingActivity extends Activity {
         commentInput = (EditText) findViewById(R.id.commentInput);
         contentText = (TextView) findViewById(R.id.contentText);
         image = (ImageView) findViewById(R.id.buildingImage);
+
+        byte[] img = building.getAvatar();
+        if(img != null)
+            image.setImageBitmap(BitmapFactory.decodeByteArray(img, 0, img.length));
 
         tHost = (TabHost) findViewById(R.id.tabHost);
         tHost.setup();
@@ -136,14 +139,13 @@ public class BuildingActivity extends Activity {
             }
         };
 
-        if(!loaded) {
-            new Thread(new Runnable() {
+    new Thread(new Runnable() {
                 @Override
                 public void run() {
                     threadLoadData();
                 }
             }).start();
-        }
+
     }
 
     private void closeKeyboard()
@@ -160,10 +162,6 @@ public class BuildingActivity extends Activity {
         switch(type)
         {
             case LOAD_DATA_SUCCESS:
-                loaded = true;
-                byte[] img = b.getByteArray("img");
-                if(img != null)
-                    image.setImageBitmap(BitmapFactory.decodeByteArray(img, 0, img.length));
                 for(Comment c : comments)
                     addComment(c);
                 break;
@@ -212,6 +210,8 @@ public class BuildingActivity extends Activity {
         coText.setText(c.getContent());
         TextView voteText = (TextView) linear.findViewById(R.id.voteText);
         voteText.setText(c.getLike() + "/" + c.getDislike());
+        ImageView avatarImage = (ImageView) linear.findViewById(R.id.avatarImage);
+        avatarImage.setImageBitmap(BitmapFactory.decodeByteArray(c.getAvatar(), 0, c.getAvatar().length));
         final Comment finalComment = c;
         final TextView finalVoteText = voteText;
         voteText.setOnClickListener(new View.OnClickListener() {
@@ -340,9 +340,10 @@ public class BuildingActivity extends Activity {
             c.setUid(user.getId());
             c.setUn(user.getUn());
             c.setContent(myComment);
+            c.setAvatar(user.getAvatar());
             comments.add(c);
             Log.d("BuildingAddComment",
-                  "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
+                    "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
 
             Bundle b = new Bundle();
             b.putInt("type", ADD_COMMENT_SUCCESS);
@@ -368,21 +369,11 @@ public class BuildingActivity extends Activity {
         {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
-            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/picture/view/" + building.getId());
-            JSONArray retArr = new JSONArray(retStr);
 
-            byte[] imgData = null;
-            if(retArr.length() != 0) {
-                JSONObject retJson = retArr.getJSONObject(0);
-                String imgPath = retJson.getString("path");
-                imgPath = "http://" + UrlConfig.HOST + "/picture/" + imgPath.replace(".", "/");
-                Log.d("BuildingImg", imgPath);
-                imgData = http.httpGetData(imgPath);
-            }
 
             http.setCharset("utf-8");
-            retStr = http.httpGet("http://" + UrlConfig.HOST + "/comment/view/" + building.getId());
-            retArr = new JSONArray(retStr);
+            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/comment/view/" + building.getId());
+            JSONArray retArr = new JSONArray(retStr);
             comments.clear();
             for(int i = 0; i < retArr.length(); i++)
             {
@@ -396,12 +387,14 @@ public class BuildingActivity extends Activity {
                 c.setContent(o.getString("content"));
                 c.setLike(o.getInt("likes"));
                 c.setDislike(o.getInt("dislike"));
+                byte[] imgData
+                        = http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + c.getUid());
+                c.setAvatar(imgData);
                 comments.add(c);
                 Log.d("BuildingComment", "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
             }
 
             Bundle b = new Bundle();
-            b.putByteArray("img", imgData);
             b.putInt("type", LOAD_DATA_SUCCESS);
             Message msg = handler.obtainMessage();
             msg.setData(b);

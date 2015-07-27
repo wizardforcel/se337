@@ -72,6 +72,14 @@ public class Building implements Serializable
         this.type = type;
     }
 
+    public byte[] getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Building)) return false;
@@ -91,6 +99,7 @@ public class Building implements Serializable
     private double longitude;
     private double radius;
     private String type;
+    private byte[] avatar;
 
     private static Map<Integer, String> typeMap
             = new HashMap<Integer, String>();

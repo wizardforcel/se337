@@ -118,6 +118,8 @@ public class RegActivity extends Activity {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
             http.setHeader("Content-Type", "application/json");
+
+            //注册
             JSONObject json = new JSONObject();
             json.put("username", un);
             json.put("password", pw);
@@ -140,6 +142,11 @@ public class RegActivity extends Activity {
             user.setUn(retJson.getString("username"));
             user.setPw(retJson.getString("password"));
             Log.d("UserReg", "id: " + user.getId() + " un: " + user.getUn() + " pw: " + user.getPw());
+
+            //获取头像
+            byte[] imgData
+                    = http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + user.getId());
+            user.setAvatar(imgData);
 
             Bundle b = new Bundle();
             b.putInt("type", REG_SUCCESS);

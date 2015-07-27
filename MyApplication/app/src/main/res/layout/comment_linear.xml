@@ -7,6 +7,13 @@
     android:background="@drawable/border_style"
     android:baselineAligned="false">
 
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="fill_parent"
+        android:id="@+id/avatarImage"
+        android:layout_marginRight="5dp"
+        android:scaleType="centerCrop" />
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="0dp"
@@ -37,4 +44,5 @@
         android:text="100/100"
         android:layout_marginLeft="5dp"
         android:gravity="center" />
+
 </LinearLayout>

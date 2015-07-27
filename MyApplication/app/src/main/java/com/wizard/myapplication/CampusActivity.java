@@ -57,7 +57,6 @@ public class CampusActivity extends Activity {
     private List<Event> events
             = new ArrayList<Event>();
     private User user;
-    boolean loaded = false;
 
 
     @Override
@@ -97,6 +96,9 @@ public class CampusActivity extends Activity {
 
         TextView tv = (TextView) findViewById(R.id.titlebar_name);
         tv.setText(campus.getName());
+        byte[] img = campus.getAvatar();
+        if(img != null)
+            collegeImage.setImageBitmap(BitmapFactory.decodeByteArray(img, 0, img.length));
         Button returnButton = (Button) findViewById(R.id.titlebar_return);
         returnButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,14 +113,13 @@ public class CampusActivity extends Activity {
             }
         };
 
-        if(!loaded) {
-            new Thread(new Runnable() {
+        new Thread(new Runnable() {
                 @Override
                 public void run() {
                     threadLoadData();
                 }
             }).start();
-        }
+
     }
 
     private void handleMessage(android.os.Message msg)
@@ -128,10 +129,6 @@ public class CampusActivity extends Activity {
         switch(type)
         {
             case LOAD_DATA_SUCCESS:
-                loaded = true;
-                byte[] img = b.getByteArray("img");
-                if(img != null)
-                    collegeImage.setImageBitmap(BitmapFactory.decodeByteArray(img, 0, img.length));
                 setEvents();
                 break;
             case LOAD_DATA_FAIL:
@@ -144,14 +141,19 @@ public class CampusActivity extends Activity {
     {
         for(int i = 0; i < events.size(); i++){
             final Event e = events.get(i);
-            TextView tv
-                    = (TextView) getLayoutInflater().inflate(R.layout.text, null);
-            tv.setText(e.getName());
-            tv.setOnClickListener(new View.OnClickListener() {
+            LinearLayout linear
+                    = (LinearLayout) getLayoutInflater().inflate(R.layout.event_linear, null);
+            TextView unText = (TextView) linear.findViewById(R.id.unText);
+            TextView titleText = (TextView) linear.findViewById(R.id.titleText);
+            ImageView avatarImage = (ImageView) linear.findViewById(R.id.avatarImage);
+            titleText.setText(e.getName());
+            unText.setText(e.getUn());
+            avatarImage.setImageBitmap(BitmapFactory.decodeByteArray(e.getAvatar(), 0, e.getAvatar().length));
+            linear.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) { eventTextOnClick(e); }
             });
-            eventPage.addView(tv);
+            eventPage.addView(linear);
         }
     }
 
@@ -171,23 +173,14 @@ public class CampusActivity extends Activity {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
             http.setCharset("utf-8");
-            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/picture/university/" + campus.getId());
-            JSONArray retArr = new JSONArray(retStr);
+            http.setTimeout(16000);
 
-            byte[] imgData = null;
-            if(retArr.length() != 0) {
-                JSONObject retJson = retArr.getJSONObject(0);
-                String imgPath = retJson.getString("path");
-                imgPath = "http://" + UrlConfig.HOST + "/picture/" + imgPath.replace(".", "/");
-                imgData  = http.httpGetData(imgPath);
-                Log.d("CampusImg", imgPath);
-            }
-
+            //获取活动
             String date = new java.text.SimpleDateFormat("yyyyMMddHHmmss")
                     .format(Calendar.getInstance().getTime());
-            retStr = http.httpGet(
+            String retStr = http.httpGet(
                     "http://" + UrlConfig.HOST + "/activity/university/" + campus.getId() + "/date/" + date);
-            retArr = new JSONArray(retStr);
+            JSONArray retArr = new JSONArray(retStr);
             events.clear();
             for(int i = 0; i < retArr.length(); i++) {
                 JSONObject json = retArr.getJSONObject(i);
@@ -200,13 +193,15 @@ public class CampusActivity extends Activity {
                 event.setUid(uid);
                 String un = http.httpGet("http://" + UrlConfig.HOST + "/user/" + uid + "/userName/");
                 event.setUn(un);
+                byte[] imgData
+                        = http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + uid);
+                event.setAvatar(imgData);
                 events.add(event);
                 Log.d("Event", "id: " + event.getId() + " uid: " + event.getUid() +
                       " un: " + event.getUn() + " date: " + event.getDate());
             }
 
             Bundle b = new Bundle();
-            b.putByteArray("img", imgData);
             b.putInt("type", LOAD_DATA_SUCCESS);
             Message msg = handler.obtainMessage();
             msg.setData(b);

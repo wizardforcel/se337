@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,6 +17,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -222,6 +224,8 @@ public class EventActivity extends Activity {
         coText.setText(c.getContent());
         TextView voteText = (TextView) linear.findViewById(R.id.voteText);
         voteText.setText(c.getLike() + "/" + c.getDislike());
+        ImageView avatarImage = (ImageView) linear.findViewById(R.id.avatarImage);
+        avatarImage.setImageBitmap(BitmapFactory.decodeByteArray(c.getAvatar(), 0, c.getAvatar().length));
         final Comment finalComment = c;
         final TextView finalVoteText = voteText;
         voteText.setOnClickListener(new View.OnClickListener() {
@@ -272,9 +276,10 @@ public class EventActivity extends Activity {
             c.setUid(user.getId());
             c.setUn(user.getUn());
             c.setContent(myComment);
+            c.setAvatar(user.getAvatar());
             comments.add(c);
-            Log.d("EventAddComment",
-                  "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
+            Log.d("BuildingAddComment",
+                    "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
 
             Bundle b = new Bundle();
             b.putInt("type", ADD_COMMENT_SUCCESS);
@@ -317,6 +322,9 @@ public class EventActivity extends Activity {
                 c.setContent(o.getString("content"));
                 c.setLike(o.getInt("likes"));
                 c.setDislike(o.getInt("dislike"));
+                byte[] imgData
+                        = http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + c.getUid());
+                c.setAvatar(imgData);
                 comments.add(c);
                 Log.d("EventComment", "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
             }

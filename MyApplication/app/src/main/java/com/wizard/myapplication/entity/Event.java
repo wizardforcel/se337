@@ -9,10 +9,19 @@ public class Event implements Serializable
 {
     private int id;
     private String name;
+    private byte[] avatar;
     private String content;
     private String date;
     private int uid;
     private String un;
+
+    public byte[] getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
+    }
 
     public int getUid() {
         return uid;

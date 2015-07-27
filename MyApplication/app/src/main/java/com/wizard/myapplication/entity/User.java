@@ -12,9 +12,17 @@ public class User implements Serializable
     private int id;
     private String un;
     private String pw;
-
     private List<String> pres
             = new ArrayList<String>();
+    private byte[] avatar;
+
+    public byte[] getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
+    }
 
     public int getId() {
         return id;
