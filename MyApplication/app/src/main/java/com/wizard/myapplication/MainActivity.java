@@ -2,6 +2,7 @@ package com.wizard.myapplication;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,6 +33,7 @@ import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.NaviNode;
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.DistanceUtil;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
 import com.wizard.myapplication.view.SlideMenu;
@@ -65,6 +67,7 @@ public class MainActivity extends Activity {
     private MapView mapView;
     private BaiduMap baiduMap;
     private List<Marker> markers = new ArrayList<Marker>();
+    private PolylineOptions path;
     private LocationClient mLocationClient;
     private TextView buildingText;
     private Handler handler;
@@ -84,6 +87,7 @@ public class MainActivity extends Activity {
     private TextView presMenuItem;
     private TextView mapTypeMenuItem;
 
+    private AlertDialog presDialog;
     private AlertDialog mapTypeDialog;
     private Button _2DButton;
     private Button _3DButton;
@@ -667,19 +671,28 @@ public class MainActivity extends Activity {
             Toast.makeText(this, "校园信息获取失败！", Toast.LENGTH_SHORT).show();
             return;
         }
+        if(user.getPres().size() == 0)
+        {
+            Toast.makeText(this, "无用户偏好。", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(lastLoc == null)
+        {
+            Toast.makeText(this, "无法获取当前位置。", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if(presShown)
         {
             hidePres();
             presMenuItem.setText("显示推荐");
+            presShown = !presShown;
         }
         else
         {
             showPres();
-            presMenuItem.setText("隐藏推荐");
         }
 
-        presShown = !presShown;
         slideMenu.closeMenu();
     }
 
@@ -796,7 +809,7 @@ public class MainActivity extends Activity {
 
     private void showPres()
     {
-        Map<Integer, Building> buildingIndexMap = new HashMap<Integer, Building>();
+        /*Map<Integer, Building> buildingIndexMap = new HashMap<Integer, Building>();
         for(Building b : campus.getBuildings())
             buildingIndexMap.put(b.getId(), b);
         Map<String, Integer> typeToIconMap = new HashMap<String, Integer>();
@@ -818,16 +831,52 @@ public class MainActivity extends Activity {
             BitmapDescriptor bitmap = BitmapDescriptorFactory
                     .fromResource(resId);
             m.setIcon(bitmap);
-        }
+        }*/
 
+        presDialog = new AlertDialog.Builder(this)
+                .setSingleChoiceItems(user.getPres().toArray(new String[0]), -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                presAlertDialogOnItemClick(dialogInterface, i);
+            }
+        }).setNegativeButton("取消", null).create();
+
+        presDialog.show();
+    }
+
+    private void presAlertDialogOnItemClick(DialogInterface dialogInterface, int i)
+    {
+        String pre = user.getPres().get(i);
+        LatLng myLoc = lastLoc;
+        List<Building> li = new ArrayList<Building>();
+        for(Building b : campus.getBuildings())
+        {
+            if(b.getType().equals(pre))
+                li.add(b);
+        }
+        li = DistanceUtil.sort(myLoc.latitude, myLoc.longitude, li);
+
+        List<LatLng> pts = new ArrayList<LatLng>();
+        pts.add(myLoc);
+        for(Building b : li)
+            pts.add(new LatLng(b.getLatitude(), b.getLongitude()));
+        path = new PolylineOptions().width(15).color(0xAAFF0000).points(pts);
+        baiduMap.addOverlay(path);
+
+        presMenuItem.setText("隐藏推荐");
+        presShown = !presShown;
+        presDialog.hide();
     }
 
     private void hidePres()
     {
-        BitmapDescriptor bitmap = BitmapDescriptorFactory
+        /*BitmapDescriptor bitmap = BitmapDescriptorFactory
                 .fromResource(R.drawable.icon_mark);
         for(Marker m : markers)
-            m.setIcon(bitmap);
+            m.setIcon(bitmap);*/
+
+        path.visible(false);
+        path = null;
     }
 
     private void mapTypeMenuItemOnClick()
