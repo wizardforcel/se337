@@ -5,5 +5,5 @@ package com.wizard.myapplication.util;
  */
 public class UrlConfig
 {
-    public static final String HOST = "202.120.40.86:44334";
+    public static final String HOST = "121.40.249.129:8080";
 }

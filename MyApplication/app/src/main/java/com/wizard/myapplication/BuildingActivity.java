@@ -92,10 +92,6 @@ public class BuildingActivity extends Activity {
         contentText = (TextView) findViewById(R.id.contentText);
         image = (ImageView) findViewById(R.id.buildingImage);
 
-        byte[] img = building.getAvatar();
-        if(img != null)
-            image.setImageBitmap(BitmapFactory.decodeByteArray(img, 0, img.length));
-
         tHost = (TabHost) findViewById(R.id.tabHost);
         tHost.setup();
         tHost.addTab(tHost.newTabSpec("简介").setIndicator("简介").setContent(R.id.contentPage));
@@ -164,6 +160,9 @@ public class BuildingActivity extends Activity {
             case LOAD_DATA_SUCCESS:
                 for(Comment c : comments)
                     addComment(c);
+                byte[] img = building.getAvatar();
+                if(img != null)
+                    image.setImageBitmap(BitmapFactory.decodeByteArray(img, 0, img.length));
                 break;
             case LOAD_DATA_FAIL:
                 Toast.makeText(BuildingActivity.this, "数据加载失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
@@ -205,7 +204,7 @@ public class BuildingActivity extends Activity {
     {
         LinearLayout linear = (LinearLayout) getLayoutInflater().inflate(R.layout.comment_linear, null);
         TextView unText = (TextView) linear.findViewById(R.id.unText);
-        unText.setText(c.getUn() + ":");
+        unText.setText(c.getUn().replace("\n", "") + ":");
         TextView coText = (TextView) linear.findViewById(R.id.contentText);
         coText.setText(c.getContent());
         TextView voteText = (TextView) linear.findViewById(R.id.voteText);
@@ -369,9 +368,9 @@ public class BuildingActivity extends Activity {
         {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
-
-
             http.setCharset("utf-8");
+
+            //景点评论
             String retStr = http.httpGet("http://" + UrlConfig.HOST + "/comment/view/" + building.getId());
             JSONArray retArr = new JSONArray(retStr);
             comments.clear();
@@ -392,6 +391,20 @@ public class BuildingActivity extends Activity {
                 c.setAvatar(imgData);
                 comments.add(c);
                 Log.d("BuildingComment", "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
+            }
+
+            //景点图片
+            retStr = http.httpGet("http://" + UrlConfig.HOST + "/picture/view/" + building.getId());
+            retArr = new JSONArray(retStr);
+            if(retArr.length() != 0) {
+                JSONObject imgJson = retArr.getJSONObject(0);
+                String imgPath = imgJson.getString("path");
+                imgPath = "http://" + UrlConfig.HOST + "/picture/" + imgPath.replace(".", "/");
+                Log.d("BuildingImg", imgPath);
+                try {
+                    byte[] imgData = http.httpGetData(imgPath);
+                    building.setAvatar(imgData);
+                } catch(Exception ex) {}
             }
 
             Bundle b = new Bundle();

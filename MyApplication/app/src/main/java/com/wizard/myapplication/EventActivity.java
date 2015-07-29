@@ -219,7 +219,7 @@ public class EventActivity extends Activity {
     {
         LinearLayout linear = (LinearLayout) getLayoutInflater().inflate(R.layout.comment_linear, null);
         TextView unText = (TextView) linear.findViewById(R.id.unText);
-        unText.setText(c.getUn() + ":");
+        unText.setText(c.getUn().replace("\n", "") + ":");
         TextView coText = (TextView) linear.findViewById(R.id.contentText);
         coText.setText(c.getContent());
         TextView voteText = (TextView) linear.findViewById(R.id.voteText);
