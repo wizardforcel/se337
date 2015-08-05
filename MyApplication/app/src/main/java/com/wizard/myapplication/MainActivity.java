@@ -77,7 +77,7 @@ public class MainActivity extends Activity {
     private MapView mapView;
     private BaiduMap baiduMap;
     private List<Marker> markers = new ArrayList<Marker>();
-    private PolylineOptions path;
+    private Polyline path;
     private LocationClient mLocationClient;
     private Handler handler;
     private LinearLayout mapLinear;
@@ -1231,8 +1231,8 @@ public class MainActivity extends Activity {
         pts.add(myLoc);
         for(Building b : li)
             pts.add(new LatLng(b.getLatitude(), b.getLongitude()));
-        path = new PolylineOptions().width(15).color(0xAAFF0000).points(pts);
-        baiduMap.addOverlay(path);
+        PolylineOptions options = new PolylineOptions().width(15).color(0xAAFF0000).points(pts);
+        path = (Polyline) baiduMap.addOverlay(options);
 
         routeText.setText("隐藏推荐");
         presShown = !presShown;
@@ -1246,7 +1246,7 @@ public class MainActivity extends Activity {
         for(Marker m : markers)
             m.setIcon(bitmap);*/
 
-        path.visible(false);
+        path.remove();
         path = null;
     }
 
