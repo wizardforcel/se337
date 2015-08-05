@@ -7,7 +7,7 @@
         android:weightSum="1"
         android:id="@+id/mapLinear">
 
-        <include layout="@layout/titlebar_main" />
+
 
         <TabHost
             android:layout_width="fill_parent"
@@ -15,7 +15,7 @@
             android:id="@+id/mainTab"
             android:layout_weight="1">
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:orientation="vertical">
@@ -24,13 +24,16 @@
                     android:id="@android:id/tabs"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"/>
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentRight="true"/>
 
                 <FrameLayout
                     android:id="@android:id/tabcontent"
                     android:layout_width="fill_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1">
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_above="@android:id/tabs">
 
                     <include
                     layout="@layout/main_page_1" />
@@ -43,7 +46,7 @@
 
                 </FrameLayout>
 
-            </LinearLayout>
+            </RelativeLayout>
         </TabHost>
 
 

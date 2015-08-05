@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent" android:layout_height="fill_parent"
     android:orientation="vertical"
     android:id="@+id/mainPage1">
@@ -8,7 +8,7 @@
     <com.baidu.mapapi.map.MapView
         android:id="@+id/bmapView"
         android:layout_width="fill_parent"
-        android:layout_height="0dp"
+        android:layout_height="fill_parent"
         android:clickable="true"
         android:layout_weight="1" />
 
@@ -20,6 +20,121 @@
         android:textStyle="bold"
         android:layout_gravity="center_horizontal"
         android:gravity="center"
-        android:background="#ff9966"
-        android:textColor="#fff" />
-</LinearLayout>
+        android:background="@drawable/border_style"
+        android:textColor="#000"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:padding="5dp" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/border_style">
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:id="@+id/imageView"
+            android:src="@drawable/search"
+            android:background="#ff9966" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="搜索"
+            android:id="@+id/searchText"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:textColor="#ff9966"
+            android:layout_marginLeft="10dp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="地图样式"
+        android:id="@+id/mapTypeText"
+        android:background="@drawable/border_style"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:textColor="#ff9966"
+        android:gravity="center"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="80dp" />
+
+    <TextView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="校园巴士"
+        android:id="@+id/busText"
+        android:background="@drawable/border_style"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:textColor="#ff9966"
+        android:gravity="center"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="140dp" />
+
+    <TextView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="推荐路线"
+        android:id="@+id/routeText"
+        android:background="@drawable/border_style"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:textColor="#ff9966"
+        android:gravity="center"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="200dp" />
+
+    <TextView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="导航"
+        android:id="@+id/naviText"
+        android:background="@drawable/border_style"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:textColor="#ff9966"
+        android:gravity="center"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="260dp" />
+
+    <TextView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="定位"
+        android:id="@+id/locText"
+        android:background="@drawable/border_style"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentRight="false"
+        android:textColor="#ff9966"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="50dp" />
+
+</RelativeLayout>

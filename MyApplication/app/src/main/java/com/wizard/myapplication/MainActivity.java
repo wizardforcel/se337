@@ -79,9 +79,16 @@ public class MainActivity extends Activity {
     private List<Marker> markers = new ArrayList<Marker>();
     private PolylineOptions path;
     private LocationClient mLocationClient;
-    private TextView buildingText;
     private Handler handler;
     private LinearLayout mapLinear;
+
+    private TextView locText;
+    private TextView mapTypeText;
+    private TextView routeText;
+    private TextView busText;
+    private TextView naviText;
+    private TextView searchText;
+    private TextView buildingText;
 
     //Page 2
     private ImageView collegeImage;
@@ -536,6 +543,51 @@ public class MainActivity extends Activity {
             public void onClick(View view) { buildingTextOnClick(); }
         });
 
+        busText = (TextView) findViewById(R.id.busText);
+        locText = (TextView) findViewById(R.id.locText);
+        naviText = (TextView) findViewById(R.id.naviText);
+        routeText = (TextView) findViewById(R.id.routeText);
+        mapTypeText = (TextView) findViewById(R.id.mapTypeText);
+        searchText = (TextView) findViewById(R.id.searchText);
+
+        busText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sjtuBusMenuItemOnClick();
+            }
+        });
+        locText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                locMenuItemOnClick();
+            }
+        });
+        naviText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                naviMenuItemOnClick();
+            }
+        });
+        routeText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                presMenuItemOnClick();
+            }
+        });
+        mapTypeText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mapTypeMenuItemOnClick();
+            }
+        });
+        searchText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                searchMenuItemOnClick();
+            }
+        });
+
+
         mapView = (MapView) findViewById(R.id.bmapView);
         mapView.showScaleControl(false);
         mapView.showZoomControls(false);
@@ -878,36 +930,32 @@ public class MainActivity extends Activity {
         return true;
     }
 
-    /*private void searchMenuItemOnClick()
+    private void searchMenuItemOnClick()
     {
         Intent i = new Intent(this, SearchActivity.class);
         i.putExtra("buildings", (Serializable) campus.getBuildings());
         startActivityForResult(i, ACTIVITY_SEARCH);
-        slideMenu.closeMenu();
     }
-
-
 
     private void locMenuItemOnClick() {
         if (lastLoc != null)
             baiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLng(lastLoc));
-        slideMenu.closeMenu();
     }
 
-    private void followMenuItemOnClick() {
+   /*private void followMenuItemOnClick() {
         onFollow = !onFollow;
         followMenuItem.setText(onFollow ? "关闭跟随" : "跟随模式");
         slideMenu.closeMenu();
-    }
+    }*/
 
-    private void campusMenuItemOnClick()
+    /*private void campusMenuItemOnClick()
     {
         Intent i = new Intent(this, CampusActivity.class);
         i.putExtra("campus", campus);
         i.putExtra("user", user);
         startActivityForResult(i, ACTIVITY_CAMPUS);
         slideMenu.closeMenu();
-    }
+    }*/
 
     private void naviMenuItemOnClick() {
         if (campus.getBuildings().size() == 0) {
@@ -931,7 +979,6 @@ public class MainActivity extends Activity {
         myLoc.setLng(lastLoc.longitude);
         i.putExtra("myLoc", myLoc);
         startActivity(i);
-        slideMenu.closeMenu();
     }
 
     private void presMenuItemOnClick()
@@ -939,6 +986,11 @@ public class MainActivity extends Activity {
         if(campus == null)
         {
             Toast.makeText(this, "校园信息获取失败！", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(user == null)
+        {
+            Toast.makeText(this, "用户未登录！", Toast.LENGTH_SHORT).show();
             return;
         }
         if(user.getPres().size() == 0)
@@ -955,33 +1007,30 @@ public class MainActivity extends Activity {
         if(presShown)
         {
             hidePres();
-            presMenuItem.setText("显示推荐");
+            routeText.setText("推荐路线");
             presShown = !presShown;
         }
         else
         {
             showPres();
         }
-
-        slideMenu.closeMenu();
     }
 
 
 
-    private void userMenuItemOnClick()
+    /*private void userMenuItemOnClick()
     {
         Intent i = new Intent(this, UserActivity.class);
         i.putExtra("user", user);
         startActivityForResult(i, ACTIVITY_PRE);
         slideMenu.closeMenu();
-    }
+    }*/
 
     private void sjtuBusMenuItemOnClick()
     {
         Intent i = new Intent(this, WebActivity.class);
         startActivity(i);
-        slideMenu.closeMenu();
-    }*/
+    }
 
     private void historyMenuItemOnClick()
     {
@@ -1185,7 +1234,7 @@ public class MainActivity extends Activity {
         path = new PolylineOptions().width(15).color(0xAAFF0000).points(pts);
         baiduMap.addOverlay(path);
 
-        //presMenuItem.setText("隐藏推荐");
+        routeText.setText("隐藏推荐");
         presShown = !presShown;
         presDialog.hide();
     }
@@ -1201,11 +1250,10 @@ public class MainActivity extends Activity {
         path = null;
     }
 
-    /*private void mapTypeMenuItemOnClick()
+    private void mapTypeMenuItemOnClick()
     {
         mapTypeDialog.show();
-        slideMenu.closeMenu();
-    }*/
+    }
 
     private void _2DButtonOnClick()
     {

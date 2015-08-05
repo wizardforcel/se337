@@ -7,6 +7,8 @@
     android:background="#fff"
     android:id="@+id/mainPage3">
 
+    <include layout="@layout/titlebar_main" />
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
