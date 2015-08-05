@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -17,6 +18,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,8 +36,10 @@ import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.NaviNode;
 import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.util.DistanceUtil;
+import com.wizard.myapplication.util.TabUtil;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
+import com.wizard.myapplication.view.CircularImage;
 import com.wizard.myapplication.view.SlideMenu;
 
 import org.json.JSONArray;
@@ -56,14 +60,20 @@ public class MainActivity extends Activity {
     private static final int ACTIVITY_REG = 0;
     private static final int ACTIVITY_LOGIN = 1;
     private static final int ACTIVITY_BUILDING = 2;
-    private static final int ACTIVITY_CAMPUS = 3;
+    //private static final int ACTIVITY_CAMPUS = 3;
     private static final int ACTIVITY_SEARCH = 4;
     private static final int ACTIVITY_HISTORY = 5;
     private static final int ACTIVITY_PRE = 6;
+    private static final int ACTIVITY_EVENT = 7;
+    private static final int ACTIVITY_ADD_EVENT = 8;
 
     private static final int GET_CAMPUS_SUCCESS = 0;
     private static final int GET_CAMPUS_FAIL = 1;
 
+    //tab
+    private TabHost mainTab;
+
+    //Page 1
     private MapView mapView;
     private BaiduMap baiduMap;
     private List<Marker> markers = new ArrayList<Marker>();
@@ -73,7 +83,29 @@ public class MainActivity extends Activity {
     private Handler handler;
     private LinearLayout mapLinear;
 
-    private SlideMenu slideMenu;
+    //Page 2
+    private ImageView collegeImage;
+    private TextView contentText;
+    private LinearLayout buildingPage;
+    private LinearLayout eventPage;
+    //private Handler handler;
+    private TabHost tHost;
+    private Button addEventButton;
+
+    //Page 3
+    private CircularImage userImage;
+    private TextView unText;
+    private TextView preText;
+    private TextView rankText;
+    private TextView taskText;
+    private TextView exchangeText;
+    private TextView loginText;
+    private TextView logoutText;
+    private TextView regText;
+    private TextView hisText;
+
+
+    /*private SlideMenu slideMenu;
     private TextView loginMenuItem;
     private TextView regMenuItem;
     private TextView campusMenuItem;
@@ -85,7 +117,7 @@ public class MainActivity extends Activity {
     private TextView sjtuBusMenuItem;
     private TextView historyMenuItem;
     private TextView presMenuItem;
-    private TextView mapTypeMenuItem;
+    private TextView mapTypeMenuItem;*/
 
     private AlertDialog presDialog;
     private AlertDialog mapTypeDialog;
@@ -95,6 +127,8 @@ public class MainActivity extends Activity {
     private Button satiButton;
 
     private Campus campus;
+    private List<Event> events
+            = new ArrayList<Event>();
     private User user;
     private boolean onFollow = false;
     private boolean firstLoc = true;
@@ -108,7 +142,9 @@ public class MainActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
-        LinearLayout mapTypeLinear = (LinearLayout) getLayoutInflater().inflate(R.layout.map_options_linear, null);
+        //init map dialog
+        LinearLayout mapTypeLinear
+                = (LinearLayout) getLayoutInflater().inflate(R.layout.map_options_linear, null);
         normalButton = (Button) mapTypeLinear.findViewById(R.id.normalButton);
         satiButton = (Button) mapTypeLinear.findViewById(R.id.satiButton);
         _2DButton = (Button) mapTypeLinear.findViewById(R.id._2DButton);
@@ -135,7 +171,10 @@ public class MainActivity extends Activity {
                             .setNegativeButton("取消", null)
                             .create();
 
-        initSideBar();
+        //initSideBar();
+        initTab();
+        initCampusPage();
+        initUserPage();
         initBaiduMap();
         initLocator();
         initNavi();
@@ -158,6 +197,7 @@ public class MainActivity extends Activity {
             case GET_CAMPUS_SUCCESS:
                 Toast.makeText(this, "获取校园信息成功！", Toast.LENGTH_SHORT).show();
                 setCampusOnMap();
+                setCampusOnPage2();
                 break;
             case GET_CAMPUS_FAIL:
                 Toast.makeText(this, "获取校园信息失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
@@ -165,8 +205,227 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void initTab()
+    {
+        mainTab = (TabHost) findViewById(R.id.mainTab);
+        mainTab.setup();
+        mainTab.addTab(mainTab.newTabSpec("地图").setIndicator("地图").setContent(R.id.mainPage1));
+        mainTab.addTab(mainTab.newTabSpec("校区").setIndicator("校区").setContent(R.id.mainPage2));
+        mainTab.addTab(mainTab.newTabSpec("用户").setIndicator("用户").setContent(R.id.mainPage3));
+        mainTab.setCurrentTab(0);
+        TabUtil.updateTab(mainTab);
+        mainTab.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String s) { TabUtil.updateTab(MainActivity.this.mainTab); }
+        });
+    }
+
+    //==========================================page3===========================================
+
+    private void initUserPage()
+    {
+        userImage = (CircularImage) findViewById(R.id.userImage);
+        unText = (TextView) findViewById(R.id.unText);
+        preText = (TextView) findViewById(R.id.preText);
+        rankText = (TextView) findViewById(R.id.rankText);
+        taskText = (TextView) findViewById(R.id.taskText);
+        exchangeText = (TextView) findViewById(R.id.exchangeText);
+        loginText = (TextView) findViewById(R.id.loginText);
+        logoutText = (TextView) findViewById(R.id.logoutText);
+        regText = (TextView) findViewById(R.id.regText);
+        hisText = (TextView) findViewById(R.id.hisText);
+
+        /*unText.setText(user.getUn());
+        userImage.setImageBitmap(BitmapFactory.decodeByteArray(user.getAvatar(), 0, user.getAvatar().length));*/
+        preText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                preTextOnClick();
+            }
+        });
+        rankText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rankTextOnClick();
+            }
+        });
+        rankText.setVisibility(View.GONE);
+        exchangeText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                exchangeTextOnClick();
+            }
+        });
+        taskText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                taskTextOnClick();
+            }
+        });
+        loginText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loginMenuItemOnClick();
+            }
+        });
+        logoutText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                logoutMenuItemOnClick();
+            }
+        });
+        regText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                regMenuItemOnClick();
+            }
+        });
+        hisText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                historyMenuItemOnClick();
+            }
+        });
+
+        setLoginStatus(false);
+    }
+
+    private void preTextOnClick(){
+        Intent i = new Intent(this, PreferenceActivity.class);
+        i.putExtra("user", user);
+        startActivityForResult(i, ACTIVITY_PRE);
+    }
+
+    private void exchangeTextOnClick()
+    {
+        Intent i = new Intent(this, ExchangeActivity.class);
+        startActivity(i);
+    }
+
+    private void taskTextOnClick()
+    {
+        Intent i = new Intent(this, AccomActivity.class);
+        startActivity(i);
+    }
+
+    private void rankTextOnClick()
+    {
+        Intent i = new Intent(this, RankActivity.class);
+        startActivity(i);
+    }
+
+    //=======================================end page3===========================================
+
+    //===========================================page2===========================================
+
+    private void initCampusPage()
+    {
+        contentText = (TextView) findViewById(R.id.contentText);
+        buildingPage = (LinearLayout) findViewById(R.id.buildingsPage);
+        eventPage = (LinearLayout) findViewById(R.id.eventPage);
+        collegeImage = (ImageView) findViewById(R.id.collegeImage);
+        addEventButton = (Button) findViewById(R.id.addEventButton);
+        addEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { addEventButtonOnClick(); }
+        });
+
+        tHost = (TabHost) findViewById(R.id.tabHost);
+        tHost.setup();
+        tHost.addTab(tHost.newTabSpec("简介").setIndicator("简介").setContent(R.id.contentPage));
+        tHost.addTab(tHost.newTabSpec("景点").setIndicator("景点").setContent(R.id.buildingsPage));
+        tHost.addTab(tHost.newTabSpec("活动").setIndicator("活动").setContent(R.id.eventPage0));
+        tHost.setCurrentTab(0);
+        TabUtil.updateTab(tHost);
+        tHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String s) { TabUtil.updateTab(tHost); }
+        });
+    }
+
+    private void addEventButtonOnClick()
+    {
+        if(user == null)
+        {
+            Intent i = new Intent(this, LoginActivity.class);
+            startActivityForResult(i, ACTIVITY_LOGIN);
+        }
+        else {
+            Intent i = new Intent(this, AddEventActivity.class);
+            i.putExtra("user", user);
+            i.putExtra("campus", campus);
+            startActivityForResult(i, ACTIVITY_ADD_EVENT);
+        }
+
+    }
+
+    private void setCampusOnPage2()
+    {
+        contentText.setText(campus.getContent());
+        collegeImage.setImageBitmap(BitmapFactory.decodeByteArray(campus.getAvatar(), 0, campus.getAvatar().length));
+        setEvents();
+        setBuildings();
+    }
+
+    private void setEvents()
+    {
+        for(int i = 0; i < events.size(); i++){
+            final Event e = events.get(i);
+            LinearLayout linear
+                    = (LinearLayout) getLayoutInflater().inflate(R.layout.event_linear, null);
+            TextView unText = (TextView) linear.findViewById(R.id.unText);
+            TextView titleText = (TextView) linear.findViewById(R.id.titleText);
+            ImageView avatarImage = (ImageView) linear.findViewById(R.id.avatarImage);
+            titleText.setText(e.getName());
+            unText.setText(e.getUn());
+            avatarImage.setImageBitmap(BitmapFactory.decodeByteArray(e.getAvatar(), 0, e.getAvatar().length));
+            linear.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) { eventTextOnClick(e); }
+            });
+            eventPage.addView(linear);
+        }
+    }
+
+    private void eventTextOnClick(Event e)
+    {
+        Intent intent = new Intent(this, EventActivity.class);
+        intent.putExtra("event", e);
+        intent.putExtra("user", user);
+        intent.putExtra("campusId", campus.getId());
+        startActivityForResult(intent, 0);
+    }
+
+    private void setBuildings(){
+        List<Building> buildings  = campus.getBuildings();
+        for(int row = 0; row < buildings.size(); row++){
+            final Building building = buildings.get(row);
+            Log.v("building", building.getName());
+
+            TextView buildingText
+                    = (TextView) getLayoutInflater().inflate(R.layout.text, null);
+            buildingText.setText(building.getName());
+            buildingText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) { buildingTextOnClick(building); }
+            });
+            buildingPage.addView(buildingText);
+        }
+    }
+
+    private void buildingTextOnClick(Building b)
+    {
+        Intent intent = new Intent(this, BuildingActivity.class);
+        intent.putExtra("building", b);
+        intent.putExtra("user", user);
+        intent.putExtra("campusId", campus.getId());
+        startActivityForResult(intent, 0);
+    }
+
+    //============================================end page 2======================================
+
     //初始化侧栏
-    private void initSideBar() {
+    /*private void initSideBar() {
         slideMenu = (SlideMenu) findViewById(R.id.slide_menu);
         ImageView menuButton = (ImageView) findViewById(R.id.titlebar_menu_btn);
         menuButton.setOnClickListener(new View.OnClickListener() {
@@ -264,7 +523,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) { mapTypeMenuItemOnClick(); }
         });
-    }
+    }*/
 
     //初始化地图
     private void initBaiduMap() {
@@ -314,8 +573,8 @@ public class MainActivity extends Activity {
 
     private void setCampusOnMap()
     {
-        campusMenuItem.setVisibility(View.VISIBLE);
-        sjtuBusMenuItem.setVisibility(View.VISIBLE);
+        //campusMenuItem.setVisibility(View.VISIBLE);
+        //sjtuBusMenuItem.setVisibility(View.VISIBLE);
 
         //设置中心点
         double lat = campus.getLatitude();
@@ -444,8 +703,9 @@ public class MainActivity extends Activity {
             http.setCharset("utf-8");
 
             //获取校园信息
-            String url = String.format("http://%s/university/findByGPS/longitude/%6f/latitude/%6f",
-                                       UrlConfig.HOST, lastLoc.longitude, lastLoc.latitude);
+            //String url = String.format("http://%s/university/findByGPS/longitude/%6f/latitude/%6f",
+            //                          UrlConfig.HOST, lastLoc.longitude, lastLoc.latitude);
+            String url = String.format("http://%s/university/findByGPS/longitude/121.449088/latitude/31.028980",  UrlConfig.HOST);
             String retStr = http.httpGet(url);
             JSONArray retArr = new JSONArray(retStr);
             JSONObject retJson = retArr.getJSONObject(0);
@@ -505,6 +765,32 @@ public class MainActivity extends Activity {
             }
             c.setBuildings(buildings);
             campus = c;
+
+            //获取活动
+            String date = new java.text.SimpleDateFormat("yyyyMMddHHmmss")
+                    .format(Calendar.getInstance().getTime());
+            retStr = http.httpGet(
+                    "http://" + UrlConfig.HOST + "/activity/university/" + campus.getId() + "/date/" + date);
+            retArr = new JSONArray(retStr);
+            events.clear();
+            for(int i = 0; i < retArr.length(); i++) {
+                JSONObject json = retArr.getJSONObject(i);
+                Event event = new Event();
+                event.setId(json.getInt("id"));
+                event.setName(json.getString("name"));
+                event.setContent(json.getString("description"));
+                event.setDate(json.getString("date"));
+                int uid = json.getInt("userId");
+                event.setUid(uid);
+                String un = http.httpGet("http://" + UrlConfig.HOST + "/user/" + uid + "/userName/");
+                event.setUn(un);
+                byte[] imgData
+                        = http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + uid);
+                event.setAvatar(imgData);
+                events.add(event);
+                Log.d("Event", "id: " + event.getId() + " uid: " + event.getUid() +
+                        " un: " + event.getUn() + " date: " + event.getDate());
+            }
 
             Bundle b = new Bundle();
             b.putInt("type", GET_CAMPUS_SUCCESS);
@@ -592,7 +878,7 @@ public class MainActivity extends Activity {
         return true;
     }
 
-    private void searchMenuItemOnClick()
+    /*private void searchMenuItemOnClick()
     {
         Intent i = new Intent(this, SearchActivity.class);
         i.putExtra("buildings", (Serializable) campus.getBuildings());
@@ -600,23 +886,7 @@ public class MainActivity extends Activity {
         slideMenu.closeMenu();
     }
 
-    private void loginMenuItemOnClick() {
-        Intent i = new Intent(this, LoginActivity.class);
-        startActivityForResult(i, ACTIVITY_LOGIN);
-        slideMenu.closeMenu();
-    }
 
-    private void regMenuItemOnClick() {
-        Intent i = new Intent(this, RegActivity.class);
-        startActivityForResult(i, ACTIVITY_REG);
-        slideMenu.closeMenu();
-    }
-
-    private void logoutMenuItemOnClick() {
-        user = null;
-        setMenuStatus(false);
-        slideMenu.closeMenu();
-    }
 
     private void locMenuItemOnClick() {
         if (lastLoc != null)
@@ -696,20 +966,7 @@ public class MainActivity extends Activity {
         slideMenu.closeMenu();
     }
 
-    private void historyMenuItemOnClick()
-    {
-        if(campus == null)
-        {
-            Toast.makeText(this, "获取校园信息失败！", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Intent i = new Intent(this, HistoryActivity.class);
-        i.putExtra("campusId", campus.getId());
-        i.putExtra("allCount", campus.getBuildings().size());
-        i.putExtra("user", user);
-        startActivityForResult(i, ACTIVITY_HISTORY);
-        slideMenu.closeMenu();
-    }
+
 
     private void userMenuItemOnClick()
     {
@@ -724,6 +981,59 @@ public class MainActivity extends Activity {
         Intent i = new Intent(this, WebActivity.class);
         startActivity(i);
         slideMenu.closeMenu();
+    }*/
+
+    private void historyMenuItemOnClick()
+    {
+        if(campus == null)
+        {
+            Toast.makeText(this, "获取校园信息失败！", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent i = new Intent(this, HistoryActivity.class);
+        i.putExtra("campusId", campus.getId());
+        i.putExtra("allCount", campus.getBuildings().size());
+        i.putExtra("user", user);
+        startActivityForResult(i, ACTIVITY_HISTORY);
+    }
+
+    private void loginMenuItemOnClick() {
+        Intent i = new Intent(this, LoginActivity.class);
+        startActivityForResult(i, ACTIVITY_LOGIN);
+    }
+
+    private void regMenuItemOnClick() {
+        Intent i = new Intent(this, RegActivity.class);
+        startActivityForResult(i, ACTIVITY_REG);
+    }
+
+    private void logoutMenuItemOnClick() {
+        user = null;
+        setLoginStatus(false);
+    }
+
+    private void setLoginStatus(boolean isLogin)
+    {
+        //登录后
+        logoutText.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
+        preText.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
+        hisText.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
+        taskText.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
+        exchangeText.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
+
+        //登录前
+        loginText.setVisibility(!isLogin ? TextView.VISIBLE : TextView.GONE);
+        regText.setVisibility(!isLogin ? TextView.VISIBLE : TextView.GONE);
+
+        if(isLogin)
+        {
+            unText.setText(user.getUn());
+            userImage.setImageBitmap(BitmapFactory.decodeByteArray(user.getAvatar(), 0, user.getAvatar().length));
+        }
+        else {
+            unText.setText("请登录");
+            userImage.setBackgroundResource(0);
+        }
     }
 
     @Override
@@ -739,10 +1049,10 @@ public class MainActivity extends Activity {
         Log.v("Result", requestCode + " " + resultCode);
 
         if ((requestCode == ACTIVITY_REG || requestCode == ACTIVITY_LOGIN ||
-             requestCode == ACTIVITY_BUILDING || requestCode == ACTIVITY_CAMPUS) &&
+             requestCode == ACTIVITY_BUILDING || requestCode == ACTIVITY_EVENT) &&
                 resultCode == Activity.RESULT_OK) {
             user = (User) i.getSerializableExtra("user");
-            setMenuStatus(true);
+            setLoginStatus(true);
         }
         else if((requestCode == ACTIVITY_SEARCH || requestCode == ACTIVITY_HISTORY) &&
                  resultCode == RESULT_OK) {
@@ -754,9 +1064,21 @@ public class MainActivity extends Activity {
             List<String> pres = (List<String>) i.getSerializableExtra("pres");
             user.setPres(pres);
         }
+        else if(requestCode == ACTIVITY_ADD_EVENT && resultCode == RESULT_OK)
+        {
+            final Event e = (Event) i.getSerializableExtra("event");
+            TextView tv
+                    = (TextView) getLayoutInflater().inflate(R.layout.text, null);
+            tv.setText(e.getName());
+            tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) { eventTextOnClick(e); }
+            });
+            eventPage.addView(tv);
+        }
     }
 
-    private void setMenuStatus(boolean isLogin) {
+    /*private void setMenuStatus(boolean isLogin) {
         //登录后
         userMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
         logoutMenuItem.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
@@ -766,7 +1088,7 @@ public class MainActivity extends Activity {
         //登录前
         loginMenuItem.setVisibility(!isLogin ? TextView.VISIBLE : TextView.GONE);
         regMenuItem.setVisibility(!isLogin ? TextView.VISIBLE : TextView.GONE);
-    }
+    }*/
 
     private void initNavi() {
         //初始化导航引擎
@@ -863,7 +1185,7 @@ public class MainActivity extends Activity {
         path = new PolylineOptions().width(15).color(0xAAFF0000).points(pts);
         baiduMap.addOverlay(path);
 
-        presMenuItem.setText("隐藏推荐");
+        //presMenuItem.setText("隐藏推荐");
         presShown = !presShown;
         presDialog.hide();
     }
@@ -879,11 +1201,11 @@ public class MainActivity extends Activity {
         path = null;
     }
 
-    private void mapTypeMenuItemOnClick()
+    /*private void mapTypeMenuItemOnClick()
     {
         mapTypeDialog.show();
         slideMenu.closeMenu();
-    }
+    }*/
 
     private void _2DButtonOnClick()
     {

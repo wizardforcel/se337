@@ -1,0 +1,55 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    tools:context="com.wizard.myapplication.CampusActivity"
+    android:id="@+id/mainPage2">
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="120dp"
+        android:id="@+id/collegeImage"
+        android:scaleType="centerCrop" />
+
+    <TabHost
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:id="@+id/tabHost"
+        android:layout_gravity="center_horizontal"
+        android:visibility="visible"
+        android:layout_weight="1" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                android:background="#ff9966" />
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" >
+
+                <include
+                    layout="@layout/campus_content_page" />
+
+                <include
+                    layout="@layout/campus_buildings_page" />
+
+                <include
+                    layout="@layout/campus_event_page" />
+
+            </FrameLayout>
+        </LinearLayout>
+    </TabHost>
+
+</LinearLayout>

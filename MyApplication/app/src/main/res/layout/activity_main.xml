@@ -1,45 +1,50 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
-    <com.wizard.myapplication.view.SlideMenu
-        android:id="@+id/slide_menu"
+ <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="fill_parent"
+        android:animateLayoutChanges="true"
+        android:orientation="vertical"
+        android:weightSum="1"
+        android:id="@+id/mapLinear">
 
-        <include layout="@layout/sidebar_main"/>
+        <include layout="@layout/titlebar_main" />
 
-        <LinearLayout
+        <TabHost
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:animateLayoutChanges="true"
-            android:orientation="vertical"
-            android:weightSum="1"
-            android:id="@+id/mapLinear">
+            android:layout_height="0dp"
+            android:id="@+id/mainTab"
+            android:layout_weight="1">
 
-            <include layout="@layout/titlebar_main" />
-
-            <com.baidu.mapapi.map.MapView
-                android:id="@+id/bmapView"
+            <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                android:clickable="true"
-                android:layout_weight="1" />
+                android:layout_height="fill_parent"
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/buildingText"
-                android:textSize="20dp"
-                android:textStyle="bold"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center"
-                android:background="#ff9966"
-                android:textColor="#fff" />
-        </LinearLayout>
+                <TabWidget
+                    android:id="@android:id/tabs"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"/>
 
-    </com.wizard.myapplication.view.SlideMenu>
+                <FrameLayout
+                    android:id="@android:id/tabcontent"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
 
-</RelativeLayout>
+                    <include
+                    layout="@layout/main_page_1" />
+
+                    <include
+                        layout="@layout/main_page_2" />
+
+                    <include
+                        layout="@layout/main_page_3" />
+
+                </FrameLayout>
+
+            </LinearLayout>
+        </TabHost>
+
+
+    </LinearLayout>
