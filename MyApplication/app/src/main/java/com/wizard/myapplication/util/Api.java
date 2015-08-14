@@ -7,6 +7,7 @@ import com.wizard.myapplication.entity.BuildingType;
 import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Comment;
 import com.wizard.myapplication.entity.Event;
+import com.wizard.myapplication.entity.Result;
 import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.entity.UserResult;
 
@@ -76,12 +77,30 @@ public class Api
         return new UserResult(0, "", user);
     }
 
-    public static boolean addPres(WizardHTTP http, int uid, String toAdd)
-            throws IOException
-    {
+    public static Result addPres(WizardHTTP http, int uid, String toAdd)
+            throws IOException, JSONException {
+        String postStr = "preferenceType=" + toAdd + "&userId="+ uid;
         String retStr
-                = http.httpGet("http://" + UrlConfig.HOST + "/user/" + uid + "/addpreference/" + toAdd);
-        return true;
+                = http.httpPost("http://" + UrlConfig.HOST + "/user/addpreference", postStr);
+        JSONObject json = new JSONObject(retStr);
+        int succ = json.getInt("code");
+        if(succ == 1)
+            return new Result(0, "");
+        else
+            return new Result(1, json.getString("detail"));
+    }
+
+    public static Result delPres(WizardHTTP http, int uid, String toAdd)
+            throws IOException, JSONException {
+        String postStr = "preferenceType=" + toAdd + "&userId="+ uid;
+        String retStr
+                = http.httpPost("http://" + UrlConfig.HOST + "/user/deletepreference", postStr);
+        JSONObject json = new JSONObject(retStr);
+        int succ = json.getInt("code");
+        if(succ == 1)
+            return new Result(0, "");
+        else
+            return new Result(1, json.getString("detail"));
     }
 
     public static boolean commentLike(WizardHTTP http, int commentId)

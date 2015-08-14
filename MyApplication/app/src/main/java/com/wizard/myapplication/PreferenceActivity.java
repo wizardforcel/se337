@@ -1,10 +1,9 @@
 package com.wizard.myapplication;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Handler;
@@ -21,26 +20,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wizard.myapplication.entity.BuildingType;
+import com.wizard.myapplication.entity.Result;
 import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.util.Api;
-import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 public class PreferenceActivity extends Activity {
 
-    private static final int SET_PRE_SUCCESS = 0;
-    private static final int SET_PRE_FAIL = 1;
+    private static final int ADD_PRE_SUCCESS = 0;
+    private static final int ADD_PRE_FAIL = 1;
+    private static final int DEL_PRE_SUCCESS = 2;
+    private static final int DEL_PRE_FAIL = 3;
 
     private Button addButton;
     private ListView preListView;
@@ -51,6 +44,7 @@ public class PreferenceActivity extends Activity {
     private List<String> pres;
     private List<String> toAdds = new ArrayList<String>();
     private String toAdd = "";
+    private int removeIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +83,14 @@ public class PreferenceActivity extends Activity {
             public void onNothingSelected(AdapterView<?> adapterView) { }
         });
 
+        preListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                preListViewOnItemLongClick(adapterView, view, i, l);
+                return true;
+            }
+        });
+
         for(String s : BuildingType.TYPES)
         {
             if(!pres.contains(s))
@@ -104,6 +106,64 @@ public class PreferenceActivity extends Activity {
         };
     }
 
+    private void preListViewOnItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+        removeIndex = i;
+        new AlertDialog.Builder(this)
+                .setTitle("确实要删除吗？")
+                .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        deleteDialogOkButtonOnClick(dialogInterface, i);
+                    }
+                })
+                .setNegativeButton("否", null)
+                .show();
+    }
+
+    private void deleteDialogOkButtonOnClick(DialogInterface dialogInterface, int i)
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() { threadDelPreference(); }
+        }).start();
+    }
+
+    private void threadDelPreference()
+    {
+        try
+        {
+            WizardHTTP http = new WizardHTTP();
+            http.setDefHeader(false);
+
+            Result r = Api.delPres(http, user.getId(), pres.get(removeIndex));
+            if(r.getErrno() != 0)
+            {
+                Bundle b = new Bundle();
+                b.putInt("type", DEL_PRE_FAIL);
+                b.putSerializable("errmsg", r.getErrmsg());
+                Message msg = handler.obtainMessage();
+                msg.setData(b);
+                handler.sendMessage(msg);
+            }
+
+            Bundle b = new Bundle();
+            b.putInt("type", DEL_PRE_SUCCESS);
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            Bundle b = new Bundle();
+            b.putInt("type", DEL_PRE_FAIL);
+            b.putSerializable("errmsg", ex.getMessage());
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+    }
+
     private void addButtonOnClick()
     {
         if(toAdd.equals(""))
@@ -114,7 +174,7 @@ public class PreferenceActivity extends Activity {
 
         new Thread(new Runnable() {
             @Override
-            public void run() { threadSetPreference(); }
+            public void run() { threadAddPreference(); }
         }).start();
     }
 
@@ -129,8 +189,8 @@ public class PreferenceActivity extends Activity {
         Bundle b = msg.getData();
         int type = b.getInt("type");
         switch(type){
-            case SET_PRE_SUCCESS:
-                Toast.makeText(this, "设置成功！", Toast.LENGTH_SHORT).show();
+            case ADD_PRE_SUCCESS:
+                Toast.makeText(this, "添加成功！", Toast.LENGTH_SHORT).show();
                 pres.add(toAdd);
                 toAdds.remove(toAdd);
                 toAdd = "";
@@ -139,20 +199,22 @@ public class PreferenceActivity extends Activity {
                 setResult(RESULT_OK, i);
                 refreshWidget();
                 break;
-            case SET_PRE_FAIL:
-                Toast.makeText(this, "设置失败" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
+            case ADD_PRE_FAIL:
+                Toast.makeText(this, "添加失败" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
                 break;
-            /*case GET_PRE_FAIL:
-                Toast.makeText(this, "获取失败" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
+            case DEL_PRE_FAIL:
+                Toast.makeText(this, "删除失败" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
                 break;
-            case GET_PRE_SUCCESS:
-                for(String s : BuildingType.TYPES)
-                {
-                    if(!pres.contains(s))
-                        toAdds.add(s);
-                }
+            case DEL_PRE_SUCCESS:
+                Toast.makeText(this, "删除成功！", Toast.LENGTH_SHORT).show();
+                String toRm = pres.get(removeIndex);
+                pres.remove(removeIndex);
+                toAdds.add(toRm);
+                Intent i2 = new Intent();
+                i2.putExtra("pres", (java.io.Serializable) pres);
+                setResult(RESULT_OK, i2);
                 refreshWidget();
-                break;*/
+                break;
         }
     }
 
@@ -171,17 +233,25 @@ public class PreferenceActivity extends Activity {
                 new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, toAddsZh));
     }
 
-    private void threadSetPreference(){
+    private void threadAddPreference(){
         try
         {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
-            http.setHeader("Content-Type", "application/json");
 
-            Api.addPres(http, user.getId(), toAdd);
+            Result r = Api.addPres(http, user.getId(), toAdd);
+            if(r.getErrno() != 0)
+            {
+                Bundle b = new Bundle();
+                b.putInt("type", ADD_PRE_FAIL);
+                b.putSerializable("errmsg", r.getErrmsg());
+                Message msg = handler.obtainMessage();
+                msg.setData(b);
+                handler.sendMessage(msg);
+            }
 
             Bundle b = new Bundle();
-            b.putInt("type", SET_PRE_SUCCESS);
+            b.putInt("type", ADD_PRE_SUCCESS);
             Message msg = handler.obtainMessage();
             msg.setData(b);
             handler.sendMessage(msg);
@@ -190,7 +260,7 @@ public class PreferenceActivity extends Activity {
         {
             ex.printStackTrace();
             Bundle b = new Bundle();
-            b.putInt("type", SET_PRE_FAIL);
+            b.putInt("type", ADD_PRE_FAIL);
             b.putSerializable("errmsg", ex.getMessage());
             Message msg = handler.obtainMessage();
             msg.setData(b);

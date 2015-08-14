@@ -1135,7 +1135,7 @@ public class MainActivity extends Activity {
         pts.add(myLoc);
         for(Building b : li)
             pts.add(new LatLng(b.getLatitude(), b.getLongitude()));
-        PolylineOptions options = new PolylineOptions().width(15).color(0xAAFF0000).points(pts);
+        PolylineOptions options = new PolylineOptions().width(15).color(0xAAFF9966).points(pts);
         path = (Polyline) baiduMap.addOverlay(options);
 
         routeText.setText("隐藏推荐");
