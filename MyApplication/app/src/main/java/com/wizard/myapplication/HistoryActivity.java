@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
 
@@ -116,23 +117,7 @@ public class HistoryActivity extends Activity {
             http.setHeader("Content-Type", "application/json");
             http.setCharset("utf-8");
 
-            //获取游览历史
-            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/view/usertoview/" + user.getId());
-            JSONArray retArr = new JSONArray(retStr);
-            for (int i = 0; i < retArr.length(); i++) {
-                JSONObject o = retArr.getJSONObject(i).getJSONObject("view");
-                if (o.getJSONObject("university").getInt("id") != campusId)
-                    continue;
-                Building b = new Building();
-                b.setId(o.getInt("id"));
-                b.setName(o.getString("name"));
-                b.setContent(o.getString("description"));
-                b.setLatitude(o.getDouble("latitude"));
-                b.setLongitude(o.getDouble("longitude"));
-                b.setRadius(o.getDouble("radius"));
-                covered.add(b);
-                Log.d("History", "id: " + b.getId() + " name: " + b.getName());
-            }
+            covered = Api.getHistory(http, user.getId(), campusId);
 
             Bundle b = new Bundle();
             b.putInt("type", GET_HIS_SUCCESS);

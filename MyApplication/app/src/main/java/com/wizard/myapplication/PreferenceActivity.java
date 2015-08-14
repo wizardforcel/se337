@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.wizard.myapplication.entity.BuildingType;
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
 
@@ -177,8 +178,7 @@ public class PreferenceActivity extends Activity {
             http.setDefHeader(false);
             http.setHeader("Content-Type", "application/json");
 
-            String retStr
-                   = http.httpGet("http://" + UrlConfig.HOST + "/user/" + user.getId() + "/addpreference/" + toAdd);
+            Api.addPres(http, user.getId(), toAdd);
 
             Bundle b = new Bundle();
             b.putInt("type", SET_PRE_SUCCESS);

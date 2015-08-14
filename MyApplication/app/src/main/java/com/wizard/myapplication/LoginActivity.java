@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.BuildingType;
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
 
@@ -145,13 +146,8 @@ public class LoginActivity extends Activity {
             http.setHeader("Content-Type", "application/json");
             http.setCharset("utf-8");
 
-            //登录
-            JSONObject json = new JSONObject();
-            json.put("username", un);
-            json.put("password", pw);
-            String postStr = json.toString();
-            String retStr = http.httpPost("http://" + UrlConfig.HOST + "/user/login/", postStr);
-            if(retStr.equals(""))
+            User user = Api.login(http, un, pw);
+            if(user == null)
             {
                 Bundle b = new Bundle();
                 b.putInt("type", LOGIN_FAIL);
@@ -161,30 +157,9 @@ public class LoginActivity extends Activity {
                 handler.sendMessage(msg);
                 return;
             }
-            JSONObject retJson = new JSONObject(retStr);
 
-            User user = new User();
-            user.setId(retJson.getInt("id"));
-            user.setUn(retJson.getString("username"));
-            user.setPw(retJson.getString("password"));
-            Log.d("UserLogin", "id: " + user.getId() + " un: " + user.getUn() + " pw: " + user.getPw());
-
-            //获取偏好
-            retStr = http.httpGet("http://" + UrlConfig.HOST + "/user/" + user.getId() +"/preference/");
-            JSONArray retArr = new JSONArray(retStr);
-            List<String> pres = user.getPres();
-            for(int i = 0; i < retArr.length(); i++)
-            {
-                JSONObject o = retArr.getJSONObject(i);
-                String type = o.getJSONObject("preference").getString("type");
-                if(Arrays.asList(BuildingType.TYPES).contains(type))
-                    pres.add(type);
-            }
-
-            //获取头像
-            byte[] imgData
-                   = http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + user.getId());
-            user.setAvatar(imgData);
+            List<String> pres = Api.getPres(http, user.getId());
+            user.setPres(pres);
 
             Bundle b = new Bundle();
             b.putInt("type", LOGIN_SUCCESS);

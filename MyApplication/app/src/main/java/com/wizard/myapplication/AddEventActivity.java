@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
 
@@ -210,28 +211,8 @@ public class AddEventActivity extends Activity {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
             http.setHeader("Content-Type", "application/json");
-            JSONObject json = new JSONObject();
-            json.put("description", content);
-            json.put("name", name);
-            json.put("userId", user.getId());
-            String date = String.format("%d%02d%02d%02d%02d00",
-                    c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1,
-                    c.get(Calendar.DATE), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
-            json.put("date", date);
-            json.put("universityId", campus.getId());
-            String postStr = json.toString();
-            String retStr = http.httpPost("http://" + UrlConfig.HOST + "/activity/add/", postStr);
-            JSONObject retJson = new JSONObject(retStr);
 
-            Event e = new Event();
-            e.setDate(date);
-            e.setName(name);
-            e.setContent(content);
-            e.setId(retJson.getInt("id"));
-            e.setUid(user.getId());
-            e.setUn(user.getUn());
-            Log.d("AddEvent", "id: " + e.getId() + " uid: " + e.getUid() +
-                  " un: " + e.getUn() + " date: " + e.getDate());
+            Event e = Api.addActivity(http, campus.getId(), user, name, content, c);
 
             Bundle b = new Bundle();
             b.putInt("type", ADD_EVENT_SUCCESS);

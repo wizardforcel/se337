@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.wizard.myapplication.entity.Comment;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.TabUtil;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
@@ -263,23 +264,8 @@ public class EventActivity extends Activity {
             http.setDefHeader(false);
             http.setHeader("Content-Type", "application/json");
 
-            JSONObject postJson = new JSONObject();
-            postJson.put("activityId", e.getId());
-            postJson.put("type", "activity");
-            postJson.put("content", myComment);
-            postJson.put("userId", user.getId());
-
-            String retStr = http.httpPost("http://" + UrlConfig.HOST + "/comment/add", postJson.toString());
-            JSONObject retJson = new JSONObject(retStr);
-            Comment c = new Comment();
-            c.setId(retJson.getInt("id"));
-            c.setUid(user.getId());
-            c.setUn(user.getUn());
-            c.setContent(myComment);
-            c.setAvatar(user.getAvatar());
+            Comment c = Api.addActivityComment(http, e.getId(), user, myComment);
             comments.add(c);
-            Log.d("BuildingAddComment",
-                    "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
 
             Bundle b = new Bundle();
             b.putInt("type", ADD_COMMENT_SUCCESS);
@@ -305,29 +291,9 @@ public class EventActivity extends Activity {
         {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
-
             http.setCharset("utf-8");
-            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/comment/activity/" + e.getId());
-            JSONArray retArr = new JSONArray(retStr);
-            comments.clear();
-            for(int i = 0; i < retArr.length(); i++)
-            {
-                JSONObject o = retArr.getJSONObject(i);
-                Comment c = new Comment();
-                c.setId(o.getInt("id"));
-                int uid = o.getInt("userId");
-                c.setUid(uid);
-                String un = http.httpGet("http://" + UrlConfig.HOST + "/user/" + uid + "/userName/");
-                c.setUn(un);
-                c.setContent(o.getString("content"));
-                c.setLike(o.getInt("likes"));
-                c.setDislike(o.getInt("dislike"));
-                byte[] imgData
-                        = http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + c.getUid());
-                c.setAvatar(imgData);
-                comments.add(c);
-                Log.d("EventComment", "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
-            }
+
+            comments = Api.getActivityComment(http, e.getId());
 
             Bundle b = new Bundle();
             b.putInt("type", LOAD_DATA_SUCCESS);
@@ -355,7 +321,7 @@ public class EventActivity extends Activity {
             http.setDefHeader(false);
             http.setCharset("utf-8");
 
-            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/comment/like/" + currentComment.getId());
+            Api.commentLike(http, currentComment.getId());
             currentComment.setLike(currentComment.getLike() + 1);
 
             Bundle b = new Bundle();
@@ -384,7 +350,7 @@ public class EventActivity extends Activity {
             http.setDefHeader(false);
             http.setCharset("utf-8");
 
-            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/comment/dislike/" + currentComment.getId());
+            Api.commentDislike(http, currentComment.getId());
             currentComment.setDislike(currentComment.getDislike() + 1);
 
             Bundle b = new Bundle();

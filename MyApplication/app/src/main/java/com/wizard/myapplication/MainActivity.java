@@ -35,6 +35,7 @@ import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.NaviNode;
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.DistanceUtil;
 import com.wizard.myapplication.util.TabUtil;
 import com.wizard.myapplication.util.UrlConfig;
@@ -732,8 +733,7 @@ public class MainActivity extends Activity {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader();
 
-            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/addusertoview/view/" + currentBuilding.getId() + "/user/" + user.getId());
-            if(retStr.equals(""))
+            if(!Api.addHistory(http, user.getId(), campus.getId()))
                 Log.d("AddHistoryFail", "uid: " + user.getId() + " viewId: " + currentBuilding.getId());
             else
                 Log.d("AddHistorySuccess", "uid: " + user.getId() + " viewId: " + currentBuilding.getId());
@@ -754,95 +754,8 @@ public class MainActivity extends Activity {
             http.setHeader("Content-Type", "application/json");
             http.setCharset("utf-8");
 
-            //获取校园信息
-            //String url = String.format("http://%s/university/findByGPS/longitude/%6f/latitude/%6f",
-            //                          UrlConfig.HOST, lastLoc.longitude, lastLoc.latitude);
-            String url = String.format("http://%s/university/findByGPS/longitude/121.449088/latitude/31.028980",  UrlConfig.HOST);
-            String retStr = http.httpGet(url);
-            JSONArray retArr = new JSONArray(retStr);
-            JSONObject retJson = retArr.getJSONObject(0);
-
-            Campus c = new Campus();
-            c.setId(retJson.getInt("id"));
-            c.setName(retJson.getString("name"));
-            c.setContent(retJson.getString("description"));
-            c.setRadius(retJson.getDouble("radius"));
-            c.setLatitude(retJson.getDouble("latitude"));
-            c.setLongitude(retJson.getDouble("longitude"));
-            Log.d("Campus", "id: " + c.getId() + " name: " + c.getName());
-
-            //获取校园图片
-            retStr = http.httpGet("http://" + UrlConfig.HOST + "/picture/university/" + c.getId());
-            retArr = new JSONArray(retStr);
-            if(retArr.length() != 0) {
-                JSONObject imgJson = retArr.getJSONObject(0);
-                String imgPath = imgJson.getString("path");
-                imgPath = "http://" + UrlConfig.HOST + "/picture/" + imgPath.replace(".", "/");
-                byte[] imgData  = http.httpGetData(imgPath);
-                c.setAvatar(imgData);
-                Log.d("CampusImg", imgPath);
-            }
-
-            //获取景点信息
-            retStr = http.httpGet("http://" + UrlConfig.HOST + "/view/university/" + c.getId());
-            retArr = new JSONArray(retStr);
-
-            List<Building> buildings = new ArrayList<Building>();
-            for(int i = 0; i < retArr.length(); i++)
-            {
-                JSONObject buildingJson = retArr.getJSONObject(i);
-                Building b = new Building();
-                b.setId(buildingJson.getInt("id"));
-                b.setName(buildingJson.getString("name"));
-                b.setContent(buildingJson.getString("description"));
-                b.setLatitude(buildingJson.getDouble("latitude"));
-                b.setLongitude(buildingJson.getDouble("longitude"));
-                b.setRadius(buildingJson.getDouble("radius"));
-                buildings.add(b);
-                Log.d("Building", "id: " + b.getId() + " name: " + b.getName());
-
-                //获取景点图片
-                /*String retStr2 = http.httpGet("http://" + UrlConfig.HOST + "/picture/view/" + b.getId());
-                JSONArray retArr2 = new JSONArray(retStr2);
-                if(retArr2.length() != 0) {
-                    JSONObject imgJson = retArr2.getJSONObject(0);
-                    String imgPath = imgJson.getString("path");
-                    imgPath = "http://" + UrlConfig.HOST + "/picture/" + imgPath.replace(".", "/");
-                    Log.d("BuildingImg", imgPath);
-                    try {
-                        byte[] imgData = http.httpGetData(imgPath);
-                        b.setAvatar(imgData);
-                    } catch(Exception ex) {}
-                }*/
-            }
-            c.setBuildings(buildings);
-            campus = c;
-
-            //获取活动
-            String date = new java.text.SimpleDateFormat("yyyyMMddHHmmss")
-                    .format(Calendar.getInstance().getTime());
-            retStr = http.httpGet(
-                    "http://" + UrlConfig.HOST + "/activity/university/" + campus.getId() + "/date/" + date);
-            retArr = new JSONArray(retStr);
-            events.clear();
-            for(int i = 0; i < retArr.length(); i++) {
-                JSONObject json = retArr.getJSONObject(i);
-                Event event = new Event();
-                event.setId(json.getInt("id"));
-                event.setName(json.getString("name"));
-                event.setContent(json.getString("description"));
-                event.setDate(json.getString("date"));
-                int uid = json.getInt("userId");
-                event.setUid(uid);
-                String un = http.httpGet("http://" + UrlConfig.HOST + "/user/" + uid + "/userName/");
-                event.setUn(un);
-                byte[] imgData
-                        = http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + uid);
-                event.setAvatar(imgData);
-                events.add(event);
-                Log.d("Event", "id: " + event.getId() + " uid: " + event.getUid() +
-                        " un: " + event.getUn() + " date: " + event.getDate());
-            }
+            campus = Api.getCampus(http, lastLoc.latitude, lastLoc.longitude);
+            events = Api.getActiivity(http, campus.getId());
 
             Bundle b = new Bundle();
             b.putInt("type", GET_CAMPUS_SUCCESS);

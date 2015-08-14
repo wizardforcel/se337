@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
 
@@ -119,13 +120,8 @@ public class RegActivity extends Activity {
             http.setDefHeader(false);
             http.setHeader("Content-Type", "application/json");
 
-            //注册
-            JSONObject json = new JSONObject();
-            json.put("username", un);
-            json.put("password", pw);
-            String postStr = json.toString();
-            String retStr = http.httpPost("http://" + UrlConfig.HOST + "/user/register/", postStr);
-            if(retStr.equals(""))
+            User user = Api.reg(http, un, pw);
+            if(user == null)
             {
                 Bundle b = new Bundle();
                 b.putInt("type", REG_FAIL);
@@ -135,18 +131,6 @@ public class RegActivity extends Activity {
                 handler.sendMessage(msg);
                 return;
             }
-            JSONObject retJson = new JSONObject(retStr);
-
-            User user = new User();
-            user.setId(retJson.getInt("id"));
-            user.setUn(retJson.getString("username"));
-            user.setPw(retJson.getString("password"));
-            Log.d("UserReg", "id: " + user.getId() + " un: " + user.getUn() + " pw: " + user.getPw());
-
-            //获取头像
-            byte[] imgData
-                    = http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + user.getId());
-            user.setAvatar(imgData);
 
             Bundle b = new Bundle();
             b.putInt("type", REG_SUCCESS);

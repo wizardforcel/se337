@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.Comment;
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.TabUtil;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
@@ -268,7 +269,7 @@ public class BuildingActivity extends Activity {
             http.setDefHeader(false);
             http.setCharset("utf-8");
 
-            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/comment/like/" + currentComment.getId());
+            Api.commentLike(http, currentComment.getId());
             currentComment.setLike(currentComment.getLike() + 1);
 
             Bundle b = new Bundle();
@@ -297,7 +298,7 @@ public class BuildingActivity extends Activity {
             http.setDefHeader(false);
             http.setCharset("utf-8");
 
-            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/comment/dislike/" + currentComment.getId());
+            Api.commentDislike(http, currentComment.getId());
             currentComment.setDislike(currentComment.getDislike() + 1);
 
             Bundle b = new Bundle();
@@ -326,23 +327,8 @@ public class BuildingActivity extends Activity {
             http.setDefHeader(false);
             http.setHeader("Content-Type", "application/json");
 
-            JSONObject postJson = new JSONObject();
-            postJson.put("viewId", building.getId());
-            postJson.put("type", "view");
-            postJson.put("content", myComment);
-            postJson.put("userId", user.getId());
-
-            String retStr = http.httpPost("http://" + UrlConfig.HOST + "/comment/add", postJson.toString());
-            JSONObject retJson = new JSONObject(retStr);
-            Comment c = new Comment();
-            c.setId(retJson.getInt("id"));
-            c.setUid(user.getId());
-            c.setUn(user.getUn());
-            c.setContent(myComment);
-            c.setAvatar(user.getAvatar());
+            Comment c = Api.addViewComment(http, building.getId(), user, myComment);
             comments.add(c);
-            Log.d("BuildingAddComment",
-                    "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
 
             Bundle b = new Bundle();
             b.putInt("type", ADD_COMMENT_SUCCESS);
@@ -370,42 +356,8 @@ public class BuildingActivity extends Activity {
             http.setDefHeader(false);
             http.setCharset("utf-8");
 
-            //景点评论
-            String retStr = http.httpGet("http://" + UrlConfig.HOST + "/comment/view/" + building.getId());
-            JSONArray retArr = new JSONArray(retStr);
-            comments.clear();
-            for(int i = 0; i < retArr.length(); i++)
-            {
-                JSONObject o = retArr.getJSONObject(i);
-                Comment c = new Comment();
-                c.setId(o.getInt("id"));
-                int uid = o.getInt("userId");
-                c.setUid(uid);
-                String un = http.httpGet("http://" + UrlConfig.HOST + "/user/" + uid + "/userName/");
-                c.setUn(un);
-                c.setContent(o.getString("content"));
-                c.setLike(o.getInt("likes"));
-                c.setDislike(o.getInt("dislike"));
-                byte[] imgData
-                        = http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + c.getUid());
-                c.setAvatar(imgData);
-                comments.add(c);
-                Log.d("BuildingComment", "id: " + c.getId() + " uid: " + c.getUid() + " un: " + c.getUn());
-            }
-
-            //景点图片
-            retStr = http.httpGet("http://" + UrlConfig.HOST + "/picture/view/" + building.getId());
-            retArr = new JSONArray(retStr);
-            if(retArr.length() != 0) {
-                JSONObject imgJson = retArr.getJSONObject(0);
-                String imgPath = imgJson.getString("path");
-                imgPath = "http://" + UrlConfig.HOST + "/picture/" + imgPath.replace(".", "/");
-                Log.d("BuildingImg", imgPath);
-                try {
-                    byte[] imgData = http.httpGetData(imgPath);
-                    building.setAvatar(imgData);
-                } catch(Exception ex) {}
-            }
+            comments = Api.getViewComment(http, building.getId());
+            building.setAvatar(Api.getViewPic(http, building.getId()));
 
             Bundle b = new Bundle();
             b.putInt("type", LOAD_DATA_SUCCESS);
