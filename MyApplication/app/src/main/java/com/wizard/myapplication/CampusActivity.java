@@ -29,7 +29,6 @@ import com.wizard.myapplication.util.WizardHTTP;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -225,7 +224,7 @@ public class CampusActivity extends Activity {
             Log.v("building", building.getName());
 
             TextView buildingText
-                    = (TextView) getLayoutInflater().inflate(R.layout.text, null);
+                    = (TextView) getLayoutInflater().inflate(R.layout.building_linear, null);
             buildingText.setText(building.getName());
             buildingText.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -257,7 +256,7 @@ public class CampusActivity extends Activity {
         {
             final Event e = (Event) data.getSerializableExtra("event");
             TextView tv
-                    = (TextView) getLayoutInflater().inflate(R.layout.text, null);
+                    = (TextView) getLayoutInflater().inflate(R.layout.building_linear, null);
             tv.setText(e.getName());
             tv.setOnClickListener(new View.OnClickListener() {
                 @Override

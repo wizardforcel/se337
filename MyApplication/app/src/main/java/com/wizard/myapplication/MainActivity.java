@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -30,7 +29,6 @@ import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.navisdk.BNaviEngineManager;
 import com.baidu.navisdk.BaiduNaviManager;
 import com.wizard.myapplication.entity.Building;
-import com.wizard.myapplication.entity.BuildingType;
 import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.NaviNode;
@@ -38,22 +36,12 @@ import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.DistanceUtil;
 import com.wizard.myapplication.util.TabUtil;
-import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
 import com.wizard.myapplication.view.CircularImage;
-import com.wizard.myapplication.view.SlideMenu;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 public class MainActivity extends Activity {
@@ -410,14 +398,16 @@ public class MainActivity extends Activity {
             final Building building = buildings.get(row);
             Log.v("building", building.getName());
 
+            LinearLayout linear
+                    = (LinearLayout) getLayoutInflater().inflate(R.layout.building_linear, null);
             TextView buildingText
-                    = (TextView) getLayoutInflater().inflate(R.layout.text, null);
+                    = (TextView) linear.findViewById(R.id.buildingText);
             buildingText.setText(building.getName());
             buildingText.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) { buildingTextOnClick(building); }
             });
-            buildingPage.addView(buildingText);
+            buildingPage.addView(linear);
         }
     }
 
@@ -755,7 +745,7 @@ public class MainActivity extends Activity {
             http.setCharset("utf-8");
 
             campus = Api.getCampus(http, lastLoc.latitude, lastLoc.longitude);
-            events = Api.getActiivity(http, campus.getId());
+            //events = Api.getActiivity(http, campus.getId());
 
             Bundle b = new Bundle();
             b.putInt("type", GET_CAMPUS_SUCCESS);
@@ -1018,6 +1008,7 @@ public class MainActivity extends Activity {
         }
         else if((requestCode == ACTIVITY_SEARCH || requestCode == ACTIVITY_HISTORY) &&
                  resultCode == RESULT_OK) {
+            mainTab.setCurrentTab(0);
             int resultId = i.getIntExtra("resultId", 0);
             searchActivityOnOk(resultId);
         }
@@ -1030,7 +1021,7 @@ public class MainActivity extends Activity {
         {
             final Event e = (Event) i.getSerializableExtra("event");
             TextView tv
-                    = (TextView) getLayoutInflater().inflate(R.layout.text, null);
+                    = (TextView) getLayoutInflater().inflate(R.layout.building_linear, null);
             tv.setText(e.getName());
             tv.setOnClickListener(new View.OnClickListener() {
                 @Override

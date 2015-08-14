@@ -8,6 +8,7 @@ import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Comment;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.entity.UserResult;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,60 +25,55 @@ import java.util.List;
  */
 public class Api
 {
-    public static User login(WizardHTTP http, String un, String pw)
+    public static UserResult login(WizardHTTP http, String un, String pw)
             throws JSONException, IOException
     {
-        JSONObject postJson = new JSONObject();
-        postJson.put("username", un);
-        postJson.put("password", pw);
-        String postStr = postJson.toString();
-        String retStr = http.httpPost("http://" + UrlConfig.HOST + "/user/login/", postStr);
-        if(retStr.equals(""))
-            return null;
+        String postStr = "userName=" + un + "&password=" + pw;
+        String retStr = http.httpPost("http://" + UrlConfig.HOST + "/user/login", postStr);
         JSONObject retJson = new JSONObject(retStr);
+        int succ = retJson.getInt("code");
+        if(succ != 1)
+            return new UserResult(1, retJson.getString("detail"), null);
         User user = new User();
-        user.setId(retJson.getInt("id"));
-        user.setUn(retJson.getString("username"));
-        user.setPw(retJson.getString("password"));
+        user.setId(Integer.parseInt(retJson.getString("detail")));
+        user.setUn(un);
+        user.setPw(pw);
         Log.d("UserLogin", "id: " + user.getId() + " un: " + user.getUn() + " pw: " + user.getPw());
         user.setAvatar(getAvatarById(http, user.getId()));
-        return user;
+        return new UserResult(0, "", user);
     }
 
     public static List<String> getPres(WizardHTTP http, int uid)
             throws JSONException, IOException
     {
-        String retStr = http.httpGet("http://" + UrlConfig.HOST + "/user/" + uid +"/preference/");
+        String retStr = http.httpGet("http://" + UrlConfig.HOST + "/user/" + uid +"/preferences");
         JSONArray retArr = new JSONArray(retStr);
         List<String> pres = new ArrayList<String>();
         for(int i = 0; i < retArr.length(); i++)
         {
-            JSONObject o = retArr.getJSONObject(i);
-            String type = o.getJSONObject("preference").getString("type");
+            String type = retArr.getString(i);
             if(Arrays.asList(BuildingType.TYPES).contains(type))
                 pres.add(type);
         }
         return pres;
     }
 
-    public static User reg(WizardHTTP http, String un, String pw)
+    public static UserResult reg(WizardHTTP http, String un, String pw)
             throws JSONException, IOException
     {
-        JSONObject postJson = new JSONObject();
-        postJson.put("username", un);
-        postJson.put("password", pw);
-        String postStr = postJson.toString();
-        String retStr = http.httpPost("http://" + UrlConfig.HOST + "/user/register/", postStr);
-        if(retStr.equals(""))
-            return null;
+        String postStr = "userName=" + un + "&password=" + pw;
+        String retStr = http.httpPost("http://" + UrlConfig.HOST + "/user/register", postStr);
         JSONObject retJson = new JSONObject(retStr);
+        int succ = retJson.getInt("code");
+        if(succ != 1)
+            return new UserResult(1, retJson.getString("detail"), null);
         User user = new User();
-        user.setId(retJson.getInt("id"));
-        user.setUn(retJson.getString("username"));
-        user.setPw(retJson.getString("password"));
+        user.setId(Integer.parseInt(retJson.getString("detail")));
+        user.setUn(un);
+        user.setPw(pw);
         Log.d("UserReg", "id: " + user.getId() + " un: " + user.getUn() + " pw: " + user.getPw());
         user.setAvatar(getAvatarById(http, user.getId()));
-        return user;
+        return new UserResult(0, "", user);
     }
 
     public static boolean addPres(WizardHTTP http, int uid, String toAdd)
@@ -319,9 +315,11 @@ public class Api
     }
 
     public static String getUnById(WizardHTTP http, int uid)
-            throws IOException
+            throws IOException, JSONException
     {
-        return http.httpGet("http://" + UrlConfig.HOST + "/user/" + uid + "/userName/");
+        String retStr = http.httpGet("http://" + UrlConfig.HOST + "/user/" + uid + "/userName/");
+        JSONObject json = new JSONObject(retStr);
+        return json.getString("detail");
     }
 
     public static byte[] getAvatarById(WizardHTTP http, int uid)

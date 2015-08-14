@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.entity.UserResult;
 import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
@@ -118,19 +119,21 @@ public class RegActivity extends Activity {
         try {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
-            http.setHeader("Content-Type", "application/json");
+            http.setCharset("utf-8");
 
-            User user = Api.reg(http, un, pw);
-            if(user == null)
+            UserResult r = Api.reg(http, un, pw);
+            if(r.getErrno() != 0)
             {
                 Bundle b = new Bundle();
                 b.putInt("type", REG_FAIL);
-                b.putSerializable("errmsg", "用户名或密码错误");
+                b.putSerializable("errmsg", r.getErrmsg());
                 Message msg = handler.obtainMessage();
                 msg.setData(b);
                 handler.sendMessage(msg);
                 return;
             }
+
+            User user = r.getUser();
 
             Bundle b = new Bundle();
             b.putInt("type", REG_SUCCESS);
@@ -141,6 +144,7 @@ public class RegActivity extends Activity {
         }
         catch(Exception ex)
         {
+            ex.printStackTrace();
             Bundle b = new Bundle();
             b.putInt("type", REG_FAIL);
             b.putSerializable("errmsg", ex.getMessage());

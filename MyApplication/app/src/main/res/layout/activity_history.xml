@@ -17,9 +17,8 @@
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/border_style"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -41,13 +40,13 @@
                 android:gravity="center_vertical" />
         </LinearLayout>
 
-        <LinearLayout
-            android:orientation="horizontal"
+        <TextView
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_style"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp" >
+            android:layout_height="1px"
+            android:id="@+id/textView3"
+            android:background="#ccc"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -56,14 +55,25 @@
             android:text="到过的地点"
             android:id="@+id/textView"
             android:minHeight="40dp"
-            android:gravity="center_vertical"  />
-        </LinearLayout>
+            android:gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:id="@+id/textView4"
+            android:background="#ccc"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
 
         <ListView
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:id="@+id/buildingList"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
     </LinearLayout>
 
 </LinearLayout>

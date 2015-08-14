@@ -18,12 +18,19 @@
         android:layout_marginRight="20dp"
         android:background="@drawable/zan" />
 
+    <TextView
+        android:layout_width="1px"
+        android:layout_height="fill_parent"
+        android:id="@+id/textView"
+        android:background="#ccc" />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/caiButton"
         android:layout_marginLeft="20dp"
         android:background="@drawable/buzan" />
+
 </LinearLayout>
 
 </LinearLayout>

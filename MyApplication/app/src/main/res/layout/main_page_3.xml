@@ -4,7 +4,6 @@
     android:orientation="vertical" android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:weightSum="1"
-    android:background="#fff"
     android:id="@+id/mainPage3">
 
     <include layout="@layout/titlebar_main" />
@@ -40,13 +39,12 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#fff">
+        android:background="#ff9966">
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="50.0dip"
             android:clickable="true"
-            android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
             android:gravity="center_vertical"
             android:paddingRight="10.0dip"
@@ -54,14 +52,14 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/loginText"
-            android:background="@drawable/border_style"
-            android:paddingLeft="15.0dip" />
+            android:paddingLeft="15.0dip"
+            android:background="#fff"
+            android:layout_marginBottom="1dp" />
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="50.0dip"
             android:clickable="true"
-            android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
             android:gravity="center_vertical"
             android:paddingRight="10.0dip"
@@ -69,14 +67,14 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/regText"
-            android:background="@drawable/border_style"
-            android:paddingLeft="15.0dip" />
+            android:paddingLeft="15.0dip"
+            android:background="#fff"
+            android:layout_marginBottom="1dp" />
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="50.0dip"
             android:clickable="true"
-            android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
             android:gravity="center_vertical"
             android:paddingRight="10.0dip"
@@ -84,14 +82,14 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/preText"
-            android:background="@drawable/border_style"
-            android:paddingLeft="15.0dip" />
+            android:paddingLeft="15.0dip"
+            android:background="#fff"
+            android:layout_marginBottom="1dp" />
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="50.0dip"
             android:clickable="true"
-            android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
             android:gravity="center_vertical"
             android:paddingRight="10.0dip"
@@ -99,14 +97,14 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/hisText"
-            android:background="@drawable/border_style"
-            android:paddingLeft="15.0dip" />
+            android:paddingLeft="15.0dip"
+            android:background="#fff"
+            android:layout_marginBottom="1dp" />
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="50.0dip"
             android:clickable="true"
-            android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
             android:gravity="center_vertical"
             android:paddingLeft="15.0dip"
@@ -115,13 +113,13 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/taskText"
-            android:background="@drawable/border_style" />
+            android:background="#fff"
+            android:layout_marginBottom="1dp" />
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="50.0dip"
             android:clickable="true"
-            android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
             android:gravity="center_vertical"
             android:paddingLeft="15.0dip"
@@ -130,13 +128,13 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/rankText"
-            android:background="@drawable/border_style" />
+            android:background="#fff"
+            android:layout_marginBottom="1dp" />
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="50.0dip"
             android:clickable="true"
-            android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
             android:gravity="center_vertical"
             android:paddingLeft="15.0dip"
@@ -145,13 +143,13 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/exchangeText"
-            android:background="@drawable/border_style" />
+            android:background="#fff"
+            android:layout_marginBottom="1dp" />
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="50.0dip"
             android:clickable="true"
-            android:drawableLeft="@drawable/ic_category_mark"
             android:drawablePadding="1.0dip"
             android:gravity="center_vertical"
             android:paddingRight="10.0dip"
@@ -159,8 +157,16 @@
             android:textColor="#ff959595"
             android:textSize="16.0sp"
             android:id="@+id/logoutText"
-            android:background="@drawable/border_style"
-            android:paddingLeft="15.0dip" />
+            android:paddingLeft="15.0dip"
+            android:background="#fff"
+            android:layout_marginBottom="1dp" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:id="@+id/textView"
+            android:layout_weight="1"
+            android:background="#fff" />
     </LinearLayout>
 
 

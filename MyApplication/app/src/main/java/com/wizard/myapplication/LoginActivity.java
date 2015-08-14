@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.BuildingType;
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.entity.UserResult;
 import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
@@ -143,21 +144,21 @@ public class LoginActivity extends Activity {
         {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
-            http.setHeader("Content-Type", "application/json");
             http.setCharset("utf-8");
 
-            User user = Api.login(http, un, pw);
-            if(user == null)
+            UserResult r = Api.login(http, un, pw);
+            if(r.getErrno() != 0)
             {
                 Bundle b = new Bundle();
                 b.putInt("type", LOGIN_FAIL);
-                b.putSerializable("errmsg", "用户名或密码错误");
+                b.putSerializable("errmsg", r.getErrmsg());
                 Message msg = handler.obtainMessage();
                 msg.setData(b);
                 handler.sendMessage(msg);
                 return;
             }
 
+            User user = r.getUser();
             List<String> pres = Api.getPres(http, user.getId());
             user.setPres(pres);
 
@@ -170,6 +171,7 @@ public class LoginActivity extends Activity {
         }
         catch(Exception ex)
         {
+            ex.printStackTrace();
             Bundle b = new Bundle();
             b.putInt("type", LOGIN_FAIL);
             b.putSerializable("errmsg", ex.getMessage());
