@@ -1,5 +1,7 @@
 package com.wizard.myapplication.util;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.wizard.myapplication.entity.Building;
@@ -19,16 +21,23 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import com.wizard.myapplication.R;
 
 /**
  * Created by asus on 2015/8/14.
  */
 public class Api
 {
+    public static final String BOUNDARY = "wizardforcel233233";
+
     public static UserResult login(WizardHTTP http, String un, String pw)
             throws JSONException, IOException
     {
+        http.getHeaders().put("Content-Type", "application/x-www-form-urlencoded");
         String postStr = "userName=" + un + "&password=" + pw;
         String retStr = http.httpPost("http://" + UrlConfig.HOST + "/user/login", postStr);
         JSONObject retJson = new JSONObject(retStr);
@@ -62,6 +71,7 @@ public class Api
     public static UserResult reg(WizardHTTP http, String un, String pw)
             throws JSONException, IOException
     {
+        http.getHeaders().put("Content-Type", "application/application/x-www-form-urlencoded");
         String postStr = "userName=" + un + "&password=" + pw;
         String retStr = http.httpPost("http://" + UrlConfig.HOST + "/user/register", postStr);
         JSONObject retJson = new JSONObject(retStr);
@@ -79,6 +89,7 @@ public class Api
 
     public static Result addPres(WizardHTTP http, int uid, String toAdd)
             throws IOException, JSONException {
+        http.getHeaders().put("Content-Type", "application/x-www-form-urlencoded");
         String postStr = "preferenceType=" + toAdd + "&userId="+ uid;
         String retStr
                 = http.httpPost("http://" + UrlConfig.HOST + "/user/addpreference", postStr);
@@ -92,6 +103,7 @@ public class Api
 
     public static Result delPres(WizardHTTP http, int uid, String toAdd)
             throws IOException, JSONException {
+        http.getHeaders().put("Content-Type", "application/x-www-form-urlencoded");
         String postStr = "preferenceType=" + toAdd + "&userId="+ uid;
         String retStr
                 = http.httpPost("http://" + UrlConfig.HOST + "/user/deletepreference", postStr);
@@ -120,6 +132,7 @@ public class Api
     public static Comment addViewComment(WizardHTTP http, int viewId, User user, String comment)
             throws JSONException, IOException
     {
+        http.getHeaders().put("Content-Type", "application/json");
         JSONObject postJson = new JSONObject();
         postJson.put("viewId", viewId);
         postJson.put("type", "view");
@@ -141,6 +154,7 @@ public class Api
     public static Comment addActivityComment(WizardHTTP http, int activityId, User user, String comment)
             throws JSONException, IOException
     {
+        http.getHeaders().put("Content-Type", "application/x-www-form-urlencoded");
         String postStr = "userId=" + user.getId() + "&activityId=" + activityId + "&content=" + comment;
         String retStr = http.httpPost("http://" + UrlConfig.HOST + "/activity/comment/add", postStr);
         JSONObject retJson = new JSONObject(retStr);
@@ -291,15 +305,15 @@ public class Api
             event.setStartDate(json.getString("activityStartDate"));
             event.setEndDate(json.getString("activityEndDate"));
             event.setMaxPeople(json.getInt("peopleLimit"));
-            event.setLat(json.getDouble("longitude"));
-            event.setLng(json.getDouble("latitude"));
+            //event.setLat(json.getDouble("longitude"));
+            //event.setLng(json.getDouble("latitude"));
             event.setLocation(json.getString("location"));
             event.setEnrollEndDate(json.getString("enrollEndDate"));
             int uid = json.getInt("userId");
             event.setUid(uid);
             event.setUn(Api.getUnById(http, uid));
             byte[] imgData
-                    = http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + uid);
+                    = Api.getAvatarById(http, uid);
             event.setAvatar(imgData);
             events.add(event);
             Log.d("Event", "id: " + event.getId() + " uid: " + event.getUid() +
@@ -313,12 +327,42 @@ public class Api
                                     int limit, Building loc)
             throws JSONException, IOException
     {
-        String postStr = "userId=" + user.getId() + "&universityId=" + campusId + "&name=" + name +
+        /*String postStr = "userId=" + user.getId() + "&universityId=" + campusId + "&name=" + name +
                          "&description=" + content + "&enrollStartDate=" + enrollStart + "&enrollEndDate=" +
                          enrollEnd + "&activityStartDate=" + start + "&activityEndDate=" + end +
-                         "&peopleLimit=" + limit + "&location=" + loc.getName();
-        String retStr = http.httpPost("http://" + UrlConfig.HOST + "/activity/add/", postStr);
+                         "&peopleLimit=" + limit + "&location=" + loc.getName();*/
+
+        http.getHeaders().put("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("userId", user.getId() + "");
+        params.put("universityId", campusId + "");
+        params.put("name", name);
+        params.put("description", content);
+        params.put("enrollStartDate", enrollStart);
+        params.put("enrollEndDate", enrollEnd);
+        params.put("activityStartDate", start);
+        params.put("activityEndDate", end);
+        params.put("peopleLimit", limit + "");
+        params.put("location", loc.getName());
+
+        StringBuffer sb = new StringBuffer();
+        for(Map.Entry<String, String> elem : params.entrySet())
+        {
+            String k = elem.getKey();
+            String v= elem.getValue();
+            sb.append("--").append(BOUNDARY).append("\r\n")
+              .append("Content-Disposition: form-data; name=\"").append(k).append("\"")
+              .append("\r\n\r\n")
+              .append(v).append("\r\n");
+        }
+        sb.append("--").append(BOUNDARY).append("--");
+        String postStr = sb.toString();
+        Log.d("AddActivityPostStr", postStr);
+
+        String retStr = http.httpPost("http://" + UrlConfig.HOST + "/activity/add", postStr);
         JSONObject retJson = new JSONObject(retStr);
+        Log.d("AddActivity", retStr);
 
         Event e = new Event();
         e.setName(name);
@@ -333,6 +377,7 @@ public class Api
         e.setEnrollEndDate(enrollEnd);
         e.setStartDate(start);
         e.setEndDate(end);
+        e.setAvatar(new byte[0]);
         Log.d("AddEvent", "id: " + e.getId() + " uid: " + e.getUid() +
                 " un: " + e.getUn() + " date: " + e.getStartDate());
         return e;
@@ -349,7 +394,8 @@ public class Api
     public static byte[] getAvatarById(WizardHTTP http, int uid)
             throws IOException
     {
-        return http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + uid);
+        //return http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + uid);
+        return new byte[0];
     }
 
     public static byte[] getCampusPic(WizardHTTP http, int campusId)

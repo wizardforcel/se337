@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -25,6 +26,7 @@ import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.util.Api;
+import com.wizard.myapplication.util.Common;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
 
@@ -37,23 +39,42 @@ public class AddEventActivity extends Activity {
     private TextView eventTitle;
     private TextView eventContent;
     private Button addButton;
+    private TextView maxEdit;
+    private Spinner locSpinner;
+    private TextView enrollStartDateText;
+    private TextView enrollStartTimeText;
+    private TextView enrollEndDateText;
+    private TextView enrollEndTimeText;
+    private TextView startDateText;
+    private TextView startTimeText;
+    private TextView endDateText;
+    private TextView endTimeText;
     private Handler handler;
 
-    private TextView dateText = null;
-    private Button dateButton = null;
-    private TextView timeText = null;
-    private Button timeButton = null;
     private AlertDialog dateDialog;
     private AlertDialog timeDialog;
     private DatePicker datePicker;
     private TimePicker timePicker;
 
-    private Calendar c = Calendar.getInstance();
+    private static final int ENROLL_START = 0;
+    private static final int ENROLL_END = 1;
+    private static final int START = 2;
+    private static final int END = 3;
+
+    private int currentType;
 
     private User user;
     private Campus campus;
+
     private String name;
     private String content;
+    private int maxPeople;
+    private int locIndex;
+    private Calendar enrollStartCal = Calendar.getInstance();
+    private Calendar enrollEndCal = Calendar.getInstance();
+    private Calendar startCal = Calendar.getInstance();
+    private Calendar endCal = Calendar.getInstance();
+
 
     private static final int ADD_EVENT_SUCCESS = 0;
     private static final int ADD_EVENT_FAIL = 1;
@@ -79,18 +100,20 @@ public class AddEventActivity extends Activity {
         eventTitle = (TextView) findViewById(R.id.eventTitle);
         eventContent = (TextView) findViewById(R.id.eventContent);
         addButton = (Button) findViewById(R.id.addButton);
-        dateText = (TextView) findViewById(R.id.showDate);
-        dateButton = (Button) findViewById(R.id.pickDate);
-        timeText = (TextView)findViewById(R.id.showTime);
-        timeButton = (Button)findViewById(R.id.pickTime);
+        maxEdit = (TextView) findViewById(R.id.maxEdit);
+        locSpinner = (Spinner) findViewById(R.id.locSpinner);
+        enrollStartDateText = (TextView) findViewById(R.id.enrollStartDateText);
+        enrollStartTimeText = (TextView) findViewById(R.id.enrollStartTimeText);
+        enrollEndDateText = (TextView) findViewById(R.id.enrollEndDateText);
+        enrollEndTimeText = (TextView) findViewById(R.id.enrollEndTimeText);
+        startDateText = (TextView) findViewById(R.id.startDateText);
+        startTimeText = (TextView) findViewById(R.id.startTimeText);
+        endDateText = (TextView) findViewById(R.id.endDateText);
+        endTimeText = (TextView) findViewById(R.id.endTimeText);
 
         timePicker = new TimePicker(this);
         timePicker.setIs24HourView(true);
-        timePicker.setCurrentHour(c.get(Calendar.HOUR_OF_DAY));
-        timePicker.setCurrentMinute(c.get(Calendar.MINUTE));
-
         datePicker = new DatePicker(this);
-        datePicker.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DATE), null);
 
         dateDialog = new AlertDialog.Builder(this).setTitle("请输入截止日期")
                 .setView(datePicker)
@@ -114,20 +137,51 @@ public class AddEventActivity extends Activity {
                 .setNegativeButton("取消", null)
                 .create();
 
-        dateText.setText(String.format("%d-%d-%d", c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DATE)));
-        timeText.setText(String.format("%02d:%02d", c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE)));
+        enrollStartDateText.setText(Common.calToDateStr(startCal));
+        enrollStartTimeText.setText(Common.calToTimeStr(startCal));
+        enrollEndDateText.setText(Common.calToDateStr(startCal));
+        enrollEndTimeText.setText(Common.calToTimeStr(startCal));
+        startDateText.setText(Common.calToDateStr(startCal));
+        startTimeText.setText(Common.calToTimeStr(startCal));
+        endDateText.setText(Common.calToDateStr(startCal));
+        endTimeText.setText(Common.calToTimeStr(startCal));
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { addButtonOnClick(); }
         });
-        dateButton.setOnClickListener(new View.OnClickListener() {
+
+        enrollStartDateText.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) { dateButtonOnClick(); }
+            public void onClick(View view) { enrollStartDateTextOnClick(); }
         });
-        timeButton.setOnClickListener(new View.OnClickListener() {
+        enrollStartTimeText.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) { timeButtonOnClick(); }
+            public void onClick(View view) { enrollStartTimeTextOnClick(); }
+        });
+        enrollEndDateText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { enrollEndDateTextOnClick(); }
+        });
+        enrollEndTimeText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { enrollEndTimeTextOnClick(); }
+        });
+        startDateText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { startDateTextOnClick(); }
+        });
+        startTimeText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { startTimeTextOnClick(); }
+        });
+        endDateText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { endDateTextOnClick(); }
+        });
+        endTimeText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { endTimeTextOnClick(); }
         });
 
         handler = new Handler()
@@ -142,18 +196,122 @@ public class AddEventActivity extends Activity {
     private void addButtonOnClick()
     {
         name = eventTitle.getText().toString();
-        content = eventContent.getText().toString();
-
-        if(!name.equals("") && !content.equals("")){
-            new Thread(new Runnable() {
-                @Override
-                public void run() { threadAddEvent(); }
-            }).start();
-        }
-        else if(name.equals(""))
+        if(name.equals("")) {
             Toast.makeText(AddEventActivity.this, "主题为空", Toast.LENGTH_SHORT).show();
-        else
+            return;
+        }
+        content = eventContent.getText().toString();
+        if(content.equals("")) {
             Toast.makeText(AddEventActivity.this, "内容为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String maxPeopleStr = maxEdit.getText().toString();
+        if(!maxPeopleStr.matches("^\\d+$")) {
+            Toast.makeText(AddEventActivity.this, "人数应为数字", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        maxPeople = Integer.parseInt(maxEdit.getText().toString());
+
+        //TODO: more verify
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() { threadAddEvent(); }
+        }).start();
+    }
+
+    private void enrollStartDateTextOnClick()
+    {
+        currentType = ENROLL_START;
+        Common.calToDatePicker(enrollStartCal, datePicker);
+        dateDialog.show();
+    }
+
+    private void enrollStartTimeTextOnClick()
+    {
+        currentType = ENROLL_START;
+        Common.calToTimePicker(enrollStartCal, timePicker);
+        timeDialog.show();
+    }
+    private void enrollEndDateTextOnClick()
+    {
+        currentType = ENROLL_END;
+        Common.calToDatePicker(enrollEndCal, datePicker);
+        dateDialog.show();
+    }
+
+    private void enrollEndTimeTextOnClick()
+    {
+        currentType = ENROLL_END;
+        Common.calToTimePicker(enrollEndCal, timePicker);
+        timeDialog.show();
+    }
+
+    private void startDateTextOnClick()
+    {
+        currentType = START;
+        Common.calToDatePicker(startCal, datePicker);
+        dateDialog.show();
+    }
+
+    private void startTimeTextOnClick()
+    {
+        currentType = START;
+        Common.calToTimePicker(startCal, timePicker);
+        timeDialog.show();
+    }
+    private void endDateTextOnClick()
+    {
+        currentType = END;
+        Common.calToDatePicker(endCal, datePicker);
+        dateDialog.show();
+    }
+
+    private void endTimeTextOnClick()
+    {
+        currentType = END;
+        Common.calToTimePicker(endCal, timePicker);
+        timeDialog.show();
+    }
+
+    private TextView getCurrentDateTextView()
+    {
+        if(currentType == ENROLL_START)
+            return enrollStartDateText;
+        else if(currentType == ENROLL_END)
+            return enrollEndDateText;
+        else if(currentType == START)
+            return startDateText;
+        else if(currentType == END)
+            return endDateText;
+        else return null;
+    }
+
+    private TextView getCurrentTimeTextView()
+    {
+        if(currentType == ENROLL_START)
+            return enrollStartTimeText;
+        else if(currentType == ENROLL_END)
+            return enrollEndTimeText;
+        else if(currentType == START)
+            return startTimeText;
+        else if(currentType == END)
+            return endTimeText;
+        else return null;
+    }
+
+    private Calendar getCurrentCal()
+    {
+        if(currentType == ENROLL_START)
+            return enrollStartCal;
+        else if(currentType == ENROLL_END)
+            return enrollEndCal;
+        else if(currentType == START)
+            return startCal;
+        else if(currentType == END)
+            return endCal;
+        else return null;
     }
 
     private void dateDialogOkButtonOnClick()
@@ -161,7 +319,9 @@ public class AddEventActivity extends Activity {
         int year = datePicker.getYear();
         int month = datePicker.getMonth();
         int date = datePicker.getDayOfMonth();
-        dateText.setText(String.format("%d-%d-%d", year, month + 1, date));
+        TextView tv = getCurrentDateTextView();
+        tv.setText(String.format("%d-%d-%d", year, month + 1, date));
+        Calendar c = getCurrentCal();
         c.set(Calendar.YEAR, year);
         c.set(Calendar.MONTH, month);
         c.set(Calendar.DATE, date);
@@ -171,23 +331,13 @@ public class AddEventActivity extends Activity {
     {
         int hour = timePicker.getCurrentHour();
         int min = timePicker.getCurrentMinute();
-        timeText.setText(String.format("%02d:%02d", hour, min));
+        TextView tv = getCurrentTimeTextView();
+        tv.setText(String.format("%02d:%02d", hour, min));
+        Calendar c = getCurrentCal();
         c.set(Calendar.HOUR_OF_DAY, hour);
         c.set(Calendar.MINUTE, min);
     }
 
-    private void dateButtonOnClick()
-    {
-        datePicker.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DATE), null);
-        dateDialog.show();
-    }
-
-    private void timeButtonOnClick()
-    {
-        timePicker.setCurrentHour(c.get(Calendar.HOUR_OF_DAY));
-        timePicker.setCurrentMinute(c.get(Calendar.MINUTE));
-        timeDialog.show();
-    }
 
     private void handleMessage(Message msg){
         Bundle b = msg.getData();
@@ -210,10 +360,13 @@ public class AddEventActivity extends Activity {
         try {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
-            http.setHeader("Content-Type", "application/json");
 
-            //Event e = Api.addActivity(http, campus.getId(), user, name, content, c);
-            Event e = null;
+            Event e = Api.addActivity(http, campus.getId(), user, name, content,
+                                      Common.calToDateNum(enrollStartCal),
+                                      Common.calToDateNum(enrollEndCal),
+                                      Common.calToDateNum(startCal),
+                                      Common.calToDateNum(endCal),
+                                      maxPeople, campus.getBuildings().get(locIndex));
 
             Bundle b = new Bundle();
             b.putInt("type", ADD_EVENT_SUCCESS);
@@ -223,6 +376,7 @@ public class AddEventActivity extends Activity {
             handler.sendMessage(msg);
         }
         catch(Exception exp){
+            exp.printStackTrace();
             Bundle b = new Bundle();
             b.putInt("type", ADD_EVENT_FAIL);
             b.putSerializable("errmsg", exp.getMessage());

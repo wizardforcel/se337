@@ -26,6 +26,7 @@ import com.wizard.myapplication.entity.Comment;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.util.Api;
+import com.wizard.myapplication.util.Common;
 import com.wizard.myapplication.util.TabUtil;
 import com.wizard.myapplication.util.WizardHTTP;
 
@@ -102,13 +103,13 @@ public class EventActivity extends Activity {
         TextView maxText = (TextView) findViewById(R.id.maxText);
         maxText.setText(e.getMaxPeople() + "");
         TextView startText = (TextView) findViewById(R.id.startText);
-        startText.setText(e.getStartDate());
+        startText.setText(Common.dateFormat(e.getStartDate()));
         TextView endText = (TextView) findViewById(R.id.endText);
-        endText.setText(e.getEndDate());
+        endText.setText(Common.dateFormat(e.getEndDate()));
         TextView enrollStartText = (TextView) findViewById(R.id.enrollStartText);
-        enrollStartText.setText(e.getEnrollStartDate());
+        enrollStartText.setText(Common.dateFormat(e.getEnrollStartDate()));
         TextView enrollEndText = (TextView) findViewById(R.id.enrollEndText);
-        enrollEndText.setText(e.getEnrollEndDate());
+        enrollEndText.setText(Common.dateFormat(e.getEnrollEndDate()));
 
         TextView tv = (TextView) findViewById(R.id.titlebar_name);
         tv.setText(e.getName());
@@ -117,8 +118,6 @@ public class EventActivity extends Activity {
             @Override
             public void onClick(View v) { finish(); }
         });
-
-
 
         closeKeyboard();
 
