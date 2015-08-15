@@ -11,9 +11,81 @@ public class Event implements Serializable
     private String name;
     private byte[] avatar;
     private String content;
-    private String date;
     private int uid;
     private String un;
+    private String enrollStartDate;
+    private String enrollEndDate;
+    private String startDate;
+    private String endDate;
+    private double lat;
+    private double lng;
+    private String location;
+    private int maxPeople;
+
+    public String getEnrollStartDate() {
+        return enrollStartDate;
+    }
+
+    public void setEnrollStartDate(String enrollStartDate) {
+        this.enrollStartDate = enrollStartDate;
+    }
+
+    public String getEnrollEndDate() {
+        return enrollEndDate;
+    }
+
+    public void setEnrollEndDate(String enrollEndDate) {
+        this.enrollEndDate = enrollEndDate;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLng() {
+        return lng;
+    }
+
+    public void setLng(double lng) {
+        this.lng = lng;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public int getMaxPeople() {
+        return maxPeople;
+    }
+
+    public void setMaxPeople(int maxPeople) {
+        this.maxPeople = maxPeople;
+    }
+
 
     public byte[] getAvatar() {
         return avatar;
@@ -61,13 +133,5 @@ public class Event implements Serializable
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 }

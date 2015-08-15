@@ -367,19 +367,7 @@ public class MainActivity extends Activity {
     {
         for(int i = 0; i < events.size(); i++){
             final Event e = events.get(i);
-            LinearLayout linear
-                    = (LinearLayout) getLayoutInflater().inflate(R.layout.event_linear, null);
-            TextView unText = (TextView) linear.findViewById(R.id.unText);
-            TextView titleText = (TextView) linear.findViewById(R.id.titleText);
-            ImageView avatarImage = (ImageView) linear.findViewById(R.id.avatarImage);
-            titleText.setText(e.getName());
-            unText.setText(e.getUn());
-            avatarImage.setImageBitmap(BitmapFactory.decodeByteArray(e.getAvatar(), 0, e.getAvatar().length));
-            linear.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) { eventTextOnClick(e); }
-            });
-            eventPage.addView(linear);
+            addEventToView(e);
         }
     }
 
@@ -745,7 +733,7 @@ public class MainActivity extends Activity {
             http.setCharset("utf-8");
 
             campus = Api.getCampus(http, lastLoc.latitude, lastLoc.longitude);
-            //events = Api.getActiivity(http, campus.getId());
+            events = Api.getActiivity(http, campus.getId());
 
             Bundle b = new Bundle();
             b.putInt("type", GET_CAMPUS_SUCCESS);
@@ -1020,15 +1008,26 @@ public class MainActivity extends Activity {
         else if(requestCode == ACTIVITY_ADD_EVENT && resultCode == RESULT_OK)
         {
             final Event e = (Event) i.getSerializableExtra("event");
-            TextView tv
-                    = (TextView) getLayoutInflater().inflate(R.layout.building_linear, null);
-            tv.setText(e.getName());
-            tv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) { eventTextOnClick(e); }
-            });
-            eventPage.addView(tv);
+            events.add(e);
+            addEventToView(e);
         }
+    }
+
+    private void addEventToView(final Event e)
+    {
+        LinearLayout linear
+                = (LinearLayout) getLayoutInflater().inflate(R.layout.event_linear, null);
+        TextView unText = (TextView) linear.findViewById(R.id.unText);
+        TextView titleText = (TextView) linear.findViewById(R.id.titleText);
+        ImageView avatarImage = (ImageView) linear.findViewById(R.id.avatarImage);
+        titleText.setText(e.getName());
+        unText.setText(e.getUn());
+        avatarImage.setImageBitmap(BitmapFactory.decodeByteArray(e.getAvatar(), 0, e.getAvatar().length));
+        linear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { eventTextOnClick(e); }
+        });
+        eventPage.addView(linear);
     }
 
     /*private void setMenuStatus(boolean isLogin) {

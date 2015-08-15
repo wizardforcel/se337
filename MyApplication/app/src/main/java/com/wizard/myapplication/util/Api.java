@@ -141,12 +141,8 @@ public class Api
     public static Comment addActivityComment(WizardHTTP http, int activityId, User user, String comment)
             throws JSONException, IOException
     {
-        JSONObject postJson = new JSONObject();
-        postJson.put("activityId", activityId);
-        postJson.put("type", "activity");
-        postJson.put("content", comment);
-        postJson.put("userId", user.getId());
-        String retStr = http.httpPost("http://" + UrlConfig.HOST + "/comment/add", postJson.toString());
+        String postStr = "userId=" + user.getId() + "&activityId=" + activityId + "&content=" + comment;
+        String retStr = http.httpPost("http://" + UrlConfig.HOST + "/activity/comment/add", postStr);
         JSONObject retJson = new JSONObject(retStr);
         Comment c = new Comment();
         c.setId(retJson.getInt("id"));
@@ -291,7 +287,14 @@ public class Api
             event.setId(json.getInt("id"));
             event.setName(json.getString("name"));
             event.setContent(json.getString("description"));
-            //event.setDate(json.getString("date"));
+            event.setEnrollStartDate(json.getString("enrollStartDate"));
+            event.setStartDate(json.getString("activityStartDate"));
+            event.setEndDate(json.getString("activityEndDate"));
+            event.setMaxPeople(json.getInt("peopleLimit"));
+            event.setLat(json.getDouble("longitude"));
+            event.setLng(json.getDouble("latitude"));
+            event.setLocation(json.getString("location"));
+            event.setEnrollEndDate(json.getString("enrollEndDate"));
             int uid = json.getInt("userId");
             event.setUid(uid);
             event.setUn(Api.getUnById(http, uid));
@@ -300,36 +303,38 @@ public class Api
             event.setAvatar(imgData);
             events.add(event);
             Log.d("Event", "id: " + event.getId() + " uid: " + event.getUid() +
-                    " un: " + event.getUn() + " date: " + event.getDate());
+                    " un: " + event.getUn() + " date: " + event.getStartDate());
         }
         return events;
     }
 
-    public static Event addActivity(WizardHTTP http, int campusId, User user, String name, String content, Calendar c)
+    public static Event addActivity(WizardHTTP http, int campusId, User user, String name, String content,
+                                    String enrollStart, String enrollEnd, String start, String end,
+                                    int limit, Building loc)
             throws JSONException, IOException
     {
-        JSONObject json = new JSONObject();
-        json.put("description", content);
-        json.put("name", name);
-        json.put("userId", user.getId());
-        String date = String.format("%d%02d%02d%02d%02d00",
-                c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1,
-                c.get(Calendar.DATE), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
-        json.put("date", date);
-        json.put("universityId", campusId);
-        String postStr = json.toString();
+        String postStr = "userId=" + user.getId() + "&universityId=" + campusId + "&name=" + name +
+                         "&description=" + content + "&enrollStartDate=" + enrollStart + "&enrollEndDate=" +
+                         enrollEnd + "&activityStartDate=" + start + "&activityEndDate=" + end +
+                         "&peopleLimit=" + limit + "&location=" + loc.getName();
         String retStr = http.httpPost("http://" + UrlConfig.HOST + "/activity/add/", postStr);
         JSONObject retJson = new JSONObject(retStr);
 
         Event e = new Event();
-        e.setDate(date);
         e.setName(name);
         e.setContent(content);
-        e.setId(retJson.getInt("id"));
+        //e.setId(retJson.getInt("id"));
         e.setUid(user.getId());
         e.setUn(user.getUn());
+        e.setLocation(loc.getName());
+        e.setLat(loc.getLatitude());
+        e.setLng(loc.getLongitude());
+        e.setEnrollStartDate(enrollStart);
+        e.setEnrollEndDate(enrollEnd);
+        e.setStartDate(start);
+        e.setEndDate(end);
         Log.d("AddEvent", "id: " + e.getId() + " uid: " + e.getUid() +
-                " un: " + e.getUn() + " date: " + e.getDate());
+                " un: " + e.getUn() + " date: " + e.getStartDate());
         return e;
     }
 
@@ -366,7 +371,7 @@ public class Api
     public static List<Building> getView(WizardHTTP http, int campusId)
             throws IOException, JSONException
     {
-        String retStr = http.httpGet("http://" + UrlConfig.HOST + "/view/university/" + campusId);
+        String retStr = http.httpGet("http://" + UrlConfig.HOST + "/views/university/" + campusId);
         JSONArray retArr = new JSONArray(retStr);
         List<Building> buildings = new ArrayList<Building>();
         for(int i = 0; i < retArr.length(); i++)

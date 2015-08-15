@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,11 +29,7 @@ import com.wizard.myapplication.entity.Comment;
 import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.TabUtil;
-import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,7 +155,7 @@ public class BuildingActivity extends Activity {
         {
             case LOAD_DATA_SUCCESS:
                 for(Comment c : comments)
-                    addComment(c);
+                    addCommentToView(c);
                 byte[] img = building.getAvatar();
                 if(img != null)
                     image.setImageBitmap(BitmapFactory.decodeByteArray(img, 0, img.length));
@@ -173,7 +168,7 @@ public class BuildingActivity extends Activity {
                 break;
             case ADD_COMMENT_SUCCESS:
                 Toast.makeText(BuildingActivity.this, "评论成功！", Toast.LENGTH_SHORT).show();
-                addComment(comments.get(comments.size() - 1));
+                addCommentToView(comments.get(comments.size() - 1));
                 closeKeyboard();
                 commentInput.setText("");
                 break;
@@ -201,24 +196,22 @@ public class BuildingActivity extends Activity {
         currentVoteText.setText(currentComment.getLike() + "/" + currentComment.getDislike());
     }
 
-    private void addComment(Comment c)
+    private void addCommentToView(final Comment c)
     {
         LinearLayout linear = (LinearLayout) getLayoutInflater().inflate(R.layout.comment_linear, null);
         TextView unText = (TextView) linear.findViewById(R.id.unText);
         unText.setText(c.getUn().replace("\n", "") + ":");
         TextView coText = (TextView) linear.findViewById(R.id.contentText);
         coText.setText(c.getContent());
-        TextView voteText = (TextView) linear.findViewById(R.id.voteText);
+        final TextView voteText = (TextView) linear.findViewById(R.id.voteText);
         voteText.setText(c.getLike() + "/" + c.getDislike());
         ImageView avatarImage = (ImageView) linear.findViewById(R.id.avatarImage);
         avatarImage.setImageBitmap(BitmapFactory.decodeByteArray(c.getAvatar(), 0, c.getAvatar().length));
-        final Comment finalComment = c;
-        final TextView finalVoteText = voteText;
         voteText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                currentComment = finalComment;
-                currentVoteText = finalVoteText;
+                currentComment = c;
+                currentVoteText = voteText;
                 voteDialog.show();
             }
         });

@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,11 +27,7 @@ import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.TabUtil;
-import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +49,6 @@ public class EventActivity extends Activity {
     private LinearLayout commentPage;
     private Button addCommentButton;
     private EditText commentInput;
-    private TextView contentText;
     private TabHost tHost;
     private AlertDialog voteDialog;
     private Handler handler;
@@ -81,7 +75,6 @@ public class EventActivity extends Activity {
         commentPage = (LinearLayout) findViewById(R.id.commentPage);
         addCommentButton = (Button) findViewById(R.id.addComment);
         commentInput = (EditText) findViewById(R.id.commentInput);
-        contentText = (TextView) findViewById(R.id.contentText);
         addCommentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { addCommentButtonOnClick(); }
@@ -100,8 +93,23 @@ public class EventActivity extends Activity {
 
         TextView unText = (TextView) findViewById(R.id.unText);
         unText.setText(e.getUn());
-        TextView dateText = (TextView) findViewById(R.id.dateText);
-        dateText.setText(e.getDate());
+        TextView contentText = (TextView) findViewById(R.id.contentText);
+        contentText.setText(e.getContent());
+        TextView titleText = (TextView) findViewById(R.id.titleText);
+        titleText.setText(e.getName());
+        TextView locText = (TextView) findViewById(R.id.locText);
+        locText.setText(e.getLocation());
+        TextView maxText = (TextView) findViewById(R.id.maxText);
+        maxText.setText(e.getMaxPeople() + "");
+        TextView startText = (TextView) findViewById(R.id.startText);
+        startText.setText(e.getStartDate());
+        TextView endText = (TextView) findViewById(R.id.endText);
+        endText.setText(e.getEndDate());
+        TextView enrollStartText = (TextView) findViewById(R.id.enrollStartText);
+        enrollStartText.setText(e.getEnrollStartDate());
+        TextView enrollEndText = (TextView) findViewById(R.id.enrollEndText);
+        enrollEndText.setText(e.getEnrollEndDate());
+
         TextView tv = (TextView) findViewById(R.id.titlebar_name);
         tv.setText(e.getName());
         Button returnButton = (Button) findViewById(R.id.titlebar_return);
@@ -110,7 +118,7 @@ public class EventActivity extends Activity {
             public void onClick(View v) { finish(); }
         });
 
-        contentText.setText(e.getContent());
+
 
         closeKeyboard();
 
@@ -151,7 +159,7 @@ public class EventActivity extends Activity {
         switch(type) {
             case LOAD_DATA_SUCCESS:
                 for (Comment c : comments)
-                    addComment(c);
+                    addCommentToView(c);
                 break;
             case LOAD_DATA_FAIL:
                 Toast.makeText(EventActivity.this, "数据加载失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
@@ -161,7 +169,7 @@ public class EventActivity extends Activity {
                 break;
             case ADD_COMMENT_SUCCESS:
                 Toast.makeText(EventActivity.this, "评论成功！", Toast.LENGTH_SHORT).show();
-                addComment(comments.get(comments.size() - 1));
+                addCommentToView(comments.get(comments.size() - 1));
                 closeKeyboard();
                 commentInput.setText("");
                 break;
@@ -216,24 +224,22 @@ public class EventActivity extends Activity {
         })).start();
     }
 
-    private void addComment(Comment c)
+    private void addCommentToView(final Comment c)
     {
         LinearLayout linear = (LinearLayout) getLayoutInflater().inflate(R.layout.comment_linear, null);
         TextView unText = (TextView) linear.findViewById(R.id.unText);
         unText.setText(c.getUn().replace("\n", "") + ":");
         TextView coText = (TextView) linear.findViewById(R.id.contentText);
         coText.setText(c.getContent());
-        TextView voteText = (TextView) linear.findViewById(R.id.voteText);
+        final TextView voteText = (TextView) linear.findViewById(R.id.voteText);
         voteText.setText(c.getLike() + "/" + c.getDislike());
         ImageView avatarImage = (ImageView) linear.findViewById(R.id.avatarImage);
         avatarImage.setImageBitmap(BitmapFactory.decodeByteArray(c.getAvatar(), 0, c.getAvatar().length));
-        final Comment finalComment = c;
-        final TextView finalVoteText = voteText;
         voteText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                currentComment = finalComment;
-                currentVoteText = finalVoteText;
+                currentComment = c;
+                currentVoteText = voteText;
                 voteDialog.show();
             }
         });
@@ -262,7 +268,6 @@ public class EventActivity extends Activity {
         {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
-            http.setHeader("Content-Type", "application/json");
 
             Comment c = Api.addActivityComment(http, e.getId(), user, myComment);
             comments.add(c);
