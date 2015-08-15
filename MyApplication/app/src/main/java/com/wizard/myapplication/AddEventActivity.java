@@ -212,7 +212,8 @@ public class AddEventActivity extends Activity {
             http.setDefHeader(false);
             http.setHeader("Content-Type", "application/json");
 
-            Event e = Api.addActivity(http, campus.getId(), user, name, content, c);
+            //Event e = Api.addActivity(http, campus.getId(), user, name, content, c);
+            Event e = null;
 
             Bundle b = new Bundle();
             b.putInt("type", ADD_EVENT_SUCCESS);

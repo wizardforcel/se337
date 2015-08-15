@@ -22,6 +22,7 @@ import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.User;
+import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.TabUtil;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
@@ -174,31 +175,7 @@ public class CampusActivity extends Activity {
             http.setCharset("utf-8");
             http.setTimeout(16000);
 
-            //获取活动
-            String date = new java.text.SimpleDateFormat("yyyyMMddHHmmss")
-                    .format(Calendar.getInstance().getTime());
-            String retStr = http.httpGet(
-                    "http://" + UrlConfig.HOST + "/activity/university/" + campus.getId() + "/date/" + date);
-            JSONArray retArr = new JSONArray(retStr);
-            events.clear();
-            for(int i = 0; i < retArr.length(); i++) {
-                JSONObject json = retArr.getJSONObject(i);
-                Event event = new Event();
-                event.setId(json.getInt("id"));
-                event.setName(json.getString("name"));
-                event.setContent(json.getString("description"));
-                event.setDate(json.getString("date"));
-                int uid = json.getInt("userId");
-                event.setUid(uid);
-                String un = http.httpGet("http://" + UrlConfig.HOST + "/user/" + uid + "/userName/");
-                event.setUn(un);
-                byte[] imgData
-                        = http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + uid);
-                event.setAvatar(imgData);
-                events.add(event);
-                Log.d("Event", "id: " + event.getId() + " uid: " + event.getUid() +
-                      " un: " + event.getUn() + " date: " + event.getDate());
-            }
+            events = Api.getActiivity(http,campus.getId());
 
             Bundle b = new Bundle();
             b.putInt("type", LOAD_DATA_SUCCESS);
