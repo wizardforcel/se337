@@ -238,7 +238,7 @@ public class Api
         JSONArray retArr = new JSONArray(retStr);
         List<Building> covered = new ArrayList<Building>();
         for (int i = 0; i < retArr.length(); i++) {
-            JSONObject o = retArr.getJSONObject(i).getJSONObject("view");
+            JSONObject o = retArr.getJSONObject(i);
             if (o.getJSONObject("university").getInt("id") != campusId)
                 continue;
             Building b = new Building();
@@ -255,11 +255,14 @@ public class Api
     }
 
     public static boolean addHistory(WizardHTTP http, int uid, int viewId)
-            throws IOException
+            throws IOException, JSONException
     {
+        http.getHeaders().put("Content-Type", "application/x-www-form-urlencoded");
+        String postStr = "userId=" + uid + "&viewId=" + viewId;
         String retStr
-                = http.httpGet("http://" + UrlConfig.HOST + "/addusertoview/view/" + viewId + "/user/" + uid);
-        return !retStr.equals("");
+                = http.httpPost("http://" + UrlConfig.HOST + "/usertoview/add", postStr);
+        JSONObject json = new JSONObject(retStr);
+        return json.getInt("code") == 1;
     }
 
     public static Campus getCampus(WizardHTTP http, double lat, double lng)
@@ -304,12 +307,82 @@ public class Api
             event.setEnrollStartDate(json.getString("enrollStartDate"));
             event.setStartDate(json.getString("activityStartDate"));
             event.setEndDate(json.getString("activityEndDate"));
-            event.setMaxPeople(json.getInt("peopleLimit"));
-            //event.setLat(json.getDouble("longitude"));
-            //event.setLng(json.getDouble("latitude"));
+            try {
+                event.setMaxPeople(json.getInt("peopleLimit"));
+            } catch(Exception ex){ event.setMaxPeople(0); }
             event.setLocation(json.getString("location"));
             event.setEnrollEndDate(json.getString("enrollEndDate"));
             int uid = json.getInt("userId");
+            event.setUid(uid);
+            event.setUn(Api.getUnById(http, uid));
+            byte[] imgData
+                    = Api.getAvatarById(http, uid);
+            event.setAvatar(imgData);
+            events.add(event);
+            Log.d("Event", "id: " + event.getId() + " uid: " + event.getUid() +
+                    " un: " + event.getUn() + " date: " + event.getStartDate());
+        }
+        return events;
+    }
+
+    public static List<Event> getSentActiivity(WizardHTTP http, int campusId, int uid)
+            throws JSONException, IOException
+    {
+        String retStr = http.httpGet(
+                "http://" + UrlConfig.HOST + "/activity/sentbyuser/" + uid);
+        JSONArray retArr = new JSONArray(retStr);
+        List<Event> events = new ArrayList<Event>();
+        for(int i = 0; i < retArr.length(); i++) {
+            JSONObject json = retArr.getJSONObject(i);
+            if(json.getInt("universityId") != campusId)
+                continue;
+            Event event = new Event();
+            event.setId(json.getInt("id"));
+            event.setName(json.getString("name"));
+            event.setContent(json.getString("description"));
+            event.setEnrollStartDate(json.getString("enrollStartDate"));
+            event.setStartDate(json.getString("activityStartDate"));
+            event.setEndDate(json.getString("activityEndDate"));
+            try {
+                event.setMaxPeople(json.getInt("peopleLimit"));
+            } catch(Exception ex){ event.setMaxPeople(0); }
+            event.setLocation(json.getString("location"));
+            event.setEnrollEndDate(json.getString("enrollEndDate"));
+            event.setUid(uid);
+            event.setUn(Api.getUnById(http, uid));
+            byte[] imgData
+                    = Api.getAvatarById(http, uid);
+            event.setAvatar(imgData);
+            events.add(event);
+            Log.d("Event", "id: " + event.getId() + " uid: " + event.getUid() +
+                    " un: " + event.getUn() + " date: " + event.getStartDate());
+        }
+        return events;
+    }
+
+    public static List<Event> getJoinedActiivity(WizardHTTP http, int campusId, int uid)
+            throws JSONException, IOException
+    {
+        String retStr = http.httpGet(
+                "http://" + UrlConfig.HOST + "/activity/myparticipant/" + uid);
+        JSONArray retArr = new JSONArray(retStr);
+        List<Event> events = new ArrayList<Event>();
+        for(int i = 0; i < retArr.length(); i++) {
+            JSONObject json = retArr.getJSONObject(i);
+            if(json.getInt("universityId") != campusId)
+                continue;
+            Event event = new Event();
+            event.setId(json.getInt("id"));
+            event.setName(json.getString("name"));
+            event.setContent(json.getString("description"));
+            event.setEnrollStartDate(json.getString("enrollStartDate"));
+            event.setStartDate(json.getString("activityStartDate"));
+            event.setEndDate(json.getString("activityEndDate"));
+            try {
+                event.setMaxPeople(json.getInt("peopleLimit"));
+            } catch(Exception ex){ event.setMaxPeople(0); }
+            event.setLocation(json.getString("location"));
+            event.setEnrollEndDate(json.getString("enrollEndDate"));
             event.setUid(uid);
             event.setUn(Api.getUnById(http, uid));
             byte[] imgData

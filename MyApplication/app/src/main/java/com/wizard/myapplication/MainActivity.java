@@ -55,6 +55,7 @@ public class MainActivity extends Activity {
     private static final int ACTIVITY_PRE = 6;
     private static final int ACTIVITY_EVENT = 7;
     private static final int ACTIVITY_ADD_EVENT = 8;
+    private static final int ACTIVITY_MY_EVENT = 9;
 
     private static final int GET_CAMPUS_SUCCESS = 0;
     private static final int GET_CAMPUS_FAIL = 1;
@@ -99,6 +100,7 @@ public class MainActivity extends Activity {
     private TextView logoutText;
     private TextView regText;
     private TextView hisText;
+    private TextView myEventText;
 
 
     /*private SlideMenu slideMenu;
@@ -230,9 +232,8 @@ public class MainActivity extends Activity {
         logoutText = (TextView) findViewById(R.id.logoutText);
         regText = (TextView) findViewById(R.id.regText);
         hisText = (TextView) findViewById(R.id.hisText);
+        myEventText= (TextView) findViewById(R.id.myEventText);
 
-        /*unText.setText(user.getUn());
-        userImage.setImageBitmap(BitmapFactory.decodeByteArray(user.getAvatar(), 0, user.getAvatar().length));*/
         preText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -280,6 +281,12 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 historyMenuItemOnClick();
+            }
+        });
+        myEventText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                myEventMenuItemOnClick();
             }
         });
 
@@ -377,7 +384,7 @@ public class MainActivity extends Activity {
         intent.putExtra("event", e);
         intent.putExtra("user", user);
         intent.putExtra("campusId", campus.getId());
-        startActivityForResult(intent, 0);
+        startActivityForResult(intent, ACTIVITY_EVENT);
     }
 
     private void setBuildings(){
@@ -923,6 +930,19 @@ public class MainActivity extends Activity {
         startActivity(i);
     }
 
+    private void myEventMenuItemOnClick()
+    {
+        if(campus == null)
+        {
+            Toast.makeText(this, "获取校园信息失败！", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent i = new Intent(this, MyEventActivity.class);
+        i.putExtra("campus", campus);
+        i.putExtra("user", user);
+        startActivityForResult(i, ACTIVITY_MY_EVENT);
+    }
+
     private void historyMenuItemOnClick()
     {
         if(campus == null)
@@ -960,6 +980,7 @@ public class MainActivity extends Activity {
         hisText.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
         taskText.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
         exchangeText.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
+        myEventText.setVisibility(isLogin ? TextView.VISIBLE : TextView.GONE);
 
         //登录前
         loginText.setVisibility(!isLogin ? TextView.VISIBLE : TextView.GONE);
@@ -989,8 +1010,9 @@ public class MainActivity extends Activity {
         Log.v("Result", requestCode + " " + resultCode);
 
         if ((requestCode == ACTIVITY_REG || requestCode == ACTIVITY_LOGIN ||
-             requestCode == ACTIVITY_BUILDING || requestCode == ACTIVITY_EVENT) &&
-                resultCode == Activity.RESULT_OK) {
+             requestCode == ACTIVITY_BUILDING || requestCode == ACTIVITY_EVENT ||
+             requestCode == ACTIVITY_MY_EVENT) &&
+             resultCode == RESULT_OK) {
             user = (User) i.getSerializableExtra("user");
             setLoginStatus(true);
         }

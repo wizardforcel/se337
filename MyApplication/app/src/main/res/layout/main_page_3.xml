@@ -107,6 +107,21 @@
             android:clickable="true"
             android:drawablePadding="1.0dip"
             android:gravity="center_vertical"
+            android:paddingRight="10.0dip"
+            android:text="我的活动"
+            android:textColor="#ff959595"
+            android:textSize="16.0sp"
+            android:id="@+id/myEventText"
+            android:paddingLeft="15.0dip"
+            android:background="#fff"
+            android:layout_marginBottom="1dp" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="50.0dip"
+            android:clickable="true"
+            android:drawablePadding="1.0dip"
+            android:gravity="center_vertical"
             android:paddingLeft="15.0dip"
             android:paddingRight="10.0dip"
             android:text="任务"

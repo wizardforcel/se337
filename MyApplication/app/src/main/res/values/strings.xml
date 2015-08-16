@@ -19,5 +19,6 @@
     <string name="title_activity_search">SearchActivity</string>
     <string name="title_activity_web">WebActivity</string>
     <string name="title_activity_history">HistoryActivity</string>
+    <string name="title_activity_my_event">MyEventActivity</string>
 
 </resources>

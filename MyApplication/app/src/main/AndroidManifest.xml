@@ -93,6 +93,10 @@
             android:name=".HistoryActivity"
             android:label="@string/title_activity_history" >
         </activity>
+        <activity
+            android:name=".MyEventActivity"
+            android:label="@string/title_activity_my_event" >
+        </activity>
     </application>
 
     <!-- 这个权限用于进行网络定位 -->
