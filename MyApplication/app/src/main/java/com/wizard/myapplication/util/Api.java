@@ -216,7 +216,7 @@ public class Api
     public static byte[] getViewPic(WizardHTTP http, int viewId)
             throws JSONException, IOException
     {
-        String retStr = http.httpGet("http://" + UrlConfig.HOST + "/picture/view/" + viewId);
+        /*String retStr = http.httpGet("http://" + UrlConfig.HOST + "/picture/view/" + viewId);
         JSONArray retArr = new JSONArray(retStr);
         byte[] imgData = null;
         if(retArr.length() != 0) {
@@ -228,7 +228,8 @@ public class Api
                 imgData = http.httpGetData(imgPath);
             } catch(Exception ex) {}
         }
-        return imgData;
+        return imgData;*/
+        return new byte[0];
     }
 
     public static List<Building> getHistory(WizardHTTP http, int uid, int campusId)
@@ -474,7 +475,7 @@ public class Api
     public static byte[] getCampusPic(WizardHTTP http, int campusId)
             throws IOException, JSONException
     {
-        String retStr = http.httpGet("http://" + UrlConfig.HOST + "/picture/university/" + campusId);
+        /*String retStr = http.httpGet("http://" + UrlConfig.HOST + "/picture/university/" + campusId);
         JSONArray retArr = new JSONArray(retStr);
         byte[] imgData = null;
         if(retArr.length() != 0) {
@@ -484,7 +485,8 @@ public class Api
             imgData  = http.httpGetData(imgPath);
             Log.d("CampusImg", imgPath);
         }
-        return imgData;
+        return imgData;*/
+        return new byte[0];
     }
 
     public static List<Building> getView(WizardHTTP http, int campusId)

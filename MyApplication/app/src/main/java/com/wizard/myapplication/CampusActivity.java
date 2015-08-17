@@ -77,8 +77,8 @@ public class CampusActivity extends Activity {
 
         tHost = (TabHost) findViewById(R.id.tabHost);
         tHost.setup();
-        tHost.addTab(tHost.newTabSpec("简介").setIndicator("简介").setContent(R.id.contentPage));
-        tHost.addTab(tHost.newTabSpec("景点").setIndicator("景点").setContent(R.id.buildingsPage));
+        tHost.addTab(tHost.newTabSpec("简介").setIndicator("简介").setContent(R.id.contentPage0));
+        tHost.addTab(tHost.newTabSpec("景点").setIndicator("景点").setContent(R.id.buildingsPage0));
         tHost.addTab(tHost.newTabSpec("活动").setIndicator("活动").setContent(R.id.eventPage0));
         tHost.setCurrentTab(0);
         TabUtil.updateTab(tHost);

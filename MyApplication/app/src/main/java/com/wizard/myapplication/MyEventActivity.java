@@ -68,8 +68,8 @@ public class MyEventActivity extends Activity {
 
         tHost = (TabHost) findViewById(R.id.tabHost);
         tHost.setup();
-        tHost.addTab(tHost.newTabSpec("我发布的").setIndicator("我发布的").setContent(R.id.sentEventPage));
-        tHost.addTab(tHost.newTabSpec("我参加的").setIndicator("我参加的").setContent(R.id.joinedEventPage));
+        tHost.addTab(tHost.newTabSpec("我发布的").setIndicator("我发布的").setContent(R.id.sentEventPage0));
+        tHost.addTab(tHost.newTabSpec("我参加的").setIndicator("我参加的").setContent(R.id.joinedEventPage0));
         tHost.setCurrentTab(0);
         TabUtil.updateTab(tHost);
         tHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {

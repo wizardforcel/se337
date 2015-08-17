@@ -12,6 +12,7 @@ public class Common {
 
     public static String dateFormat(String date)
     {
+        if(date.equals("")) return "";
         long dateInt = Long.parseLong(date);
         int sec = (int) (dateInt % 100);
         dateInt /= 100;

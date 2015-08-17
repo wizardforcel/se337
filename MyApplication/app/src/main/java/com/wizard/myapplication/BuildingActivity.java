@@ -90,7 +90,7 @@ public class BuildingActivity extends Activity {
 
         tHost = (TabHost) findViewById(R.id.tabHost);
         tHost.setup();
-        tHost.addTab(tHost.newTabSpec("简介").setIndicator("简介").setContent(R.id.contentPage));
+        tHost.addTab(tHost.newTabSpec("简介").setIndicator("简介").setContent(R.id.contentPage0));
         tHost.addTab(tHost.newTabSpec("评论").setIndicator("评论").setContent(R.id.commentPage0));
         tHost.setCurrentTab(0);
         TabUtil.updateTab(tHost);

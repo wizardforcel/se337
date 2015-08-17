@@ -31,31 +31,12 @@
                 android:layout_height="0dp"
                 android:layout_weight="1">
 
-                <ScrollView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:id="@+id/scrollView2" >
 
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/joinedEventPage">
+                <include
+                    layout="@layout/my_event_sent_page" />
 
-                    </LinearLayout>
-                </ScrollView>
-
-                <ScrollView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:id="@+id/scrollView" >
-
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/sentEventPage"></LinearLayout>
-                </ScrollView>
+                <include
+                    layout="@layout/my_event_joined_page" />
 
             </FrameLayout>
         </LinearLayout>
