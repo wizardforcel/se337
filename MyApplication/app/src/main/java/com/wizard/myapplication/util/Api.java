@@ -38,7 +38,7 @@ public class Api
 {
     public static final String BOUNDARY = "wizardforcel233233";
 
-    private static byte[] AVATAR = null;
+
 
     public static DataResult<User> login(WizardHTTP http, String un, String pw)
             throws JSONException, IOException
@@ -499,18 +499,7 @@ public class Api
             throws IOException
     {
         //return http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + uid);
-        if(AVATAR == null) {
-            InputStream in = MainApplication.res.openRawResource(R.drawable.avatar);
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            byte[] buffer = new byte[4096];
-            while (true) {
-                int len = in.read(buffer);
-                if (len == -1) break;
-                os.write(buffer, 0, len);
-            }
-            AVATAR = os.toByteArray();
-        }
-        return AVATAR;
+        return TestData.AVATAR;
     }
 
     public static byte[] getCampusPic(WizardHTTP http, int campusId)
