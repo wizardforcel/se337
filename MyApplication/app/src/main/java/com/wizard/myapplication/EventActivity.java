@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.wizard.myapplication.entity.Comment;
 import com.wizard.myapplication.entity.Event;
+import com.wizard.myapplication.entity.Result;
 import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.Common;
@@ -43,6 +44,8 @@ public class EventActivity extends Activity {
     private static final int ZAN_FAIL = 5;
     private static final int CAI_SUCCESS = 6;
     private static final int CAI_FAIL = 7;
+    private static final int JOIN_EVENT_SUCC = 8;
+    private static final int JOIN_EVENT_FAIL = 9;
 
 
     private static final int ACTIVITY_LOGIN = 0;
@@ -54,6 +57,7 @@ public class EventActivity extends Activity {
     private AlertDialog voteDialog;
     private Handler handler;
     private TextView currentVoteText;
+    private Button joinButton;
 
     private User user;
     private Event e;
@@ -79,6 +83,11 @@ public class EventActivity extends Activity {
         addCommentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { addCommentButtonOnClick(); }
+        });
+        joinButton = (Button) findViewById(R.id.joinButton);
+        joinButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { joinButtonOnClick(); }
         });
 
         tHost = (TabHost) findViewById(R.id.tabHost);
@@ -159,6 +168,11 @@ public class EventActivity extends Activity {
             case LOAD_DATA_SUCCESS:
                 for (Comment c : comments)
                     addCommentToView(c);
+                if(b.getBoolean("joined"))
+                {
+                    joinButton.setEnabled(false);
+                    joinButton.setText("已报名");
+                }
                 break;
             case LOAD_DATA_FAIL:
                 Toast.makeText(EventActivity.this, "数据加载失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
@@ -188,6 +202,14 @@ public class EventActivity extends Activity {
             case CAI_FAIL:
                 Toast.makeText(EventActivity.this, "点踩失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
                 break;
+            case JOIN_EVENT_SUCC:
+                Toast.makeText(EventActivity.this, "报名成功！", Toast.LENGTH_SHORT).show();
+                joinButton.setEnabled(false);
+                joinButton.setText("已报名");
+                break;
+            case JOIN_EVENT_FAIL:
+                Toast.makeText(EventActivity.this, "报名失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
+                break;
         }
     }
 
@@ -201,6 +223,60 @@ public class EventActivity extends Activity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(commentInput.getWindowToken(), 0);
+    }
+
+    private void joinButtonOnClick()
+    {
+        if(user == null)
+        {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivityForResult(intent, ACTIVITY_LOGIN);
+            return;
+        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() { threadJoinEvent(); }
+        }).start();
+    }
+
+    private void threadJoinEvent()
+    {
+        try
+        {
+            WizardHTTP http = new WizardHTTP();
+            http.setDefHeader();
+            http.setCharset("utf-8");
+
+            Result r = Api.joinActivity(http, user.getId(), e.getId());
+
+            if(r.getErrno() == 0) {
+                Bundle b = new Bundle();
+                b.putInt("type", JOIN_EVENT_SUCC);
+                Message msg = handler.obtainMessage();
+                msg.setData(b);
+                handler.sendMessage(msg);
+            }
+            else
+            {
+                Bundle b = new Bundle();
+                b.putInt("type", JOIN_EVENT_FAIL);
+                b.putString("errmsg", r.getErrmsg());
+                Message msg = handler.obtainMessage();
+                msg.setData(b);
+                handler.sendMessage(msg);
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            Bundle b = new Bundle();
+            b.putInt("type", JOIN_EVENT_FAIL);
+            b.putString("errmsg", ex.getMessage());
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
     }
 
     private void addCommentButtonOnClick()
@@ -298,9 +374,11 @@ public class EventActivity extends Activity {
             http.setCharset("utf-8");
 
             comments = Api.getActivityComment(http, e.getId());
+            List<Integer> joiners = Api.getActicityJoiner(http, e.getId());
 
             Bundle b = new Bundle();
             b.putInt("type", LOAD_DATA_SUCCESS);
+            b.putBoolean("joined", joiners.contains(user.getId()));
             Message msg = handler.obtainMessage();
             msg.setData(b);
             handler.sendMessage(msg);

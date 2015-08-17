@@ -156,6 +156,7 @@ public class MyEventActivity extends Activity {
         {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader();
+            http.setCharset("utf-8");
 
             sentEvents = Api.getSentActiivity(http, campus.getId(), user.getId());
             joinedEvents = Api.getJoinedActiivity(http, campus.getId(), user.getId());

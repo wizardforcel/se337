@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wizard.myapplication.entity.User;
-import com.wizard.myapplication.entity.UserResult;
+import com.wizard.myapplication.entity.DataResult;
 import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
@@ -121,7 +121,7 @@ public class RegActivity extends Activity {
             http.setDefHeader(false);
             http.setCharset("utf-8");
 
-            UserResult r = Api.reg(http, un, pw);
+            DataResult<User> r = Api.reg(http, un, pw);
             if(r.getErrno() != 0)
             {
                 Bundle b = new Bundle();
@@ -133,7 +133,7 @@ public class RegActivity extends Activity {
                 return;
             }
 
-            User user = r.getUser();
+            User user = r.getData();
 
             Bundle b = new Bundle();
             b.putInt("type", REG_SUCCESS);

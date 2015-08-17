@@ -4,20 +4,24 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import com.wizard.myapplication.MainApplication;
 import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.BuildingType;
 import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Comment;
+import com.wizard.myapplication.entity.DataResult;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.Result;
 import com.wizard.myapplication.entity.User;
-import com.wizard.myapplication.entity.UserResult;
+import com.wizard.myapplication.entity.DataResult;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -34,7 +38,9 @@ public class Api
 {
     public static final String BOUNDARY = "wizardforcel233233";
 
-    public static UserResult login(WizardHTTP http, String un, String pw)
+    private static byte[] AVATAR = null;
+
+    public static DataResult<User> login(WizardHTTP http, String un, String pw)
             throws JSONException, IOException
     {
         http.getHeaders().put("Content-Type", "application/x-www-form-urlencoded");
@@ -43,14 +49,14 @@ public class Api
         JSONObject retJson = new JSONObject(retStr);
         int succ = retJson.getInt("code");
         if(succ != 1)
-            return new UserResult(1, retJson.getString("detail"), null);
+            return new DataResult<User>(1, retJson.getString("detail"), null);
         User user = new User();
         user.setId(Integer.parseInt(retJson.getString("detail")));
         user.setUn(un);
         user.setPw(pw);
         Log.d("UserLogin", "id: " + user.getId() + " un: " + user.getUn() + " pw: " + user.getPw());
         user.setAvatar(getAvatarById(http, user.getId()));
-        return new UserResult(0, "", user);
+        return new DataResult<User>(0, "", user);
     }
 
     public static List<String> getPres(WizardHTTP http, int uid)
@@ -68,7 +74,7 @@ public class Api
         return pres;
     }
 
-    public static UserResult reg(WizardHTTP http, String un, String pw)
+    public static DataResult<User> reg(WizardHTTP http, String un, String pw)
             throws JSONException, IOException
     {
         http.getHeaders().put("Content-Type", "application/application/x-www-form-urlencoded");
@@ -77,14 +83,14 @@ public class Api
         JSONObject retJson = new JSONObject(retStr);
         int succ = retJson.getInt("code");
         if(succ != 1)
-            return new UserResult(1, retJson.getString("detail"), null);
+            return new DataResult<User>(1, retJson.getString("detail"), null);
         User user = new User();
         user.setId(Integer.parseInt(retJson.getString("detail")));
         user.setUn(un);
         user.setPw(pw);
         Log.d("UserReg", "id: " + user.getId() + " un: " + user.getUn() + " pw: " + user.getPw());
         user.setAvatar(getAvatarById(http, user.getId()));
-        return new UserResult(0, "", user);
+        return new DataResult<User>(0, "", user);
     }
 
     public static Result addPres(WizardHTTP http, int uid, String toAdd)
@@ -113,6 +119,19 @@ public class Api
             return new Result(0, "");
         else
             return new Result(1, json.getString("detail"));
+    }
+
+    public static Result joinActivity(WizardHTTP http, int uid, int activitiId)
+            throws IOException, JSONException {
+        http.getHeaders().put("Content-Type", "application/x-www-form-urlencoded");
+        String postStr = "userId=" + uid + "&activityId=" + activitiId;
+        String retStr = http.httpPost("http://" + UrlConfig.HOST + "/activity/participant ", postStr);
+        JSONObject json = new JSONObject(retStr);
+        int succ = json.getInt("code");
+        if(succ == 1)
+            return new Result(0, "");
+        else
+            return new Result(1,json.getString("detail"));
     }
 
     public static boolean commentLike(WizardHTTP http, int commentId)
@@ -159,7 +178,7 @@ public class Api
         String retStr = http.httpPost("http://" + UrlConfig.HOST + "/activity/comment/add", postStr);
         JSONObject retJson = new JSONObject(retStr);
         Comment c = new Comment();
-        c.setId(retJson.getInt("id"));
+        c.setId(Integer.parseInt(retJson.getString("detail")));
         c.setUid(user.getId());
         c.setUn(user.getUn());
         c.setContent(comment);
@@ -191,6 +210,17 @@ public class Api
         return comments;
     }
 
+
+    public static List<Integer> getActicityJoiner(WizardHTTP http, int eid)
+            throws IOException, JSONException {
+        String retStr = http.httpGet("http://" + UrlConfig.HOST + "/activity/detail/" + eid);
+        JSONObject json = new JSONObject(retStr);
+        JSONArray arr  = json.getJSONArray("participants");
+        List<Integer> joiners = new ArrayList<Integer>();
+        for(int i = 0; i < arr.length(); i++)
+            joiners.add(arr.getInt(i));
+        return joiners;
+    }
 
     public static List<Comment> getActivityComment(WizardHTTP http, int activityId)
             throws JSONException, IOException {
@@ -469,7 +499,18 @@ public class Api
             throws IOException
     {
         //return http.httpGetData("http://" + UrlConfig.HOST + "/avatar/user/" + uid);
-        return new byte[0];
+        if(AVATAR == null) {
+            InputStream in = MainApplication.res.openRawResource(R.drawable.avatar);
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            byte[] buffer = new byte[4096];
+            while (true) {
+                int len = in.read(buffer);
+                if (len == -1) break;
+                os.write(buffer, 0, len);
+            }
+            AVATAR = os.toByteArray();
+        }
+        return AVATAR;
     }
 
     public static byte[] getCampusPic(WizardHTTP http, int campusId)

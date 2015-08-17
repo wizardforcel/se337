@@ -298,7 +298,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="报名"
-            android:id="@+id/button"
+            android:id="@+id/joinButton"
             android:background="#ff9966"
             android:textColor="#fff"
             android:layout_marginBottom="10dp"

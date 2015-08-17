@@ -2,6 +2,7 @@ package com.wizard.myapplication;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -79,6 +80,7 @@ public class MainActivity extends Activity {
     private TextView naviText;
     private TextView searchText;
     private TextView buildingText;
+    private TextView scanText;
 
     //Page 2
     private ImageView collegeImage;
@@ -535,6 +537,7 @@ public class MainActivity extends Activity {
         routeText = (TextView) findViewById(R.id.routeText);
         mapTypeText = (TextView) findViewById(R.id.mapTypeText);
         searchText = (TextView) findViewById(R.id.searchText);
+        scanText = (TextView) findViewById(R.id.scanText);
 
         busText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -570,6 +573,12 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 searchMenuItemOnClick();
+            }
+        });
+        scanText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                scanMenuItemOnClick();
             }
         });
 
@@ -877,6 +886,23 @@ public class MainActivity extends Activity {
         myLoc.setLng(lastLoc.longitude);
         i.putExtra("myLoc", myLoc);
         startActivity(i);
+    }
+
+    private void scanMenuItemOnClick()
+    {
+        // 这些代码是启动另外的一个应用程序的主Activity
+        ComponentName componetName = new ComponentName(
+                // 这个是另外一个应用程序的包名 ,androidmanifest.xml中的package值！！！
+                "com.hy.ProductName",
+                // 这个参数是要启动的Activity （主activity）
+                "com.unity3d.player.UnityPlayerNativeActivity");
+        try {
+            Intent intent = new Intent();
+            intent.setComponent(componetName);
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(),"没有找到应用程序", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void presMenuItemOnClick()

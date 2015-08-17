@@ -21,7 +21,7 @@ import org.json.JSONObject;
 import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.BuildingType;
 import com.wizard.myapplication.entity.User;
-import com.wizard.myapplication.entity.UserResult;
+import com.wizard.myapplication.entity.DataResult;
 import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
@@ -146,7 +146,7 @@ public class LoginActivity extends Activity {
             http.setDefHeader(false);
             http.setCharset("utf-8");
 
-            UserResult r = Api.login(http, un, pw);
+            DataResult<User> r = Api.login(http, un, pw);
             if(r.getErrno() != 0)
             {
                 Bundle b = new Bundle();
@@ -158,7 +158,7 @@ public class LoginActivity extends Activity {
                 return;
             }
 
-            User user = r.getUser();
+            User user = r.getData();
             List<String> pres = Api.getPres(http, user.getId());
             user.setPres(pres);
 
