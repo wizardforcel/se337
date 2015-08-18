@@ -1,5 +1,8 @@
 package com.wizard.myapplication.entity;
 
+import android.graphics.Bitmap;
+
+import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,4 +58,5 @@ public class User implements Serializable
     public void setPres(List<String> pres) {
         this.pres = pres;
     }
+
 }

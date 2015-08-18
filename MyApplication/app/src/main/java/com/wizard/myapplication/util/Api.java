@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -30,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.wizard.myapplication.R;
+
+import junit.framework.Test;
 
 /**
  * Created by asus on 2015/8/14.
@@ -259,7 +262,7 @@ public class Api
             } catch(Exception ex) {}
         }
         return imgData;*/
-        return new byte[0];
+        return TestData.CAMPUS_PIC;
     }
 
     public static List<Building> getHistory(WizardHTTP http, int uid, int campusId)
@@ -516,7 +519,7 @@ public class Api
             Log.d("CampusImg", imgPath);
         }
         return imgData;*/
-        return new byte[0];
+        return TestData.CAMPUS_PIC;
     }
 
     public static List<Building> getView(WizardHTTP http, int campusId)
@@ -541,4 +544,32 @@ public class Api
         return buildings;
     }
 
+    public static Result uploadAvatar(WizardHTTP http, int uid, byte[] avatar)
+            throws IOException {
+        http.getHeaders().put("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        StreamWriter sw = new StreamWriter(os, "utf-8");
+        sw.write("--" + BOUNDARY + "\r\n");
+        sw.write("Content-Disposition: form-data; name=\"file\"; filename=\"avatar.png\"\r\n");
+        sw.write("Content-Type: image/png\r\n\r\n");
+        sw.flush();
+        os.write(avatar);
+        sw.write("\r\n");
+        sw.write("--" + BOUNDARY + "\r\n");
+        sw.write("Content-Disposition: form-data; name=\"userid\"\r\n\r\n");
+        sw.write(uid + "\r\n");
+        sw.write("--"+ BOUNDARY + "--");
+        sw.flush();
+        byte[] postData = os.toByteArray();
+        sw.close();
+
+        String retStr = http.httpPost("http://" + UrlConfig.HOST + "/avatar/upload", postData);
+        Log.d("AvatarUpload", retStr);
+
+        if(retStr.contains("success"))
+            return new Result(0, "");
+        else
+            return new Result(1, retStr);
+    }
 }

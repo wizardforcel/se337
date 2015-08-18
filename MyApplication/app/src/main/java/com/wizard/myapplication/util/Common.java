@@ -1,8 +1,10 @@
 package com.wizard.myapplication.util;
 
+import android.graphics.Bitmap;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 
 /**
@@ -52,6 +54,13 @@ public class Common {
     {
         tp.setCurrentHour(c.get(Calendar.HOUR_OF_DAY));
         tp.setCurrentMinute(c.get(Calendar.MINUTE));
+    }
+
+    public static byte[] bmpToByteArr(Bitmap bmp)
+    {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, os);
+        return os.toByteArray();
     }
 
 }

@@ -13,6 +13,7 @@ import java.util.List;
 public class TestData {
 
     public static byte[] AVATAR = null;
+    public static byte[] CAMPUS_PIC = null;
 
     public static Campus getCampus()
     {

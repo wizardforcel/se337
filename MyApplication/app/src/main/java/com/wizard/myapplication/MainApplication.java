@@ -28,7 +28,8 @@ public class MainApplication extends Application
         SDKInitializer.initialize(getApplicationContext());
 
         try {
-            loadAvatar();
+            TestData.AVATAR = loadRsrcDataById(R.drawable.avatar);
+            TestData.CAMPUS_PIC = loadRsrcDataById(R.drawable.sjtu);
         } catch (IOException e)
         {   e.printStackTrace(); }
 
@@ -43,9 +44,9 @@ public class MainApplication extends Application
         return null;
     }
 
-    private void loadAvatar()
+    private byte[] loadRsrcDataById(int id)
             throws IOException {
-        InputStream in = getResources().openRawResource(R.drawable.avatar);
+        InputStream in = getResources().openRawResource(id);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         byte[] buffer = new byte[4096];
         while (true) {
@@ -53,6 +54,8 @@ public class MainApplication extends Application
             if (len == -1) break;
             os.write(buffer, 0, len);
         }
-        TestData.AVATAR = os.toByteArray();
+        return os.toByteArray();
     }
+
+
 }

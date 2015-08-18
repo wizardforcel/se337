@@ -5,10 +5,13 @@ import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,8 +36,10 @@ import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.NaviNode;
+import com.wizard.myapplication.entity.Result;
 import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.util.Api;
+import com.wizard.myapplication.util.Common;
 import com.wizard.myapplication.util.DistanceUtil;
 import com.wizard.myapplication.util.TabUtil;
 import com.wizard.myapplication.util.WizardHTTP;
@@ -47,6 +52,7 @@ import java.util.List;
 
 public class MainActivity extends Activity {
 
+    // activity request code table
     private static final int ACTIVITY_REG = 0;
     private static final int ACTIVITY_LOGIN = 1;
     private static final int ACTIVITY_BUILDING = 2;
@@ -57,9 +63,14 @@ public class MainActivity extends Activity {
     private static final int ACTIVITY_EVENT = 7;
     private static final int ACTIVITY_ADD_EVENT = 8;
     private static final int ACTIVITY_MY_EVENT = 9;
+    private static final int ACTIVITY_CAMERA = 10;
+    private static final int ACTIVITY_ALBUM = 11;
 
+    // handler message table
     private static final int GET_CAMPUS_SUCCESS = 0;
     private static final int GET_CAMPUS_FAIL = 1;
+    private static final int UPLOAD_AVATAR_SUCC = 2;
+    private static final int UPLOAD_AVATAR_FAIL = 3;
 
     //tab
     private TabHost mainTab;
@@ -119,12 +130,18 @@ public class MainActivity extends Activity {
     private TextView presMenuItem;
     private TextView mapTypeMenuItem;*/
 
+    // map options dialog
     private AlertDialog presDialog;
-    private AlertDialog mapTypeDialog;
+    private AlertDialog mapOptionsDialog;
     private Button _2DButton;
     private Button _3DButton;
     private Button normalButton;
     private Button satiButton;
+
+    // avatar upload dialog
+    private AlertDialog avatarUploadDialog;
+    private Button albumButton;
+    private Button cameraButton;
 
     private Campus campus;
     private List<Event> events
@@ -135,6 +152,7 @@ public class MainActivity extends Activity {
     private boolean presShown = false;
     private LatLng lastLoc;
     private Building currentBuilding;
+    private byte[] avatarToUpload;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,12 +161,12 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         //init map dialog
-        LinearLayout mapTypeLinear
+        LinearLayout mapOptionsLinear
                 = (LinearLayout) getLayoutInflater().inflate(R.layout.map_options_linear, null);
-        normalButton = (Button) mapTypeLinear.findViewById(R.id.normalButton);
-        satiButton = (Button) mapTypeLinear.findViewById(R.id.satiButton);
-        _2DButton = (Button) mapTypeLinear.findViewById(R.id._2DButton);
-        _3DButton = (Button) mapTypeLinear.findViewById(R.id._3DButton);
+        normalButton = (Button) mapOptionsLinear.findViewById(R.id.normalButton);
+        satiButton = (Button) mapOptionsLinear.findViewById(R.id.satiButton);
+        _2DButton = (Button) mapOptionsLinear.findViewById(R.id._2DButton);
+        _3DButton = (Button) mapOptionsLinear.findViewById(R.id._3DButton);
         normalButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { normalButtonOnClick(); }
@@ -166,10 +184,29 @@ public class MainActivity extends Activity {
             public void onClick(View view) { _3DButtonOnClick(); }
         });
 
-        mapTypeDialog = new AlertDialog.Builder(this)
-                            .setView(mapTypeLinear)
+        mapOptionsDialog = new AlertDialog.Builder(this)
+                            .setView(mapOptionsLinear)
                             .setNegativeButton("取消", null)
                             .create();
+
+        //init avatar dialog
+        LinearLayout avatarUploadLinear
+                = (LinearLayout) getLayoutInflater().inflate(R.layout.avatar_upload_linear, null);
+        cameraButton = (Button) avatarUploadLinear.findViewById(R.id.cameraButton);
+        albumButton = (Button) avatarUploadLinear.findViewById(R.id.albumButton);
+        cameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { cameraButtonOnClick(); }
+        });
+        albumButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { albumButtonOnClick(); }
+        });
+        avatarUploadDialog = new AlertDialog.Builder(this)
+                .setView(avatarUploadLinear)
+                .setNegativeButton("取消", null)
+                .create();
+
 
         //initSideBar();
         initTab();
@@ -201,6 +238,13 @@ public class MainActivity extends Activity {
                 break;
             case GET_CAMPUS_FAIL:
                 Toast.makeText(this, "获取校园信息失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
+                break;
+            case UPLOAD_AVATAR_FAIL:
+                Toast.makeText(this, "头像上传失败！" + b.getString("errmsg"), Toast.LENGTH_SHORT).show();
+                break;
+            case UPLOAD_AVATAR_SUCC:
+                Toast.makeText(this, "头像上传成功！", Toast.LENGTH_SHORT).show();
+                userImage.setImageBitmap(BitmapFactory.decodeByteArray(user.getAvatar(), 0, user.getAvatar().length));
                 break;
         }
     }
@@ -236,6 +280,10 @@ public class MainActivity extends Activity {
         hisText = (TextView) findViewById(R.id.hisText);
         myEventText= (TextView) findViewById(R.id.myEventText);
 
+        userImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { avatarImageOnClick(); }
+        });
         preText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -865,6 +913,11 @@ public class MainActivity extends Activity {
     }*/
 
     private void naviMenuItemOnClick() {
+        if(campus == null)
+        {
+            Toast.makeText(this, "获取校园信息失败", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (campus.getBuildings().size() == 0) {
             Toast.makeText(this, "无任何景点", Toast.LENGTH_SHORT).show();
             return;
@@ -1019,7 +1072,7 @@ public class MainActivity extends Activity {
         }
         else {
             unText.setText("请登录");
-            userImage.setBackgroundResource(0);
+            userImage.setImageBitmap(BitmapFactory.decodeByteArray(new byte[0], 0, 0));
         }
     }
 
@@ -1058,6 +1111,39 @@ public class MainActivity extends Activity {
             final Event e = (Event) i.getSerializableExtra("event");
             events.add(e);
             addEventToView(e);
+        }
+        else if((requestCode == ACTIVITY_ALBUM || requestCode == ACTIVITY_CAMERA) &&
+                 resultCode == RESULT_OK)
+        {
+            if (i == null) return;
+            //取得返回的Uri,基本上选择照片的时候返回的是以Uri形式，但是在拍照中有得机子呢Uri是空的，所以要特别注意
+            Uri mImageCaptureUri = i.getData();
+            //返回的Uri不为空时，那么图片信息数据都会在Uri中获得。如果为空，那么我们就进行下面的方式获取
+            if (mImageCaptureUri != null) {
+                try {
+                    //这个方法是根据Uri获取Bitmap图片的静态方法
+                    Bitmap image = MediaStore.Images.Media.getBitmap(this.getContentResolver(), mImageCaptureUri);
+                    if (image == null) return;
+                    avatarToUpload = Common.bmpToByteArr(image);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() { threadUploadAvatar(); }
+                    }).start();
+                } catch (Exception e)
+                { e.printStackTrace(); }
+
+            } else {
+                Bundle extras = i.getExtras();
+                if (extras == null) return;
+                //这里是有些拍照后的图片是直接存放到Bundle中的所以我们可以从这里面获取Bitmap图片
+                Bitmap image = extras.getParcelable("data");
+                if (image == null) return;
+                avatarToUpload = Common.bmpToByteArr(image);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() { threadUploadAvatar(); }
+                }).start();
+            }
         }
     }
 
@@ -1203,32 +1289,108 @@ public class MainActivity extends Activity {
 
     private void mapTypeMenuItemOnClick()
     {
-        mapTypeDialog.show();
+        mapOptionsDialog.show();
     }
 
     private void _2DButtonOnClick()
     {
         baiduMap.setMapStatus(
                 MapStatusUpdateFactory.newMapStatus(new MapStatus.Builder().overlook(0).build()));
-        mapTypeDialog.hide();
+        mapOptionsDialog.hide();
     }
 
     private void _3DButtonOnClick()
     {
         baiduMap.setMapStatus(
                 MapStatusUpdateFactory.newMapStatus(new MapStatus.Builder().overlook(-45).build()));
-        mapTypeDialog.hide();
+        mapOptionsDialog.hide();
     }
     private void normalButtonOnClick()
     {
         baiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
-        mapTypeDialog.hide();
+        mapOptionsDialog.hide();
     }
 
     private void satiButtonOnClick()
     {
         baiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);
-        mapTypeDialog.hide();
+        mapOptionsDialog.hide();
     }
 
+    private void avatarImageOnClick()
+    {
+        if(user == null) return;
+        avatarUploadDialog.show();
+    }
+
+
+    private void cameraButtonOnClick()
+    {
+        try {
+            //拍照我们用Action为MediaStore.ACTION_IMAGE_CAPTURE，
+            //有些人使用其他的Action但我发现在有些机子中会出问题，所以优先选择这个
+            //Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+            startActivityForResult(intent, ACTIVITY_CAMERA);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        avatarUploadDialog.hide();
+    }
+
+    private void albumButtonOnClick()
+    {
+        try {
+            //选择照片的时候也一样，我们用Action为Intent.ACTION_GET_CONTENT，
+            //有些人使用其他的Action但我发现在有些机子中会出问题，所以优先选择这个
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, ACTIVITY_ALBUM);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        avatarUploadDialog.hide();
+    }
+
+    private void threadUploadAvatar()
+    {
+
+        try
+        {
+            WizardHTTP http = new WizardHTTP();
+            http.setDefHeader();
+            http.setCharset("utf-8");
+
+            Result r = Api.uploadAvatar(http, user.getId(), avatarToUpload);
+
+            if(r.getErrno() == 0)
+            {
+                user.setAvatar(avatarToUpload);
+                Bundle b = new Bundle();
+                b.putInt("type", UPLOAD_AVATAR_SUCC);
+                Message msg = handler.obtainMessage();
+                msg.setData(b);
+                handler.sendMessage(msg);
+            }
+            else
+            {
+                Bundle b = new Bundle();
+                b.putInt("type", UPLOAD_AVATAR_FAIL);
+                b.putSerializable("errmsg", r.getErrmsg());
+                Message msg = handler.obtainMessage();
+                msg.setData(b);
+                handler.sendMessage(msg);
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            Bundle b = new Bundle();
+            b.putInt("type", UPLOAD_AVATAR_FAIL);
+            b.putSerializable("errmsg", ex.getMessage());
+            Message msg = handler.obtainMessage();
+            msg.setData(b);
+            handler.sendMessage(msg);
+        }
+    }
 }
