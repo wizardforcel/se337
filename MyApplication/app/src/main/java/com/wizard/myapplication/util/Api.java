@@ -538,6 +538,11 @@ public class Api
             b.setLatitude(buildingJson.getDouble("latitude"));
             b.setLongitude(buildingJson.getDouble("longitude"));
             b.setRadius(buildingJson.getDouble("radius"));
+            JSONArray typeJson = buildingJson.getJSONArray("prefrences");
+            if(typeJson.length() == 0)
+                b.setType("UNKNOWN");
+            else
+                b.setType(typeJson.getString(0));
             buildings.add(b);
             Log.d("Building", "id: " + b.getId() + " name: " + b.getName());
         }

@@ -36,8 +36,6 @@ public class Building implements Serializable
 
     public void setId(int id) {
         this.id = id;
-        this.type = Building.typeMap.get(id);
-        if(this.type == null) this.type = "";
     }
 
     public double getRadius() {
@@ -101,24 +99,24 @@ public class Building implements Serializable
     private String type;
     private byte[] avatar;
 
-    private static Map<Integer, String> typeMap
+    /*private static Map<Integer, String> typeMap
             = new HashMap<Integer, String>();
 
     static {
-        typeMap.put(1, BuildingType.ACADAMIC);
+        typeMap.put(1, BuildingType.ACADEMIC);
         typeMap.put(2, BuildingType.SPORT);
         typeMap.put(3, BuildingType.SCENE);
         typeMap.put(4, BuildingType.SCENE);
         typeMap.put(5, BuildingType.SPORT);
-        typeMap.put(6, BuildingType.ACADAMIC);
-        typeMap.put(7, BuildingType.ACADAMIC);
+        typeMap.put(6, BuildingType.ACADEMIC);
+        typeMap.put(7, BuildingType.ACADEMIC);
         typeMap.put(8, BuildingType.SPORT);
-        typeMap.put(9, BuildingType.ACADAMIC);
+        typeMap.put(9, BuildingType.ACADEMIC);
         typeMap.put(11, BuildingType.SCENE);
         typeMap.put(12, BuildingType.SPORT);
         typeMap.put(13, BuildingType.FOOD);
-        typeMap.put(14, BuildingType.ACADAMIC);
+        typeMap.put(14, BuildingType.ACADEMIC);
         typeMap.put(15, BuildingType.HISTORY);
         typeMap.put(16, BuildingType.HISTORY);
-    }
+    }*/
 }

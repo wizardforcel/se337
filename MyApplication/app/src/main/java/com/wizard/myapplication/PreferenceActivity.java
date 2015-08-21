@@ -180,9 +180,9 @@ public class PreferenceActivity extends Activity {
 
     private void toAddSpinnerOnItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3)
     {
-        Toast.makeText(this, arg2 + "", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, arg2 + "", Toast.LENGTH_SHORT).show();
         toAdd = toAdds.get(arg2);
-        arg0.setVisibility(View.VISIBLE);
+        //arg0.setVisibility(View.VISIBLE);
     }
 
     private void handleMessage(Message msg){

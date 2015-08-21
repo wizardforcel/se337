@@ -33,6 +33,7 @@ import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.navisdk.BNaviEngineManager;
 import com.baidu.navisdk.BaiduNaviManager;
 import com.wizard.myapplication.entity.Building;
+import com.wizard.myapplication.entity.BuildingType;
 import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.NaviNode;
@@ -982,15 +983,9 @@ public class MainActivity extends Activity {
         }
 
         if(presShown)
-        {
             hidePres();
-            routeText.setText("推荐路线");
-            presShown = !presShown;
-        }
         else
-        {
             showPres();
-        }
     }
 
 
@@ -1222,7 +1217,7 @@ public class MainActivity extends Activity {
             buildingIndexMap.put(b.getId(), b);
         Map<String, Integer> typeToIconMap = new HashMap<String, Integer>();
         typeToIconMap.put(BuildingType.HISTORY, R.drawable.icon_mark_history);
-        typeToIconMap.put(BuildingType.ACADAMIC, R.drawable.icon_mark_academic);
+        typeToIconMap.put(BuildingType.ACADEMIC, R.drawable.icon_mark_academic);
         typeToIconMap.put(BuildingType.FOOD, R.drawable.icon_mark_food);
         typeToIconMap.put(BuildingType.SCENE, R.drawable.icon_mark_scene);
         typeToIconMap.put(BuildingType.SPORT, R.drawable.icon_mark_sports);
@@ -1241,8 +1236,12 @@ public class MainActivity extends Activity {
             m.setIcon(bitmap);
         }*/
 
+        List<String> presZh = new ArrayList<String>();
+        for(String pre : user.getPres())
+            presZh.add(BuildingType.enToZhMap.get(pre));
+
         presDialog = new AlertDialog.Builder(this)
-                .setSingleChoiceItems(user.getPres().toArray(new String[0]), -1, new DialogInterface.OnClickListener() {
+                .setSingleChoiceItems(presZh.toArray(new String[0]), -1, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 presAlertDialogOnItemClick(dialogInterface, i);
@@ -1285,6 +1284,8 @@ public class MainActivity extends Activity {
 
         path.remove();
         path = null;
+        routeText.setText("推荐路线");
+        presShown = !presShown;
     }
 
     private void mapTypeMenuItemOnClick()
