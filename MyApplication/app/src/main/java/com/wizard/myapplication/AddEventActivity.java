@@ -2,19 +2,17 @@ package com.wizard.myapplication;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Spinner;
@@ -22,17 +20,17 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.wizard.myapplication.entity.Building;
 import com.wizard.myapplication.entity.Campus;
 import com.wizard.myapplication.entity.Event;
 import com.wizard.myapplication.entity.User;
 import com.wizard.myapplication.util.Api;
 import com.wizard.myapplication.util.Common;
-import com.wizard.myapplication.util.UrlConfig;
 import com.wizard.myapplication.util.WizardHTTP;
 
-import org.json.JSONObject;
-
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class AddEventActivity extends Activity {
 
@@ -146,6 +144,21 @@ public class AddEventActivity extends Activity {
         endDateText.setText(Common.calToDateStr(startCal));
         endTimeText.setText(Common.calToTimeStr(startCal));
 
+        locSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                locSpinneronItemSelected(adapterView, view, i, l);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) { }
+        });
+
+        List<String> buildingsStr = new ArrayList<String>();
+        for(Building b : campus.getBuildings())
+            buildingsStr.add(b.getName());
+        locSpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, buildingsStr));
+
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { addButtonOnClick(); }
@@ -191,6 +204,11 @@ public class AddEventActivity extends Activity {
                 AddEventActivity.this.handleMessage(msg);
             }
         };
+    }
+
+    private void locSpinneronItemSelected(AdapterView<?> adapterView, View view, int i, long l)
+    {
+        locIndex = i;
     }
 
     private void addButtonOnClick()
@@ -360,6 +378,7 @@ public class AddEventActivity extends Activity {
         try {
             WizardHTTP http = new WizardHTTP();
             http.setDefHeader(false);
+            http.setCharset("utf-8");
 
             Event e = Api.addActivity(http, campus.getId(), user, name, content,
                                       Common.calToDateNum(enrollStartCal),
