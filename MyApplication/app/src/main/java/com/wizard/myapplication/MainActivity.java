@@ -947,9 +947,9 @@ public class MainActivity extends Activity {
         // 这些代码是启动另外的一个应用程序的主Activity
         ComponentName componetName = new ComponentName(
                 // 这个是另外一个应用程序的包名 ,androidmanifest.xml中的package值！！！
-                "com.hy.ProductName",
+                Common.SCANNER_PACKAGE,
                 // 这个参数是要启动的Activity （主activity）
-                "com.unity3d.player.UnityPlayerNativeActivity");
+                Common.SCANNER_MAIN);
         try {
             Intent intent = new Intent();
             intent.setComponent(componetName);

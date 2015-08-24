@@ -12,6 +12,9 @@ import java.util.Calendar;
  */
 public class Common {
 
+    public static final String SCANNER_PACKAGE = "com.Companytemp.ProductName";
+    public static final String SCANNER_MAIN = "com.unity3d.player.UnityPlayerNativeActivity";
+
     public static String dateFormat(String date)
     {
         if(date.equals("")) return "";
