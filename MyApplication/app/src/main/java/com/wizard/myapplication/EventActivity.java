@@ -378,7 +378,7 @@ public class EventActivity extends Activity {
 
             Bundle b = new Bundle();
             b.putInt("type", LOAD_DATA_SUCCESS);
-            b.putBoolean("joined", joiners.contains(user.getId()));
+            b.putBoolean("joined", (user == null)? false: joiners.contains(user.getId()));
             Message msg = handler.obtainMessage();
             msg.setData(b);
             handler.sendMessage(msg);
